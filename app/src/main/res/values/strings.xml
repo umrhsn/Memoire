@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Mémoire</string>
+    <!--  board size full text for radio buttons  -->
+    <string name="super_duper_easy_fullText">Super Duper Easy (3 × 2)</string>
+    <string name="super_easy_fullText">Super Easy (4 × 2)</string>
+    <string name="easy_fullText">Easy (4 × 3)</string>
+    <string name="medium_fullText">Medium (6 × 3)</string>
+    <string name="hard_fullText">Hard (6 × 4)</string>
+    <string name="super_hard_fullText">Super Hard (9 × 4)</string>
+    <string name="super_duper_hard_fullText">Super Duper Hard (8 × 5)</string>
+
+    <!--  board size text only for text views -->
+    <string name="super_duper_easy_text">Super Duper Easy</string>
+    <string name="super_easy_text">Super Easy</string>
+    <string name="easy_text">Easy</string>
+    <string name="medium_text">Medium</string>
+    <string name="hard_text">Hard</string>
+    <string name="super_hard_text">Super Hard</string>
+    <string name="super_duper_hard_text">Super Duper Hard</string>
+
+    <!--  board size size only for text views -->
+    <string name="super_duper_easy_size">(3 × 2)</string>
+    <string name="super_easy_size">(4 × 2)</string>
+    <string name="easy_size">(4 × 3)</string>
+    <string name="medium_size">(6 × 3)</string>
+    <string name="hard_size">(6 × 4)</string>
+    <string name="super_hard_size">(9 × 4)</string>
+    <string name="super_duper_hard_size">(8 × 5)</string>
+
+    <!--  CreateActivity  -->
+    <string name="btn_save">Save</string>
+</resources>

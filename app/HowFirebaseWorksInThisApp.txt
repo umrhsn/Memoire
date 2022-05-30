@@ -1,0 +1,32 @@
+1- User wanting to create a custom memory game will pick various images from their phone.
+2- Each of these images will be stored inside the [Cloud Storage for Firebase]
+3- When we successfully upload an image into the [Cloud Storage], we will get back a url, which defines how we can retrieve that image later on.
+4- Now we have a list of imageUrls for each photo that user wants to attach to the memory game.
+5- We take that list of imageUrls and push it to the [Cloud Firestore] along with the associated key.
+FOR EXAMPLE:
+- user's game named "Corgi"     - has 4 unique images.      - that will live in the [Cloud Firestore].
+- another user wants to play that game, we can call the [Cloud Firestore] to pull down all the images associated with "Corgi" game (which will be a list of 4 different image urls).
+
+================================================================
+    About uploading the images..
+
+    Uploading the images is an Asynchronous operation.
+
+    There are 2 kinds of programming: Synchronous (sync) VS Asynchronous (async)
+    --> Most operations we are familiar with are 'sync' like adding 1 + 2 or combining Strings in Kotlin, and when you execute that you expect the result immediately.
+    --> However, what we are dealing with here is 'async', when we execute the operation we will not find out immediately whether it succeeded or failed, because it might take a longer amount of time.
+
+    Image uploads are a good example of 'async' operations because they inherently quite data-rich, there will be a lot of data and all that data will be uploaded over the internet, anything dealing with internet requires more time.
+
+    - app starts uploading the 4 images of "Corgi" game into the [Cloud Storage].
+    - the tricky thing is that the rate at which image is uploaded is not in our control.
+    - the question now is how will we know when all the images have successfully been uploaded so we can record the image url corresponding to each image we've uploaded?
+    --> we can do this by getting notified when each image has successfully been uploaded.
+    --> As soon as each image gets uploaded to [Cloud Storage] we will get a corresponding download url for that image, and we will track how many download urls have we received, and the size of that list of download imageUrls is equal to the number of images that we're uploading, then we know we're finished.
+    - now the images have been uploaded and we have a list of imageUrls =
+    { storage.com/corgi1,
+    storage.com/corgi2,
+    storage.com/corgi3,
+    storage.com/corgi4
+    }
+    and we will combine that to the custom game name, and this is what we will upload to the [Firebase Firestore].
