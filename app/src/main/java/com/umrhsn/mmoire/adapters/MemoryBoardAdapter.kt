@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
@@ -19,7 +20,7 @@ class MemoryBoardAdapter(
     private val context: Context,
     private val boardSize: BoardSize,
     private val cards: List<MemoryCard>,
-    private val cardClickListener: CardClickListener
+    private val cardClickListener: CardClickListener,
 ) :
     RecyclerView.Adapter<MemoryBoardAdapter.ViewHolder>() {
 
@@ -67,8 +68,16 @@ class MemoryBoardAdapter(
             val memoryCard = cards[position]
 
             // what image to show if card is face-up or face-down
-            if (memoryCard.isFaceUp) ibMemoryCard.setImageResource(memoryCard.identifier)
-            else ibMemoryCard.setImageResource(R.drawable.memory_card_facedown)
+            if (memoryCard.isFaceUp) {
+                if (memoryCard.imageUrl != null) {
+                    Picasso.get().load(memoryCard.imageUrl).placeholder(R.drawable.image_loading)
+                        .into(ibMemoryCard)
+                } else {
+                    ibMemoryCard.setImageResource(memoryCard.identifier)
+                }
+            } else {
+                ibMemoryCard.setImageResource(R.drawable.memory_card_facedown)
+            }
 
             // change the opacity of the image buttons of 2 matched cards
             ibMemoryCard.alpha = if (memoryCard.isMatched) 0.4f else 1.0f

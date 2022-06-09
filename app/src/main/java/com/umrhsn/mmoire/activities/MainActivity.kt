@@ -36,12 +36,17 @@ class MainActivity : AppCompatActivity() {
 
     /** declaring [MainActivity] views */
     private lateinit var clRoot: ConstraintLayout
+
     private lateinit var llGameInfo: LinearLayout
+
     private lateinit var cvNumMoves: CardView
     private lateinit var cvNumPairs: CardView
+
     private lateinit var tvNumMoves: TextView
     private lateinit var tvNumPairs: TextView
+
     private lateinit var rvBoard: RecyclerView
+    private lateinit var adapter: MemoryBoardAdapter
 
     /** [boardSize] */
     private var boardSize: BoardSize = SUPER_DUPER_EASY
@@ -64,11 +69,15 @@ class MainActivity : AppCompatActivity() {
 
         // init MainActivity views
         clRoot = findViewById(R.id.clRoot)
+
         llGameInfo = findViewById(R.id.llGameInfo)
+
         cvNumMoves = findViewById(R.id.cvNumMoves)
         cvNumPairs = findViewById(R.id.cvNumPairs)
+
         tvNumMoves = findViewById(R.id.tvNumMoves)
         tvNumPairs = findViewById(R.id.tvNumPairs)
+
         rvBoard = findViewById(R.id.rvBoard)
 
         // setting the memory board size and adapter
@@ -103,6 +112,9 @@ class MainActivity : AppCompatActivity() {
 
     /** update ui info according to [boardSize] */
     private fun setupBoard() {
+        // depending on the board size we set the values of the text fields at the bottom
+        supportActionBar?.title = gameName ?: getString(R.string.app_name)
+
         when (boardSize) {
             SUPER_DUPER_EASY -> {
                 tvNumMoves.text =
@@ -141,17 +153,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
         tvNumPairs.setTextColor(ContextCompat.getColor(this, R.color.color_progress_none))
+
         // setting the memoryGame params
         memoryGame = MemoryGame(boardSize, customGameImages)
+
         // update recyclerView and setOnClickListener
-        rvBoard.adapter = MemoryBoardAdapter(
+        adapter = MemoryBoardAdapter(
             this,
             boardSize,
             memoryGame.cards,
             object : MemoryBoardAdapter.CardClickListener {
-                override fun onCardClicked(position: Int) = updateGameWithFlip(position)
+                override fun onCardClicked(position: Int) {
+                    updateGameWithFlip(position)
+                    Log.i(TAG, "Clicked on $position")
+                }
             }
         )
+        rvBoard.adapter = adapter
         rvBoard.setHasFixedSize(true)
         rvBoard.layoutManager = GridLayoutManager(this, boardSize.getWidth())
     }
@@ -191,8 +209,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         tvNumMoves.text = "Moves: ${memoryGame.getNumMoves()}"
-        rvBoard.post { run { rvBoard.adapter?.notifyDataSetChanged() } }
+        rvBoard.post { run { adapter.notifyDataSetChanged() } }
     }
+
     /** configure menu item [R.id.miRefresh] */
     private fun configureMIRefreshMenuItem() {
         if (!memoryGame.haveWonGame()) {
@@ -280,7 +299,6 @@ class MainActivity : AppCompatActivity() {
             .collection("games")
             .document(customGameName)
             .get()
-
             .addOnSuccessListener { document ->
                 val userImageList = document.toObject(UserImageList::class.java)
                 if (userImageList?.images == null) {
@@ -303,7 +321,6 @@ class MainActivity : AppCompatActivity() {
                 gameName = customGameName
                 setupBoard()
             }
-
             .addOnFailureListener { exception ->
                 Log.e(
                     TAG,

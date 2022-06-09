@@ -1,6 +1,7 @@
 package com.umrhsn.mmoire.activities
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -51,6 +52,7 @@ class CreateActivity : AppCompatActivity() {
 
     /** declaring [CreateActivity] views */
     private lateinit var rvImagePicker: RecyclerView
+    private lateinit var adapter: ImagePickerAdapter
     private lateinit var etGameName: EditText
     private lateinit var btnSave: Button
     private lateinit var pbUploading: ProgressBar
@@ -113,7 +115,8 @@ class CreateActivity : AppCompatActivity() {
         })
 
         // setup the image picking recycler view
-        rvImagePicker.adapter = ImagePickerAdapter(this,
+        adapter = ImagePickerAdapter(
+            this,
             chosenImageUris,
             boardSize,
             object : ImagePickerAdapter.ImageClickListener {
@@ -131,6 +134,7 @@ class CreateActivity : AppCompatActivity() {
                     }
                 }
             })
+        rvImagePicker.adapter = adapter
         rvImagePicker.setHasFixedSize(true)
         rvImagePicker.layoutManager = GridLayoutManager(this, boardSize.getWidth())
     }
@@ -173,12 +177,16 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private var resultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+        { result ->
+
             val data = result.data
+
             if (result.resultCode != Activity.RESULT_OK || data == null) {
                 Log.w(TAG, "No data from launched activity, user likely cancelled the flow")
                 return@registerForActivityResult
             }
+
             /** if we reached this far in the function we know that we have valid data.
              *
              * there are 2 attributes worth concern when user picks photos:
@@ -204,7 +212,6 @@ class CreateActivity : AppCompatActivity() {
                                 "Sorry, one or multiple images you're trying to add already exist",
                                 Toast.LENGTH_LONG).show()
                         }
-                        // DONE (1) add functionality to prevent user from choosing duplicate images.
                     }
                 }
             } else if (selectedUri != null) {
@@ -219,7 +226,7 @@ class CreateActivity : AppCompatActivity() {
                 Log.i(TAG, "called from Uri, selectedUri = $selectedUri")
             }
 
-            rvImagePicker.post { kotlin.run { rvImagePicker.adapter?.notifyDataSetChanged() } }
+            rvImagePicker.post { kotlin.run { adapter.notifyDataSetChanged() } }
 
             // update text in ActionBar to detected number of selected images
             supportActionBar?.title = "Choose pics (${chosenImageUris.size} / $numImagesRequired)"
@@ -257,14 +264,14 @@ class CreateActivity : AppCompatActivity() {
         var didEncounterError = false
         val uploadedImageUrls = mutableListOf<String>()
         chosenImageUris.withIndex().forEach { (index, photoUri) ->
-            /** the [imageByteArray] is what we will actually upload to the Firebase and [getImageByteArray] method will handle all the logic of quality downgrading */
+            /** the [imageByteArray] is what we will actually upload to the Firebase
+             * and [getImageByteArray] method will handle all the logic of quality downgrading */
             val imageByteArray = getImageByteArray(photoUri)
 
             /** [filePath] defines where the images should live in the [FirebaseStorage] */
             val filePath = "images/$gameName/${System.currentTimeMillis()}-${index}.jpg"
 
             /** [photoReference] is the location where the photo will be saved int [StorageReference]
-             *
              * it takes [filePath] as a parameter */
             val photoReference = storage.reference.child(filePath)
             photoReference
@@ -273,12 +280,12 @@ class CreateActivity : AppCompatActivity() {
                         photoUploadTask ->
                     // progress status (conclude how many bytes were uploaded)
                     Log.i(TAG, "Uploaded bytes: ${photoUploadTask.result?.bytesTransferred}")
-                    // once a photo has been uploaded we want to get the corresponding download url
+                    // we have to end this block with another task, once a photo has been uploaded we want to get the corresponding download url
                     photoReference.downloadUrl
                 } // the operation before is async and we want to get notified when it's completed
                 .addOnCompleteListener { // handles the notification we need for this
                         downloadUrlTask ->
-                    /** first thing to check: did this operation succeed or not?*/
+                    // 1- first thing to check: did this operation succeed or not?
                     if (!downloadUrlTask.isSuccessful) { // check for particular image
                         Log.e(TAG, "Exception with Firebase storage", downloadUrlTask.exception)
                         Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT)
@@ -344,32 +351,29 @@ class CreateActivity : AppCompatActivity() {
      * --> also less size means faster download */
     private fun saveDataToFirebase() {
         Log.i(TAG, "saveDataToFirebase")
-
         btnSave.isEnabled = false
-
         val customGameName = etGameName.text.toString()
-
         // check that we are not overwriting someone else's data
-        db
-            .collection("games")
-            .document(customGameName)
-            .get()
+        db.collection("games")
+            .document(customGameName).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.data != null) {
-                    showAlertDialog(this,
-                        "Name taken",
-                        "A game already exists with the name '$customGameName'.\nPlease choose another name.",
-                        null) {}
+                    AlertDialog.Builder(this)
+                        .setTitle("Name taken")
+                        .setMessage("A game already exists with the name '$customGameName'. Please choose another.")
+                        .setPositiveButton("OK", null)
+                        .show()
                     btnSave.isEnabled = true
                 } else {
                     handleImageUploading(customGameName)
                 }
-            }
-            .addOnFailureListener { exception ->
+            }.addOnFailureListener { exception ->
                 Log.e(TAG, "Encountered an error while saving memory game", exception)
-                Toast.makeText(this,
+                Toast.makeText(
+                    this,
                     "Encountered an error while saving memory game",
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
                 btnSave.isEnabled = false
             }
     }

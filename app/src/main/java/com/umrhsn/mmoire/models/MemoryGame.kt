@@ -1,16 +1,6 @@
 package com.umrhsn.mmoire.models
 
-import android.animation.ArgbEvaluator
-import android.annotation.SuppressLint
-import android.content.Context
-import android.util.Log
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
-import com.umrhsn.mmoire.R
-import com.umrhsn.mmoire.activities.MainActivity
-import com.umrhsn.mmoire.utils.*
+import com.umrhsn.mmoire.utils.DEFAULT_CARDS
 
 class MemoryGame(private val boardSize: BoardSize, customImages: List<String>?) {
 
@@ -25,25 +15,19 @@ class MemoryGame(private val boardSize: BoardSize, customImages: List<String>?) 
 
     /** if there are NO [customImages] chosen by user, we set the image List to be [DEFAULT_CARDS] */
     init {
-        when (customImages) {
-            null -> {
-                val chosenImages = DEFAULT_CARDS.shuffled().take(boardSize.getNumPairs())
-                val randomizedImages = (chosenImages + chosenImages).shuffled()
-                cards = randomizedImages.map { card -> MemoryCard(card, null) }
-                cards.forEach { card -> Log.i(TAG, "card is ${card.identifier}") }
-            }
-            else -> {
-                val randomizedImages = (customImages + customImages).shuffled()
-                cards = randomizedImages.map { card -> MemoryCard(card.hashCode(), card) }
-                cards.forEach { card -> Log.i(TAG, "card is ${card.identifier}") }
-            }
+        cards = if (customImages == null) {
+            val chosenImages = DEFAULT_CARDS.shuffled().take(boardSize.getNumPairs())
+            val randomizedImages = (chosenImages + chosenImages).shuffled()
+            randomizedImages.map { card -> MemoryCard(card, null) }
+        } else {
+            val randomizedImages = (customImages + customImages).shuffled()
+            randomizedImages.map { card -> MemoryCard(card.hashCode(), card) }
         }
     }
 
     // this function describes what happens when user flips a card
     fun flipCard(position: Int): Boolean {
         numCardFlips++
-        Log.i(TAG, "numCardFlips = $numCardFlips")
 
         val card = cards[position]
         /*
@@ -65,10 +49,9 @@ class MemoryGame(private val boardSize: BoardSize, customImages: List<String>?) 
             indexOfSingleSelectedCard = null
         }
         card.isFaceUp = !card.isFaceUp // the actual flip effect
-        Log.i(TAG, "card[$position].isFaceUp = ${card.isFaceUp}")
         return foundMatch
     }
-    
+
     /** if 2 face-up cards are not matched they should return to face-down */
     private fun restoreCards() =
         cards.forEach { card -> if (!card.isMatched) card.isFaceUp = false }
@@ -80,7 +63,6 @@ class MemoryGame(private val boardSize: BoardSize, customImages: List<String>?) 
         cards[position1].isMatched = true
         cards[position2].isMatched = true
         numPairsFound++
-        Log.i(TAG, "numPairsFound = $numPairsFound")
         return true
     }
 
