@@ -1,7 +1,12 @@
 package com.umrhsn.mmoire
 
-// TODO:
+// DONE:
 //  1- add different board sizes.
+
+// FIXME:
+//
+
+// TODO:
 //  2- see all my custom boards after user authentication.
 //  3- discovery of other people's boards.
 //  4- explore Google Analytics
