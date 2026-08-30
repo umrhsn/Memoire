@@ -19,7 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,12 +57,12 @@ fun CreateScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header (Shared)
                 AppHeader(
-                    title = "New Board",
+                    title = stringResource(R.string.new_board),
                     navigationIcon = {
                         IconButton(onClick = onBackClicked) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
                     }
@@ -70,13 +71,13 @@ fun CreateScreen(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
                 ) {
                     // Step 1: Info with Icon
                     SectionHeader(
                         icon = Icons.Default.Collections,
-                        title = "Step 1: Choose Photos",
-                        subtitle = "Select $numImagesRequired pairs for your board."
+                        title = stringResource(R.string.step_1_title),
+                        subtitle = stringResource(R.string.step_1_subtitle, numImagesRequired)
                     )
 
                     // Selection Progress Bar
@@ -85,8 +86,8 @@ fun CreateScreen(
                         progress = { selectionProgress },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp)
-                            .height(8.dp),
+                            .padding(bottom = dimensionResource(R.dimen.spacing_small))
+                            .height(dimensionResource(R.dimen.spacing_small)),
                         strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
                         color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
@@ -110,23 +111,26 @@ fun CreateScreen(
                     // Step 2: Naming
                     SectionHeader(
                         icon = Icons.Default.DriveFileRenameOutline,
-                        title = "Step 2: Name Your Game",
-                        subtitle = "Give it a unique ID to find it later."
+                        title = stringResource(R.string.step_2_title),
+                        subtitle = stringResource(R.string.step_2_subtitle)
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 }
                 
                 // Bottom Control Section
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    shadowElevation = 24.dp
+                    shape = RoundedCornerShape(
+                        topStart = dimensionResource(R.dimen.spacing_extra_large),
+                        topEnd = dimensionResource(R.dimen.spacing_extra_large)
+                    ),
+                    shadowElevation = dimensionResource(R.dimen.spacing_large)
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(24.dp)
+                            .padding(dimensionResource(R.dimen.spacing_large))
                             .navigationBarsPadding()
                     ) {
                         OutlinedTextField(
@@ -136,12 +140,12 @@ fun CreateScreen(
                                     gameName = input
                                 }
                             },
-                            label = { Text("Board Identity") },
-                            placeholder = { Text("e.g., family_vacation") },
+                            label = { Text(stringResource(R.string.board_identity_label)) },
+                            placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             enabled = !uiState.isUploading,
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
                                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -153,37 +157,41 @@ fun CreateScreen(
                             leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null) }
                         )
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                         Button(
                             onClick = { onSaveClicked(gameName) },
                             modifier = Modifier
-                                .height(64.dp)
+                                .height(dimensionResource(R.dimen.button_height_large))
                                 .fillMaxWidth(),
                             enabled = chosenImageUris.size == numImagesRequired && 
                                       gameName.isNotBlank() && 
                                       gameName.length >= 3 && 
                                       !uiState.isUploading,
-                            shape = RoundedCornerShape(16.dp),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = dimensionResource(R.dimen.spacing_small))
                         ) {
                             if (uiState.isUploading) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
+                                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
                                     color = MaterialTheme.colorScheme.onPrimary,
                                     strokeWidth = 3.dp
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text("SAVING BOARD...", fontWeight = FontWeight.Black)
+                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                Text(stringResource(R.string.saving_board), fontWeight = FontWeight.Black)
                             } else {
                                 Icon(Icons.Default.CloudUpload, contentDescription = null)
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text("CREATE & PLAY", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
+                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                Text(
+                                    text = stringResource(R.string.create_and_play),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
                             }
                         }
 
                         if (uiState.isUploading) {
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                             LinearProgressIndicator(
                                 progress = { uiState.uploadProgress / 100f },
                                 modifier = Modifier.fillMaxWidth(),
@@ -200,16 +208,16 @@ fun CreateScreen(
             if (uiState.isSuccess) {
                 AppDialog(
                     onDismissRequest = {}, 
-                    title = "Board Ready! 🎉",
+                    title = stringResource(R.string.board_ready_title),
                     icon = Icons.Default.CheckCircle
                 ) {
                     Text(
-                        text = "Your custom board '${uiState.gameName}' is ready to play. It has been saved to your local storage.",
+                        text = stringResource(R.string.board_ready_message, uiState.gameName ?: ""),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                     Button(
                         onClick = {
                             val activity = context as? Activity
@@ -219,9 +227,9 @@ fun CreateScreen(
                             activity?.finish()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
                     ) {
-                        Text("START GAME", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.start_game), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -230,22 +238,22 @@ fun CreateScreen(
             if (uiState.nameTaken) {
                 AppDialog(
                     onDismissRequest = { viewModel.resetState() },
-                    title = "Name Exists 😕",
+                    title = stringResource(R.string.name_exists_title),
                     icon = Icons.Default.Warning
                 ) {
                     Text(
-                        text = "A board with the ID '${uiState.gameName}' is already saved. Try using a date or a unique suffix.",
+                        text = stringResource(R.string.name_exists_message, uiState.gameName ?: ""),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                     Button(
                         onClick = { viewModel.resetState() },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
                     ) {
-                        Text("OK, CHANGE NAME")
+                        Text(stringResource(R.string.change_name_action))
                     }
                 }
             }
@@ -260,19 +268,27 @@ private fun SectionHeader(
     subtitle: String
 ) {
     Row(
-        modifier = Modifier.padding(top = 24.dp, bottom = 12.dp),
+        modifier = Modifier.padding(
+            top = dimensionResource(R.dimen.spacing_large),
+            bottom = dimensionResource(R.dimen.radius_medium)
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            modifier = Modifier.size(40.dp),
+            modifier = Modifier.size(dimensionResource(R.dimen.spacing_huge).value.dp),
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp))
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large).value.dp)
+                )
             }
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         Column {
             Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
             Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -285,54 +301,57 @@ private fun EmptySelectionState(onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(dimensionResource(R.dimen.spacing_medium)),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
             border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.spacing_extra_large)),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.PhotoLibrary,
                     contentDescription = null,
-                    modifier = Modifier.size(64.dp),
+                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_huge)),
                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 
                 Text(
-                    text = "No Photos Yet",
+                    text = stringResource(R.string.no_photos_yet),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Text(
-                    text = "Select images from your gallery to build your board.",
+                    text = stringResource(R.string.no_photos_yet_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small))
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
                 
                 Button(
                     onClick = onClick,
-                    shape = RoundedCornerShape(16.dp),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                    contentPadding = PaddingValues(
+                        horizontal = dimensionResource(R.dimen.spacing_large),
+                        vertical = dimensionResource(R.dimen.spacing_medium)
+                    )
                 ) {
                     Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("OPEN GALLERY", fontWeight = FontWeight.ExtraBold)
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                    Text(stringResource(R.string.open_gallery), fontWeight = FontWeight.ExtraBold)
                 }
             }
         }
@@ -352,7 +371,7 @@ private fun DynamicImageGrid(
         contentAlignment = Alignment.Center
     ) {
         val totalSlots = chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
-        val spacing = 8.dp
+        val spacing = dimensionResource(R.dimen.spacing_small)
         
         var bestCols = 1
         var bestCardSizeValue = 0f
@@ -365,7 +384,6 @@ private fun DynamicImageGrid(
             
             val cw = availableWidth.value / cols
             val ch = availableHeight.value / rows
-            
             val s = if (cw < ch) cw else ch
             
             if (s > bestCardSizeValue) {
@@ -423,8 +441,8 @@ private fun ImageItem(
             .fillMaxSize()
             .aspectRatio(1f)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.spacing_tiny))
     ) {
         Box {
             AsyncImage(
@@ -438,19 +456,19 @@ private fun ImageItem(
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(4.dp)
-                    .size(24.dp)
+                    .padding(dimensionResource(R.dimen.spacing_tiny))
+                    .size(dimensionResource(R.dimen.badge_size))
                     .clickable { onRemove() },
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
                 contentColor = Color.White,
-                shadowElevation = 4.dp
+                shadowElevation = dimensionResource(R.dimen.spacing_tiny)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Remove",
-                        modifier = Modifier.size(16.dp)
+                        contentDescription = stringResource(R.string.remove_desc),
+                        modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium))
                     )
                 }
             }
@@ -465,7 +483,7 @@ private fun PlaceholderItem(onClick: () -> Unit) {
             .fillMaxSize()
             .aspectRatio(1f)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
     ) {
@@ -475,8 +493,8 @@ private fun PlaceholderItem(onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.AddPhotoAlternate,
-                contentDescription = "Add image",
-                modifier = Modifier.size(32.dp),
+                contentDescription = stringResource(R.string.add_image_desc),
+                modifier = Modifier.size(dimensionResource(R.dimen.spacing_extra_large)),
                 tint = MaterialTheme.colorScheme.primary
             )
         }

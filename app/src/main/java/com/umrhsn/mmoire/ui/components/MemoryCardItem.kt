@@ -17,7 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.umrhsn.mmoire.R
@@ -32,20 +34,20 @@ fun MemoryCardItem(
     val rotation by animateFloatAsState(
         targetValue = if (memoryCard.isFaceUp) 180f else 0f,
         animationSpec = tween(durationMillis = 400),
-        label = "cardFlip"
+        label = stringResource(R.string.cardFlip_label)
     )
 
     Card(
         modifier = modifier
-            .padding(4.dp)
+            .padding(dimensionResource(R.dimen.spacing_tiny))
             .aspectRatio(1f)
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = 12f * density
             }
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.spacing_tiny)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -58,7 +60,11 @@ fun MemoryCardItem(
                     if (rotation > 90f) rotationY = 180f
                 }
         ) {
-            val contentDescription = if (memoryCard.isFaceUp) "Face up" else "Face down"
+            val contentDescription = if (memoryCard.isFaceUp) {
+                stringResource(R.string.face_up)
+            } else {
+                stringResource(R.string.face_down)
+            }
             val alpha = if (memoryCard.isMatched) 0.4f else 1.0f
 
             // Show content only when appropriate in the rotation

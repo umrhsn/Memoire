@@ -15,6 +15,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.content.IntentCompat
+import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.networking.BitmapScaler
 import com.umrhsn.mmoire.ui.screens.CreateScreen
@@ -42,11 +43,7 @@ class CreateActivity : AppCompatActivity() {
 
             if (replaceIndex != -1) {
                 // Replacing a specific image
-                val newUri = if (clipData != null && clipData.itemCount > 0) {
-                    clipData.getItemAt(0).uri
-                } else {
-                    selectedUri
-                }
+                val newUri = clipData?.let { if (it.itemCount > 0) it.getItemAt(0).uri else null } ?: selectedUri
                 
                 if (newUri != null && replaceIndex < chosenImageUris.size) {
                     chosenImageUris[replaceIndex] = newUri
@@ -73,7 +70,7 @@ class CreateActivity : AppCompatActivity() {
         if (permissions.all { it.value }) {
             launchPhotoPicker(replaceIndex)
         } else {
-            Toast.makeText(this, "Permission denied. Access to photos is required.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -124,7 +121,7 @@ class CreateActivity : AppCompatActivity() {
         val pickerLimit = if (index != -1) 1 else (numImagesRequired - chosenImageUris.size)
         
         if (pickerLimit <= 0 && index == -1) {
-            Toast.makeText(this, "Board is already full", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.board_full), Toast.LENGTH_SHORT).show()
             return
         }
 

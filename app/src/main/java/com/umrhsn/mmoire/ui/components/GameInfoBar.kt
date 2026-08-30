@@ -15,9 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.umrhsn.mmoire.R
 
 @Composable
 fun GameInfoBar(
@@ -30,8 +33,8 @@ fun GameInfoBar(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(dimensionResource(R.dimen.spacing_small)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
     ) {
         InfoCard(
             text = infoLabel,
@@ -39,7 +42,7 @@ fun GameInfoBar(
         )
         
         InfoCard(
-            text = "Pairs: $numPairs / $totalPairs",
+            text = stringResource(R.string.pairs_progress, numPairs, totalPairs),
             modifier = Modifier.weight(1.5f)
         )
     }
@@ -53,13 +56,13 @@ private fun InfoCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_small)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(dimensionResource(R.dimen.spacing_small)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -67,7 +70,7 @@ private fun InfoCard(
                 text = text,
                 color = textColor,
                 fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
+                fontSize = dimensionResource(R.dimen.text_small).value.sp
             )
         }
     }

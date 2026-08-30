@@ -2,6 +2,7 @@ package com.umrhsn.mmoire.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.repository.GameRepository
@@ -19,7 +20,8 @@ data class MainUiState(
     val memoryGame: MemoryGame? = null,
     val gameName: String? = null,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    val errorMessage: Int? = null, // Store string resource ID
+    val errorArg: String? = null,
     val customImages: List<String>? = null,
     val gameSessionId: Long = 0L
 )
@@ -46,6 +48,7 @@ class MainViewModel @Inject constructor(
                 customImages = customImages,
                 gameName = gameName,
                 errorMessage = null,
+                errorArg = null,
                 isLoading = false,
                 gameSessionId = System.currentTimeMillis()
             )
@@ -78,7 +81,7 @@ class MainViewModel @Inject constructor(
     fun downloadGame(name: String) {
         if (name.isBlank()) return
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, errorArg = null) }
             val userImageList = repository.getGame(name)
             if (userImageList?.images != null) {
                 val numCards = userImageList.images.size * 2
@@ -88,7 +91,8 @@ class MainViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Sorry we couldn't find such game, '$name'"
+                        errorMessage = R.string.game_not_found,
+                        errorArg = name
                     )
                 }
             }

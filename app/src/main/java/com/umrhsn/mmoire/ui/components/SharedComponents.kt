@@ -10,12 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.umrhsn.mmoire.R
 
 @Composable
 fun AppHeader(
@@ -29,16 +32,24 @@ fun AppHeader(
         // Pitch black header in dark mode for immersive feel
         color = if (isDark) Color.Black else MaterialTheme.colorScheme.primary,
         contentColor = Color.White,
-        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-        shadowElevation = 8.dp
+        shape = RoundedCornerShape(
+            bottomStart = dimensionResource(R.dimen.radius_extra_large),
+            bottomEnd = dimensionResource(R.dimen.radius_extra_large)
+        ),
+        shadowElevation = dimensionResource(R.dimen.spacing_small)
     ) {
         Row(
-            modifier = Modifier.padding(start = 16.dp, top = 48.dp, end = 24.dp, bottom = 24.dp),
+            modifier = Modifier.padding(
+                start = dimensionResource(R.dimen.spacing_medium),
+                top = dimensionResource(R.dimen.spacing_huge),
+                end = dimensionResource(R.dimen.spacing_large),
+                bottom = dimensionResource(R.dimen.spacing_large)
+            ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (navigationIcon != null) {
                 navigationIcon()
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
             }
             Text(
                 text = title,
@@ -56,27 +67,31 @@ fun StatBadge(
     value: String,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
     // Improved contrast using primary container colors
     Surface(
         color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(
+                horizontal = dimensionResource(R.dimen.spacing_medium),
+                vertical = dimensionResource(R.dimen.spacing_small)
+            ),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.stat_icon_size))
             )
             Text(
                 text = value,
                 fontWeight = FontWeight.Black,
-                fontSize = 14.sp
+                fontSize = with(density) { dimensionResource(R.dimen.text_small).toSp() }
             )
         }
     }
@@ -87,17 +102,18 @@ fun NumericBadge(
     number: Int,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
     Surface(
-        modifier = modifier.size(24.dp),
+        modifier = modifier.size(dimensionResource(R.dimen.badge_size)),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
-        shadowElevation = 4.dp
+        shadowElevation = dimensionResource(R.dimen.spacing_tiny)
     ) {
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = number.toString(),
-                fontSize = 12.sp,
+                fontSize = with(density) { dimensionResource(R.dimen.text_tiny).toSp() },
                 fontWeight = FontWeight.ExtraBold
             )
         }
@@ -121,18 +137,18 @@ fun AppDialog(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            shape = RoundedCornerShape(32.dp),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_huge)),
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 8.dp,
-            shadowElevation = 24.dp
+            tonalElevation = dimensionResource(R.dimen.spacing_small),
+            shadowElevation = dimensionResource(R.dimen.spacing_large)
         ) {
             Column(
-                modifier = Modifier.padding(28.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.spacing_extra_large)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (icon != null) {
                     Surface(
-                        modifier = Modifier.size(72.dp),
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_giant)),
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -141,11 +157,11 @@ fun AppDialog(
                             Icon(
                                 imageVector = icon,
                                 contentDescription = null,
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_large))
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                 }
                 
                 Text(
@@ -154,7 +170,7 @@ fun AppDialog(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Black,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_medium))
                 )
                 
                 content()

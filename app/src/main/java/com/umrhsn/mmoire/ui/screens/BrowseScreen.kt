@@ -22,11 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.repository.UserImageListWithId
 import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
@@ -47,12 +51,12 @@ fun BrowseScreen(
         Scaffold(
             topBar = {
                 AppHeader(
-                    title = "Saved Boards",
+                    title = stringResource(R.string.saved_boards),
                     navigationIcon = {
                         IconButton(onClick = onBackClicked) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.back),
                                 tint = Color.White
                             )
                         }
@@ -69,8 +73,8 @@ fun BrowseScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_medium)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
                     ) {
                         items(uiState.games) { game ->
                             GameItem(
@@ -104,16 +108,17 @@ private fun GameItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val density = LocalDensity.current
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 2.dp,
-        shadowElevation = 4.dp
+        tonalElevation = dimensionResource(R.dimen.spacing_tiny),
+        shadowElevation = dimensionResource(R.dimen.spacing_tiny)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(dimensionResource(R.dimen.spacing_medium))) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -127,7 +132,7 @@ private fun GameItem(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "${game.images.size} Pairs",
+                        text = stringResource(R.string.pairs_label, game.images.size),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -135,20 +140,24 @@ private fun GameItem(
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onDelete) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colorScheme.error
+                        )
                     }
                     IconButton(onClick = onClick) {
                         Surface(
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_large))
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    Icons.Default.Visibility, 
-                                    contentDescription = "Preview", 
+                                    imageVector = Icons.Default.Visibility, 
+                                    contentDescription = stringResource(R.string.preview_desc), 
                                     tint = Color.White,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(with(density) { dimensionResource(R.dimen.text_large).toSp() }.value.dp)
                                 )
                             }
                         }
@@ -156,11 +165,11 @@ private fun GameItem(
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             // Image Preview Row (Sticker-style)
             Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 game.images.take(4).forEach { imageUrl ->
@@ -168,8 +177,8 @@ private fun GameItem(
                         model = imageUrl,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .size(dimensionResource(R.dimen.card_size_preview))
+                            .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentScale = ContentScale.Crop
                     )
@@ -178,13 +187,13 @@ private fun GameItem(
                 if (game.images.size > 4) {
                     Box(
                         modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .size(dimensionResource(R.dimen.card_size_preview))
+                            .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
                             .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "+${game.images.size - 4}",
+                            text = stringResource(R.string.more_images_count, game.images.size - 4),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -204,7 +213,7 @@ private fun BoardPreviewDialog(
 ) {
     AppDialog(
         onDismissRequest = onDismiss,
-        title = "Board Gallery",
+        title = stringResource(R.string.board_gallery),
         icon = Icons.Default.Visibility
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -216,19 +225,19 @@ private fun BoardPreviewDialog(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Contains ${game.images.size} unique pairs",
+                text = stringResource(R.string.contains_pairs, game.images.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large))
             )
 
             // Grid showing ALL images in the board
-            Box(modifier = Modifier.heightIn(max = 400.dp)) {
+            Box(modifier = Modifier.heightIn(max = dimensionResource(R.dimen.dialog_max_height))) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(80.dp),
-                    contentPadding = PaddingValues(4.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_tiny)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     items(game.images) { imageUrl ->
@@ -237,7 +246,7 @@ private fun BoardPreviewDialog(
                             contentDescription = null,
                             modifier = Modifier
                                 .aspectRatio(1f)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
                                 .background(MaterialTheme.colorScheme.surfaceVariant),
                             contentScale = ContentScale.Crop
                         )
@@ -245,28 +254,28 @@ private fun BoardPreviewDialog(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.radius_medium))
             ) {
                 OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
                 Button(
                     onClick = onPlay,
                     modifier = Modifier.weight(1.5f),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("START GAME", fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+                    Text(stringResource(R.string.start_game), fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -276,20 +285,20 @@ private fun BoardPreviewDialog(
 @Composable
 private fun EmptyState(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.padding(32.dp),
+        modifier = modifier.padding(dimensionResource(R.dimen.spacing_extra_large)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "No Saved Games",
+            text = stringResource(R.string.no_saved_games),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = "Create your first custom memory board to see it here.",
+            text = stringResource(R.string.create_first_board),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small))
         )
     }
 }

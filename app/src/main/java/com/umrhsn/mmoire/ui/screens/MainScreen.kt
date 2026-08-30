@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +46,7 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val game = uiState.memoryGame
-    
+
     var showWinDialog by remember { mutableStateOf(false) }
     var hasTriggeredWinEffects by remember { mutableStateOf(false) }
     
@@ -75,10 +77,10 @@ fun MainScreen(
                     AnimatedContent(
                         targetState = uiState.gameSessionId,
                         transitionSpec = {
-                            fadeIn(animationSpec = tween(500)) togetherWith 
+                            fadeIn(animationSpec = tween(500)) togetherWith
                             fadeOut(animationSpec = tween(500))
                         },
-                        label = "gameTransition"
+                        label = stringResource(R.string.gameTransition_label)
                     ) { targetSessionId: Long ->
                         var sessionGame by remember { mutableStateOf(uiState.memoryGame) }
                         var sessionSize by remember { mutableStateOf(uiState.boardSize) }
@@ -111,7 +113,7 @@ fun MainScreen(
                 }
                 
                 // Spacer for Floating Bottom Bar
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.app_header_height)))
             }
 
             // Floating Bottom Bar
@@ -155,7 +157,7 @@ fun MainScreen(
             if (showCreateSelectionDialog) {
                 BoardSizeDialog(
                     currentSize = uiState.boardSize,
-                    title = "Create Custom Game",
+                    title = stringResource(R.string.create_custom_game),
                     icon = Icons.Default.AddPhotoAlternate,
                     onSizeSelected = {
                         onCreateClicked(it)
@@ -181,33 +183,36 @@ private fun FloatingControlBar(
 ) {
     Surface(
         modifier = modifier
-            .padding(16.dp)
+            .padding(dimensionResource(R.dimen.spacing_medium))
             .fillMaxWidth(),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp,
-        shadowElevation = 12.dp,
+        tonalElevation = dimensionResource(R.dimen.spacing_small),
+        shadowElevation = dimensionResource(R.dimen.radius_medium),
         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(
+                horizontal = dimensionResource(R.dimen.spacing_small),
+                vertical = dimensionResource(R.dimen.spacing_tiny)
+            ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
-                modifier = Modifier.padding(start = 12.dp),
+                modifier = Modifier.padding(start = dimensionResource(R.dimen.radius_medium)),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.radius_medium))
             ) {
                 StatBadge(icon = Icons.Default.DirectionsRun, value = numMoves.toString())
-                StatBadge(icon = Icons.Default.Extension, value = "$numPairs/$totalPairs")
+                StatBadge(icon = Icons.Default.Extension, value = stringResource(R.string.pairs_progress, numPairs, totalPairs))
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                ControlIcon(icon = Icons.Default.Refresh, contentDescription = "Reset", onClick = onRefresh)
-                ControlIcon(icon = Icons.Default.AspectRatio, contentDescription = "Size", onClick = onSize)
-                ControlIcon(icon = Icons.Default.AddCircle, contentDescription = "Create", onClick = onCreate)
-                ControlIcon(icon = Icons.Default.FolderOpen, contentDescription = "Load Local", onClick = onDownload)
+                ControlIcon(icon = Icons.Default.Refresh, contentDescription = stringResource(R.string.reset_game), onClick = onRefresh)
+                ControlIcon(icon = Icons.Default.AspectRatio, contentDescription = stringResource(R.string.change_size), onClick = onSize)
+                ControlIcon(icon = Icons.Default.AddCircle, contentDescription = stringResource(R.string.create_game), onClick = onCreate)
+                ControlIcon(icon = Icons.Default.FolderOpen, contentDescription = stringResource(R.string.load_game), onClick = onDownload)
             }
         }
     }
@@ -229,33 +234,33 @@ private fun WinDialog(
 ) {
     AppDialog(
         onDismissRequest = onDismiss,
-        title = if (isSmoothWin) "Perfect Win! 🏆" else "Game Finished!",
+        title = if (isSmoothWin) stringResource(R.string.perfect_win) else stringResource(R.string.game_finished),
         icon = if (isSmoothWin) Icons.Default.WorkspacePremium else Icons.Default.SentimentVerySatisfied
     ) {
         Text(
-            text = "Amazing! You cleared the board in $numMoves moves.",
+            text = stringResource(R.string.win_message, numMoves),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.radius_medium))
         ) {
             OutlinedButton(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
             ) {
-                Text("Close")
+                Text(stringResource(R.string.close))
             }
             Button(
                 onClick = { onPlayAgain() },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
             ) {
-                Text("Play Again", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.play_again), fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -264,7 +269,7 @@ private fun WinDialog(
 @Composable
 private fun BoardSizeDialog(
     currentSize: BoardSize,
-    title: String = "Choose Level",
+    title: String = stringResource(R.string.choose_level),
     icon: ImageVector = Icons.Default.Layers,
     onSizeSelected: (BoardSize) -> Unit,
     onDismiss: () -> Unit
@@ -274,11 +279,12 @@ private fun BoardSizeDialog(
         title = title,
         icon = icon
     ) {
+        val density = LocalDensity.current
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 450.dp)
+                .heightIn(max = dimensionResource(R.dimen.dialog_max_height))
                 .verticalScroll(scrollState)
         ) {
             BoardSize.values().forEach { size ->
@@ -286,19 +292,19 @@ private fun BoardSizeDialog(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 6.dp)
+                        .padding(vertical = dimensionResource(R.dimen.spacing_small))
                         .clickable { onSizeSelected(size) },
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
                     color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.spacing_medium)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(40.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.size(dimensionResource(R.dimen.spacing_huge)),
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Box(contentAlignment = Alignment.Center) {
@@ -314,11 +320,11 @@ private fun BoardSizeDialog(
                                     },
                                     contentDescription = null,
                                     tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(with(density) { dimensionResource(R.dimen.text_large).toSp() }.value.dp)
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = size.name.replace("_", " ").lowercase(Locale.ROOT).replaceFirstChar { it.uppercase() },
@@ -327,7 +333,7 @@ private fun BoardSizeDialog(
                                 color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "${size.numCards} cards • ${size.getNumPairs()} pairs",
+                                text = stringResource(R.string.cards_pairs_info, size.numCards, size.getNumPairs()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -343,12 +349,12 @@ private fun BoardSizeDialog(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
         TextButton(
             onClick = onDismiss,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text("MAYBE LATER", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(stringResource(R.string.maybe_later), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         }
     }
 }

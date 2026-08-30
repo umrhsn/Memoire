@@ -7,7 +7,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
 import kotlinx.coroutines.delay
@@ -24,7 +27,7 @@ fun MemoryBoard(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(dimensionResource(R.dimen.spacing_medium)),
         contentAlignment = Alignment.Center
     ) {
         val scope = this
@@ -33,7 +36,6 @@ fun MemoryBoard(
         val numCards = cards.size
 
         // Dynamic Grid Sizing:
-        // We want to fit all cards in the available space without scrolling.
         var bestCols = 1
         var bestCardSize = 0.dp
 
@@ -80,7 +82,7 @@ fun MemoryBoard(
                                     durationMillis = 300,
                                     delayMillis = index * 20
                                 ),
-                                label = "cardEntryScale"
+                                label = stringResource(R.string.cardEntryScale_label)
                             )
                             
                             val alpha by animateFloatAsState(
@@ -89,7 +91,7 @@ fun MemoryBoard(
                                     durationMillis = 300,
                                     delayMillis = index * 20
                                 ),
-                                label = "cardEntryAlpha"
+                                label = stringResource(R.string.cardEntryAlpha_label)
                             )
 
                             Box(

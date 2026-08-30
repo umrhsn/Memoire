@@ -2,6 +2,7 @@ package com.umrhsn.mmoire.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.repository.GameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ data class CreateUiState(
     val isUploading: Boolean = false,
     val uploadProgress: Int = 0,
     val isSuccess: Boolean = false,
-    val errorMessage: String? = null,
+    val errorMessage: Int? = null, // String resource ID
+    val errorArg: String? = null,
     val gameName: String? = null,
     val nameTaken: Boolean = false
 )
@@ -34,7 +36,7 @@ class CreateViewModel @Inject constructor(
 
     fun createGame(gameName: String, imageByteArrays: List<ByteArray>) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isUploading = true, errorMessage = null, nameTaken = false) }
+            _uiState.update { it.copy(isUploading = true, errorMessage = null, errorArg = null, nameTaken = false) }
             
             // Check if name is taken
             if (repository.checkGameExists(gameName)) {
@@ -54,8 +56,13 @@ class CreateViewModel @Inject constructor(
                         )
                     }
                 } catch (e: Exception) {
-                    val message = "Failed to save: ${e.localizedMessage}"
-                    _uiState.update { it.copy(isUploading = false, errorMessage = message) }
+                    _uiState.update { 
+                        it.copy(
+                            isUploading = false, 
+                            errorMessage = R.string.failed_to_save,
+                            errorArg = e.localizedMessage
+                        ) 
+                    }
                     return@launch
                 }
             }
@@ -73,7 +80,7 @@ class CreateViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isUploading = false,
-                        errorMessage = "Failed to create game entry in database"
+                        errorMessage = R.string.failed_to_create_db
                     )
                 }
             }
