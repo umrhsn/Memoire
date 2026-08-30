@@ -1,0 +1,98 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/.artifacts/37a72eff-21b6-441c-ba97-5b151ce3c673/implementation_plan.artifact.md</file>
+  <line>14</line>
+  <module>Mémoire</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/.artifacts/37a72eff-21b6-441c-ba97-5b151ce3c673/implementation_plan.artifact.md" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'umrhsn'</description>
+  <highlighted_element>umrhsn</highlighted_element>
+  <language>TEXT</language>
+  <offset>49</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/README.md</file>
+  <line>54</line>
+  <module>Mémoire</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/README.md" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'Pandey'</description>
+  <highlighted_element>Pandey</highlighted_element>
+  <language>Markdown</language>
+  <offset>43</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/google-services.json</file>
+  <line>12</line>
+  <module>Mémoire.app</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/google-services.json" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'umrhsn'</description>
+  <highlighted_element>umrhsn</highlighted_element>
+  <language>JSON</language>
+  <offset>31</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/google-services.json</file>
+  <line>12</line>
+  <module>Mémoire.app</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/google-services.json" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'mmoire'</description>
+  <highlighted_element>mmoire</highlighted_element>
+  <language>JSON</language>
+  <offset>38</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/res/layout/activity_create.xml</file>
+  <line>28</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/res/layout/activity_create.xml" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'abcdefghijklmnopqrstuvwxyz'</description>
+  <highlighted_element>abcdefghijklmnopqrstuvwxyz</highlighted_element>
+  <language>XML</language>
+  <offset>34</offset>
+  <length>26</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/res/layout/card_memory.xml</file>
+  <line>25</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/res/layout/card_memory.xml" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'facedown'</description>
+  <highlighted_element>facedown</highlighted_element>
+  <language>XML</language>
+  <offset>49</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/res/layout/dialog_board_download.xml</file>
+  <line>14</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_board_download.xml" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'abcdefghijklmnopqrstuvwxyz'</description>
+  <highlighted_element>abcdefghijklmnopqrstuvwxyz</highlighted_element>
+  <language>XML</language>
+  <offset>34</offset>
+  <length>26</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/gradlew.bat</file>
+  <line>25</line>
+  <module>Mémoire</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/gradlew.bat" />
+  <problem_class id="SpellCheckingInspection" severity="TYPO" attribute_key="TYPO">Spelling</problem_class>
+  <description>Typo: In word 'setlocal'</description>
+  <highlighted_element>setlocal</highlighted_element>
+  <language>textmate</language>
+  <offset>24</offset>
+  <length>8</length>
+</problem>
+</problems>

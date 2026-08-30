@@ -1,0 +1,26 @@
+{
+  "permissionMode": "default",
+  "permissions": {
+    "allow": [
+      "shell_execute::dir /a && (if exist package.json type package.json) && (if exist README.md type README.md)",
+      "shell_execute::dir /s /b app && echo. && type build.gradle && echo. && type settings.gradle && echo. && type app\\build.gradle && echo. && type gradle\\wrapper\\gradle-wrapper.properties",
+      "shell_execute::java -version && gradlew.bat --version",
+      "shell_execute::git status --short && git log --oneline -5",
+      "shell_execute::gradlew.bat assembleDebug --stacktrace",
+      "shell_execute::dir \"%LOCALAPPDATA%\\Android\\Sdk\" && dir \"%LOCALAPPDATA%\\Android\\Sdk\\platforms\" && dir \"%LOCALAPPDATA%\\Android\\Sdk\\build-tools\"",
+      "shell_execute::type app\\src\\main\\AndroidManifest.xml && type app\\src\\main\\java\\com\\umrhsn\\mmoire\\activities\\MainActivity.kt && type app\\src\\main\\java\\com\\umrhsn\\mmoire\\activities\\CreateActivity.kt",
+      "shell_execute::dir \"C:\\Users\\pc\\AppData\\Local\\Programs\\Android Studio\\jbr\" && dir \"C:\\Program Files\\Java\" 2>nul && dir \"C:\\Program Files\\Eclipse Adoptium\" 2>nul && dir \"C:\\Program Files\\Android\" 2>nul && adb devices",
+      "shell_execute::dir \"%USERPROFILE%\\.gradle\\jdks\" /s /b 2>nul && dir \"%USERPROFILE%\\.jdks\" /s /b 2>nul && type \"C:\\Users\\pc\\AppData\\Local\\Programs\\Android Studio\\jbr\\release\"",
+      "shell_execute::if exist \"%USERPROFILE%\\.gradle\\jdks\" dir \"%USERPROFILE%\\.gradle\\jdks\" /s /b & if exist \"%USERPROFILE%\\.jdks\" dir \"%USERPROFILE%\\.jdks\" /s /b & type \"C:\\Users\\pc\\AppData\\Local\\Programs\\Android Studio\\jbr\\release\"",
+      "shell_execute::curl.exe --version",
+      "shell_execute::if not exist \"%USERPROFILE%\\.jdks\\temurin-17\" mkdir \"%USERPROFILE%\\.jdks\\temurin-17\" & if not exist \"%USERPROFILE%\\.jdks\\OpenJDK17U-jdk_x64_windows_hotspot_17.zip\" curl.exe -L --fail --retry 2 -o \"%USERPROFILE%\\.jdks\\OpenJDK17U-jdk_x64_windows_hotspot_17.zip\" \"https://api.adoptium.net/v3/binary/latest/17/ga/windows/x64/jdk/hotspot/normal/eclipse\" & if not exist \"%USERPROFILE%\\.jdks\\temurin-17\\bin\\java.exe\" tar.exe -xf \"%USERPROFILE%\\.jdks\\OpenJDK17U-jdk_x64_windows_hotspot_17.zip\" -C \"%USERPROFILE%\\.jdks\\temurin-17\" --strip-components=1 & \"%USERPROFILE%\\.jdks\\temurin-17\\bin\\java.exe\" -version",
+      "shell_execute::set \"JAVA_HOME=%USERPROFILE%\\.jdks\\temurin-17\" && set \"PATH=%JAVA_HOME%\\bin;%PATH%\" && gradlew.bat assembleDebug --stacktrace",
+      "shell_execute::set \"JAVA_HOME=%USERPROFILE%\\.jdks\\temurin-17\" && set \"PATH=%JAVA_HOME%\\bin;%PATH%\" && gradlew.bat testDebugUnitTest",
+      "shell_execute::adb start-server >nul 2>&1 & adb devices -l & \"%LOCALAPPDATA%\\Android\\Sdk\\emulator\\emulator.exe\" -list-avds",
+      "shell_execute::dir app\\build\\outputs\\apk\\debug && git status --short",
+      "shell_execute::adb -s adb-a45d899-NBgajY._adb-tls-connect._tcp install -r \"C:\\Users\\pc\\umrhsn\\Memoire\\app\\build\\outputs\\apk\\debug\\app-debug.apk\"",
+      "shell_execute::adb devices -l",
+      "shell_execute::dir \"app\\src\\main\\java\\com\\umrhsn\\mmoire\\activities\" /b"
+    ]
+  }
+}

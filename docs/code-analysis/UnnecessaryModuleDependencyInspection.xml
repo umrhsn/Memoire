@@ -1,0 +1,14 @@
+<problems>
+<problem>
+  <file>Mémoire.app.androidTest</file>
+  <module>Mémoire.app.androidTest</module>
+  <entry_point TYPE="module" FQNAME="Mémoire.app.androidTest" />
+  <problem_class id="UnnecessaryModuleDependencyInspection" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unnecessary module dependency</problem_class>
+  <hints>
+    <hint value="Mémoire.app.main" />
+  </hints>
+  <description>Module 'Mémoire.app.androidTest' sources do not depend on module 'Mémoire.app.main' sources</description>
+  <highlighted_element />
+  <language />
+</problem>
+</problems>

@@ -1,0 +1,41 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/java/com/umrhsn/mmoire/db/GameEntity.kt</file>
+  <line>8</line>
+  <module>Mémoire.app.main</module>
+  <package>com.umrhsn.mmoire.db</package>
+  <entry_point TYPE="method" FQNAME="com.umrhsn.mmoire.db.GameEntity GameEntity(java.lang.String name, java.lang.String imageUrlsJson)" />
+  <problem_class id="AddExplicitTargetToParameterAnnotation" severity="WEAK WARNING" attribute_key="INFO_ATTRIBUTES">Redundant interpolation prefix</problem_class>
+  <description>The annotation is only applied to the parameter. An explicit annotation use-site target is recommended.</description>
+  <highlighted_element>@PrimaryKey</highlighted_element>
+  <language>kotlin</language>
+  <offset>4</offset>
+  <length>11</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/java/com/umrhsn/mmoire/utils/LocalImageManager.kt</file>
+  <line>15</line>
+  <module>Mémoire.app.main</module>
+  <package>com.umrhsn.mmoire.utils</package>
+  <entry_point TYPE="method" FQNAME="com.umrhsn.mmoire.utils.LocalImageManager LocalImageManager(android.content.Context context)" />
+  <problem_class id="AddExplicitTargetToParameterAnnotation" severity="WEAK WARNING" attribute_key="INFO_ATTRIBUTES">Redundant interpolation prefix</problem_class>
+  <description>The annotation is only applied to the parameter. An explicit annotation use-site target is recommended.</description>
+  <highlighted_element>@ApplicationContext</highlighted_element>
+  <language>kotlin</language>
+  <offset>4</offset>
+  <length>19</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/java/com/umrhsn/mmoire/utils/SoundManager.kt</file>
+  <line>12</line>
+  <module>Mémoire.app.main</module>
+  <package>com.umrhsn.mmoire.utils</package>
+  <entry_point TYPE="method" FQNAME="com.umrhsn.mmoire.utils.SoundManager SoundManager(android.content.Context context)" />
+  <problem_class id="AddExplicitTargetToParameterAnnotation" severity="WEAK WARNING" attribute_key="INFO_ATTRIBUTES">Redundant interpolation prefix</problem_class>
+  <description>The annotation is only applied to the parameter. An explicit annotation use-site target is recommended.</description>
+  <highlighted_element>@ApplicationContext</highlighted_element>
+  <language>kotlin</language>
+  <offset>4</offset>
+  <length>19</length>
+</problem>
+</problems>

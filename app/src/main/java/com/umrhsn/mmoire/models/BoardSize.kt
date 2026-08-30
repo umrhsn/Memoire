@@ -10,7 +10,7 @@ enum class BoardSize(val numCards: Int) {
     SUPER_DUPER_HARD(40); // 8 * 5
 
     companion object {
-        fun getByValue(value: Int) = values().first { it.numCards == value }
+        fun getByValue(value: Int) = entries.firstOrNull { it.numCards == value } ?: EASY
     }
 
     fun getWidth(): Int = when (this) {

@@ -1,0 +1,15 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/java/com/umrhsn/mmoire/repository/GameRepository.kt</file>
+  <line>30</line>
+  <module>Mémoire.app.main</module>
+  <package>com.umrhsn.mmoire.repository</package>
+  <entry_point TYPE="method" FQNAME="com.umrhsn.mmoire.repository.GameRepository java.lang.Object uploadImage(java.lang.String gameName, int imageIndex, byte[] imageByteArray, kotlin.coroutines.Continuation&lt;? super java.lang.String&gt; $completion)" />
+  <problem_class id="RedundantSuspendModifier" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Redundant 'suspend' modifier</problem_class>
+  <description>Redundant 'suspend' modifier</description>
+  <highlighted_element>suspend</highlighted_element>
+  <language>kotlin</language>
+  <offset>4</offset>
+  <length>7</length>
+</problem>
+</problems>

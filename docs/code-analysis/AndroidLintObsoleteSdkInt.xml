@@ -1,0 +1,11 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/res/values-v23</file>
+  <entry_point TYPE="dir" FQNAME="$PROJECT_DIR$/app/src/main/res/values-v23" />
+  <problem_class id="AndroidLintObsoleteSdkInt" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Obsolete SDK_INT Version Check</problem_class>
+  <hints />
+  <description>&lt;html&gt;This folder configuration (&lt;code&gt;v23&lt;/code&gt;) is unnecessary; &lt;code&gt;minSdkVersion&lt;/code&gt; is 23. Merge all the resources in this folder into &lt;code&gt;values&lt;/code&gt;.&lt;/html&gt;</description>
+  <highlighted_element />
+  <language />
+</problem>
+</problems>

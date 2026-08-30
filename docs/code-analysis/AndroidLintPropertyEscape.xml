@@ -1,0 +1,15 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/gradle.properties</file>
+  <line>24</line>
+  <module>Mémoire</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/gradle.properties" />
+  <problem_class id="AndroidLintPropertyEscape" severity="ERROR" attribute_key="ERRORS_ATTRIBUTES">Incorrect property escapes</problem_class>
+  <hints />
+  <description>&lt;html&gt;Windows file separators (&lt;code&gt;\&lt;/code&gt;) and drive letter separators (':') must be escaped (&lt;code&gt;\\&lt;/code&gt;) in property files; use C\:/Users/pc/.jdks/temurin-17&lt;/html&gt;</description>
+  <highlighted_element>$USER_HOME$/.jdks/temurin-17</highlighted_element>
+  <language>Properties</language>
+  <offset>21</offset>
+  <length>28</length>
+</problem>
+</problems>
