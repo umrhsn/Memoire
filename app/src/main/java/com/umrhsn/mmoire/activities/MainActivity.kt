@@ -6,6 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.core.os.LocaleListCompat
 import com.umrhsn.mmoire.ui.screens.MainScreen
 import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
@@ -26,6 +31,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val uiState by viewModel.uiState.collectAsState()
+
+            // Handle Language Change
+            LaunchedEffect(uiState.appLanguage) {
+                val appLocales = LocaleListCompat.forLanguageTags(uiState.appLanguage ?: "")
+                AppCompatDelegate.setApplicationLocales(appLocales)
+            }
+
             MainScreen(
                 viewModel = viewModel,
                 onCreateClicked = { desiredSize ->

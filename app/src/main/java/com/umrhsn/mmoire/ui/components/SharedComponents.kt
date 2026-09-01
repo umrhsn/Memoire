@@ -22,11 +22,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
@@ -41,10 +43,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -92,7 +96,7 @@ fun FloatingPill(
         shadowElevation = 8.dp,
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.8f else 0.8f)
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.8f)
         )
     ) {
         Box(
@@ -221,14 +225,55 @@ fun AppHeaderIcon(
     icon: ImageVector,
     contentDescription: String?,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    autoMirror: Boolean = true // Added this
 ) {
+    val isRtl = LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
     AppTooltipIconButton(
         icon = icon,
         contentDescription = contentDescription ?: "",
         tooltipText = contentDescription ?: "",
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier.graphicsLayer {
+            if (autoMirror && isRtl) {
+                rotationY = 180f
+            }
+        }
+    )
+}
+
+@Composable
+fun AppDropdownItem(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    iconTint: Color = MaterialTheme.colorScheme.primary
+) {
+    DropdownMenuItem(
+        modifier = modifier,
+        text = { Text(text, style = MaterialTheme.typography.bodyLarge) },
+        onClick = onClick,
+        leadingIcon = {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconTint,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        },
+        colors = MenuDefaults.itemColors(
+            textColor = MaterialTheme.colorScheme.onSurface,
+            leadingIconColor = iconTint
+        )
     )
 }
 
@@ -240,8 +285,10 @@ fun StatBadge(
     tooltipText: String? = null,
     containerColor: Color? = null,
     contentColor: Color? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    autoMirror: Boolean = false // Default to false for stats
 ) {
+    val isRtl = LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
     val density = LocalDensity.current
     val finalContainerColor =
         containerColor ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -265,7 +312,13 @@ fun StatBadge(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.stat_icon_size))
+                    modifier = Modifier
+                        .size(dimensionResource(R.dimen.stat_icon_size))
+                        .graphicsLayer {
+                            if (autoMirror && isRtl) {
+                                rotationY = 180f
+                            }
+                        }
                 )
                 Text(
                     text = value,

@@ -20,4 +20,12 @@ class PrefsManager @Inject constructor(
     fun setFirstTime(value: Boolean) {
         prefs.edit().putBoolean("is_first_time", value).apply()
     }
+
+    fun getLanguage(): String? {
+        return prefs.getString("app_language", null)
+    }
+
+    fun setLanguage(lang: String?) {
+        prefs.edit().putString("app_language", lang).apply()
+    }
 }

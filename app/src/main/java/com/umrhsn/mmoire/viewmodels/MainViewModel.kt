@@ -33,7 +33,8 @@ data class MainUiState(
     val bestTime: Long? = null,
     val isTimerRunning: Boolean = false,
     val showTutorial: Boolean = false,
-    val tutorialAnchors: Map<String, Rect> = emptyMap()
+    val tutorialAnchors: Map<String, Rect> = emptyMap(),
+    val appLanguage: String? = null
 )
 
 @HiltViewModel
@@ -43,7 +44,7 @@ class MainViewModel @Inject constructor(
     private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState())
+    private val _uiState = MutableStateFlow(MainUiState(appLanguage = prefs.getLanguage()))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     private var timerJob: Job? = null
@@ -68,6 +69,11 @@ class MainViewModel @Inject constructor(
     fun dismissTutorial() {
         prefs.setFirstTime(false)
         _uiState.update { it.copy(showTutorial = false) }
+    }
+
+    fun changeLanguage(lang: String?) {
+        prefs.setLanguage(lang)
+        _uiState.update { it.copy(appLanguage = lang) }
     }
 
     private fun startTimer() {

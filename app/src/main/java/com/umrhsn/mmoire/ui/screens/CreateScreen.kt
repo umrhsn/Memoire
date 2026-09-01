@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,10 +19,12 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -56,6 +57,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -80,7 +83,6 @@ import compose.icons.evaicons.outline.Flash
 import compose.icons.evaicons.outline.Image
 import compose.icons.evaicons.outline.Plus
 import compose.icons.evaicons.outline.Save
-import kotlin.math.ceil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,7 +150,7 @@ fun CreateScreen(
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
 
-                    // Grid Area
+                    // Grid Area - Fixed Grid for creation
                     Box(modifier = Modifier.weight(1f)) {
                         if (chosenImageUris.isEmpty() && !uiState.isLoading) {
                             EmptySelectionState(
@@ -158,13 +160,26 @@ fun CreateScreen(
                         } else if (uiState.isLoading) {
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         } else {
-                            DynamicImageGrid(
-                                boardSize = boardSize,
-                                chosenImageUris = chosenImageUris,
-                                onPlaceholderClicked = onPlaceholderClicked,
-                                onImageClicked = onImageClicked,
-                                onRemoveImage = onRemoveImage
-                            )
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                itemsIndexed(chosenImageUris) { index, uri ->
+                                    ImageItem(
+                                        uri = uri,
+                                        onClick = { onImageClicked(index) },
+                                        onRemove = { onRemoveImage(uri) }
+                                    )
+                                }
+                                if (chosenImageUris.size < numImagesRequired) {
+                                    item {
+                                        PlaceholderItem(onClick = onPlaceholderClicked)
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -197,7 +212,7 @@ fun CreateScreen(
                         OutlinedTextField(
                             value = gameName,
                             onValueChange = { input ->
-                                if (input.length <= 14 && input.all { it.isLetterOrDigit() || it == '_' }) {
+                                if (input.length <= 24) { // Increased from 14
                                     gameName = input
                                 }
                             },
@@ -213,7 +228,12 @@ fun CreateScreen(
                                     EvaIcons.Outline.Flash,
                                     contentDescription = null
                                 )
-                            }
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                                autoCorrectEnabled = true,
+                                keyboardType = KeyboardType.Text
+                            )
                         )
 
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
@@ -222,13 +242,17 @@ fun CreateScreen(
                             positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                             tooltip = {
                                 PlainTooltip {
-                                    Text(if (chosenImageUris.size < numImagesRequired) "Select all photos first" else "Finalize board")
+                                    Text(
+                                        if (chosenImageUris.size < numImagesRequired)
+                                            stringResource(R.string.select_all_photos)
+                                        else stringResource(R.string.finalize_board)
+                                    )
                                 }
                             },
                             state = rememberTooltipState()
                         ) {
                             Button(
-                                onClick = { onSaveClicked(gameName) },
+                                onClick = { onSaveClicked(gameName.trim()) }, // Added trim()
                                 modifier = Modifier
                                     .height(dimensionResource(R.dimen.button_height_large))
                                     .fillMaxWidth(),
@@ -452,63 +476,6 @@ private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun DynamicImageGrid(
-    boardSize: BoardSize,
-    chosenImageUris: List<Uri>,
-    onPlaceholderClicked: () -> Unit,
-    onImageClicked: (Int) -> Unit,
-    onRemoveImage: (Uri) -> Unit
-) {
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        val spacing = dimensionResource(R.dimen.spacing_small)
-        val numPairsRequired = boardSize.getNumPairs()
-
-        // We use the same fixed grid logic here
-        // Width for creation screen is usually 2 or 3 to keep it readable
-        val columns = if (numPairsRequired <= 4) 2 else 3
-        val rows = ceil(numPairsRequired.toFloat() / columns).toInt()
-
-        val cardWidth = maxWidth / columns
-        val cardHeight = maxHeight / rows
-        val bestCardSize = if (cardWidth < cardHeight) cardWidth else cardHeight
-
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            verticalArrangement = Arrangement.spacedBy(spacing),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            for (r in 0 until rows) {
-                Row(
-                    modifier = Modifier.wrapContentWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(spacing),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    for (c in 0 until columns) {
-                        val index = r * columns + c
-                        if (index < numPairsRequired) {
-                            Box(modifier = Modifier.size(bestCardSize)) {
-                                if (index < chosenImageUris.size) {
-                                    ImageItem(
-                                        uri = chosenImageUris[index],
-                                        onClick = { onImageClicked(index) },
-                                        onRemove = { onRemoveImage(chosenImageUris[index]) }
-                                    )
-                                } else {
-                                    PlaceholderItem(onClick = onPlaceholderClicked)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ImageItem(
@@ -518,7 +485,7 @@ private fun ImageItem(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .aspectRatio(1f)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
@@ -580,7 +547,7 @@ private fun PlaceholderItem(onClick: () -> Unit) {
     ) {
         Card(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .aspectRatio(1f)
                 .clickable { onClick() },
             shape = RoundedCornerShape(16.dp),

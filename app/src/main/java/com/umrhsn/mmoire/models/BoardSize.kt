@@ -1,5 +1,7 @@
 package com.umrhsn.mmoire.models
 
+import com.umrhsn.mmoire.R
+
 enum class BoardSize(val numCards: Int) {
     SUPER_DUPER_EASY(6),  // 3 * 2
     SUPER_EASY(8),        // 4 * 2
@@ -11,6 +13,16 @@ enum class BoardSize(val numCards: Int) {
 
     companion object {
         fun getByValue(value: Int) = entries.firstOrNull { it.numCards == value } ?: EASY
+    }
+
+    fun getNameResId(): Int = when (this) {
+        SUPER_DUPER_EASY -> R.string.size_super_duper_easy
+        SUPER_EASY -> R.string.size_super_easy
+        EASY -> R.string.size_easy
+        MEDIUM -> R.string.size_medium
+        HARD -> R.string.size_hard
+        SUPER_HARD -> R.string.size_super_hard
+        SUPER_DUPER_HARD -> R.string.size_super_duper_hard
     }
 
     fun getWidth(): Int = when (this) {
