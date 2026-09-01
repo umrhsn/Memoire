@@ -2,8 +2,22 @@ package com.umrhsn.mmoire.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -44,7 +58,7 @@ fun MemoryBoard(
             val cardWidth = maxWidth / cols
             val cardHeight = maxHeight / rows
             val currentSize = if (cardWidth < cardHeight) cardWidth else cardHeight
-            
+
             if (currentSize > bestCardSize) {
                 bestCardSize = currentSize
                 bestCols = cols
@@ -52,7 +66,7 @@ fun MemoryBoard(
         }
 
         val rows = ceil(numCards.toFloat() / bestCols).toInt()
-        
+
         // One-time entry animation flag
         var isVisible by remember { mutableStateOf(false) }
         LaunchedEffect(boardSize, cards.size) {
@@ -75,7 +89,7 @@ fun MemoryBoard(
                         val index = r * bestCols + c
                         if (index < numCards) {
                             val card = cards[index]
-                            
+
                             val scale by animateFloatAsState(
                                 targetValue = if (isVisible) 1f else 0f,
                                 animationSpec = tween(
@@ -84,7 +98,7 @@ fun MemoryBoard(
                                 ),
                                 label = stringResource(R.string.cardEntryScale_label)
                             )
-                            
+
                             val alpha by animateFloatAsState(
                                 targetValue = if (isVisible) 1f else 0f,
                                 animationSpec = tween(

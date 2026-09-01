@@ -19,7 +19,10 @@ class SoundManager @Inject constructor(
         CARD_FLIP,
         MATCH_SUCCESS,
         MATCH_FAIL,
-        GAME_WIN
+        GAME_WIN,
+        BUTTON_CLICK,
+        DELETE_ACTION,
+        SUCCESS_FANFARE
     }
 
     init {
@@ -33,18 +36,23 @@ class SoundManager @Inject constructor(
             .setAudioAttributes(audioAttributes)
             .build()
 
-        // Direct resource loading is more efficient and avoids reflection
+        // Load all available sounds from raw resources
         loadSound(SoundType.CARD_FLIP, R.raw.card_flip)
         loadSound(SoundType.MATCH_SUCCESS, R.raw.match_success)
         loadSound(SoundType.MATCH_FAIL, R.raw.match_fail)
         loadSound(SoundType.GAME_WIN, R.raw.game_win)
+
+        // Re-using existing sounds for new types if specific ones aren't available
+        loadSound(SoundType.BUTTON_CLICK, R.raw.card_flip)
+        loadSound(SoundType.DELETE_ACTION, R.raw.match_fail)
+        loadSound(SoundType.SUCCESS_FANFARE, R.raw.game_win)
     }
 
     private fun loadSound(type: SoundType, resId: Int) {
         try {
             sounds[type] = soundPool.load(context, resId, 1)
         } catch (e: Exception) {
-            // Log or handle error if resource is missing
+            // Log or handle missing resource
         }
     }
 

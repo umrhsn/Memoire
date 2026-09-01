@@ -15,7 +15,7 @@ interface GameDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM games WHERE name = :name)")
     suspend fun exists(name: String): Boolean
-    
+
     @Query("SELECT * FROM games")
     suspend fun getAllGames(): List<GameEntity>
 

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.umrhsn.mmoire.db.AppDatabase
 import com.umrhsn.mmoire.db.GameDao
+import com.umrhsn.mmoire.db.RecordDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,11 +23,17 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "memoire_db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     fun provideGameDao(database: AppDatabase): GameDao {
         return database.gameDao()
+    }
+
+    @Provides
+    fun provideRecordDao(database: AppDatabase): RecordDao {
+        return database.recordDao()
     }
 }

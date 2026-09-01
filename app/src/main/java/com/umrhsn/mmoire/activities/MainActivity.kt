@@ -7,7 +7,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.umrhsn.mmoire.ui.screens.MainScreen
-import com.umrhsn.mmoire.utils.*
+import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
+import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
+import com.umrhsn.mmoire.utils.explosionConfettiArray
+import com.umrhsn.mmoire.utils.rainingConfettiLong
+import com.umrhsn.mmoire.utils.rainingConfettiShort
+import com.umrhsn.mmoire.utils.showToastSmoothWin
+import com.umrhsn.mmoire.utils.showToastYouWon
 import com.umrhsn.mmoire.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,12 +24,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         setContent {
             MainScreen(
                 viewModel = viewModel,
                 onCreateClicked = { desiredSize ->
-                    val intent = Intent(this, CreateActivity::class.java).putExtra(EXTRA_BOARD_SIZE, desiredSize)
+                    val intent = Intent(this, CreateActivity::class.java).putExtra(
+                        EXTRA_BOARD_SIZE,
+                        desiredSize
+                    )
                     resultLauncher.launch(intent)
                 },
                 onBrowseClicked = {
@@ -48,13 +57,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val customGameName = data?.getStringExtra(EXTRA_GAME_NAME)
-            if (customGameName != null) {
-                viewModel.downloadGame(customGameName)
+    private var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                val customGameName = data?.getStringExtra(EXTRA_GAME_NAME)
+                if (customGameName != null) {
+                    viewModel.downloadGame(customGameName)
+                }
             }
         }
-    }
 }

@@ -11,13 +11,20 @@ data class MemoryGame(
 ) {
 
     companion object {
-        fun create(boardSize: BoardSize, customImages: List<String>?, shouldShuffle: Boolean = true): MemoryGame {
+        fun create(
+            boardSize: BoardSize,
+            customImages: List<String>?,
+            shouldShuffle: Boolean = true
+        ): MemoryGame {
             val cards = if (customImages == null) {
-                val chosenImages = DEFAULT_CARDS.let { if (shouldShuffle) it.shuffled() else it }.take(boardSize.getNumPairs())
-                val randomizedImages = (chosenImages + chosenImages).let { if (shouldShuffle) it.shuffled() else it }
+                val chosenImages = DEFAULT_CARDS.let { if (shouldShuffle) it.shuffled() else it }
+                    .take(boardSize.getNumPairs())
+                val randomizedImages =
+                    (chosenImages + chosenImages).let { if (shouldShuffle) it.shuffled() else it }
                 randomizedImages.map { card -> MemoryCard(card, null) }
             } else {
-                val randomizedImages = (customImages + customImages).let { if (shouldShuffle) it.shuffled() else it }
+                val randomizedImages =
+                    (customImages + customImages).let { if (shouldShuffle) it.shuffled() else it }
                 randomizedImages.map { card -> MemoryCard(card.hashCode(), card) }
             }
             return MemoryGame(boardSize, cards)
@@ -36,14 +43,15 @@ data class MemoryGame(
 
         if (indexOfSingleSelectedCard == null) {
             // Case 1: 0 cards previously flipped over or just restored
-            newCards = newCards.map { if (!it.isMatched) it.copy(isFaceUp = false) else it }.toMutableList()
+            newCards = newCards.map { if (!it.isMatched) it.copy(isFaceUp = false) else it }
+                .toMutableList()
             newCards[position] = newCards[position].copy(isFaceUp = true)
             newIndexOfSingleSelectedCard = position
         } else {
             // Case 2: 1 card previously flipped over
             val card1 = newCards[indexOfSingleSelectedCard]
             val card2 = newCards[position]
-            
+
             if (card1.identifier == card2.identifier) {
                 foundMatch = true
                 newNumPairsFound++

@@ -39,6 +39,22 @@
     <string name="pairs_count">%1$d pairs</string>
     <string name="cards_pairs_info">%1$d cards • %2$d pairs</string>
     <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="edit">Edit</string>
+    <string name="sort">Sort</string>
+    <string name="search_boards">Search boards…</string>
+    <string name="sort_latest">Latest</string>
+    <string name="sort_oldest">Oldest</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="sort_name_desc">Name (Z-A)</string>
+    <string name="sort_pairs">Pairs Count</string>
+    <string name="created_at">Created: %1$s</string>
+    <string name="edit_board">Edit Board</string>
+    <string name="update_and_play">UPDATE &amp; PLAY</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="duration_seconds">%1$ds</string>
+    <string name="duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="best_time_label">Best: %1$s</string>
+    <string name="current_record_info">New Personal Best! 🏆</string>
 
     <!-- Browse Screen -->
     <string name="saved_boards">Saved Boards</string>

@@ -3,7 +3,6 @@ package com.umrhsn.mmoire.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -22,22 +21,22 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = Color(0xFF000033),
     primaryContainer = MemoirePrimaryContainerDark,
     onPrimaryContainer = Color(0xFFE0E0FF),
-    
+
     secondary = MemoireSecondary,
     onSecondary = Color.Black,
     secondaryContainer = Color(0xFF003730),
     onSecondaryContainer = Color(0xFF6FFFD9),
-    
+
     tertiary = MemoireAccent,
     onTertiary = Color.Black,
-    
+
     background = BackgroundDark,
     onBackground = Color(0xFFE4E1E6),
     surface = SurfaceDark,
     onSurface = Color(0xFFE4E1E6),
     surfaceVariant = SurfaceVariantDark,
     onSurfaceVariant = Color(0xFFC4C6D0),
-    
+
     error = MemoireError,
     onError = Color.White
 )
@@ -47,15 +46,15 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     primaryContainer = MemoirePrimaryContainer,
     onPrimaryContainer = Color(0xFF000066),
-    
+
     secondary = MemoireSecondary,
     onSecondary = Color.White,
     secondaryContainer = MemoireSecondaryContainer,
     onSecondaryContainer = Color(0xFF003730),
-    
+
     tertiary = MemoireAccent,
     onTertiary = Color.Black,
-    
+
     background = BackgroundLight,
     onBackground = Color(0xFF1B1B1F),
     surface = SurfaceLight,

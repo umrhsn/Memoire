@@ -1,8 +1,6 @@
 package com.umrhsn.mmoire.utils
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -29,7 +27,7 @@ class LocalImageManager @Inject constructor(
         }
         val fileName = "img_$index.jpg"
         val file = File(gameDir, fileName)
-        
+
         FileOutputStream(file).use { out ->
             out.write(byteArray)
         }
@@ -39,10 +37,10 @@ class LocalImageManager @Inject constructor(
     fun getImages(gameName: String): List<String> {
         val gameDir = File(imagesDir, gameName)
         if (!gameDir.exists()) return emptyList()
-        
+
         return gameDir.listFiles()?.map { Uri.fromFile(it).toString() } ?: emptyList()
     }
-    
+
     fun deleteGameImages(gameName: String) {
         val gameDir = File(imagesDir, gameName)
         if (gameDir.exists()) {

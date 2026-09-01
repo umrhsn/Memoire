@@ -1,38 +1,89 @@
 package com.umrhsn.mmoire.ui.screens
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.EaseInOutQuart
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
-import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
+import com.umrhsn.mmoire.ui.components.AppHeaderIcon
+import com.umrhsn.mmoire.ui.components.FloatingPill
 import com.umrhsn.mmoire.ui.components.MemoryBoard
 import com.umrhsn.mmoire.ui.components.StatBadge
+import com.umrhsn.mmoire.ui.components.TutorialOverlay
+import com.umrhsn.mmoire.ui.components.getMainTutorialSteps
+import com.umrhsn.mmoire.ui.components.tutorialAnchor
 import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.viewmodels.MainViewModel
+import compose.icons.EvaIcons
+import compose.icons.evaicons.Outline
+import compose.icons.evaicons.outline.Activity
+import compose.icons.evaicons.outline.AlertTriangle
+import compose.icons.evaicons.outline.Award
+import compose.icons.evaicons.outline.CheckmarkCircle2
+import compose.icons.evaicons.outline.Clock
+import compose.icons.evaicons.outline.Flash
+import compose.icons.evaicons.outline.Folder
+import compose.icons.evaicons.outline.Grid
+import compose.icons.evaicons.outline.Image
+import compose.icons.evaicons.outline.Layers
+import compose.icons.evaicons.outline.Navigation2
+import compose.icons.evaicons.outline.PlusCircle
+import compose.icons.evaicons.outline.QuestionMarkCircle
+import compose.icons.evaicons.outline.Refresh
+import compose.icons.evaicons.outline.SmilingFace
+import compose.icons.evaicons.outline.Star
+import compose.icons.evaicons.outline.Sun
 import java.util.Locale
 
 @Composable
@@ -46,14 +97,14 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val game = uiState.memoryGame
+    val haptic = LocalHapticFeedback.current
 
     var showWinDialog by remember { mutableStateOf(false) }
     var hasTriggeredWinEffects by remember { mutableStateOf(false) }
-    
+
     var showSizeDialog by remember { mutableStateOf(false) }
     var showCreateSelectionDialog by remember { mutableStateOf(false) }
 
-    // Detect win state
     LaunchedEffect(game?.haveWonGame()) {
         if (game?.haveWonGame() == true && !hasTriggeredWinEffects) {
             onWin(game.smoothWin())
@@ -67,18 +118,74 @@ fun MainScreen(
     }
 
     MemoireTheme {
-        Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Box(modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Header (Shared)
-                AppHeader(title = uiState.gameName ?: stringResource(R.string.app_name))
+                AppHeader(
+                    title = uiState.gameName ?: stringResource(R.string.app_name),
+                    actions = {
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.Refresh,
+                            contentDescription = stringResource(R.string.reset_game),
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                viewModel.refreshGame()
+                            }
+                        )
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.Grid,
+                            contentDescription = stringResource(R.string.change_size),
+                            onClick = {
+                                viewModel.playClickSound()
+                                showSizeDialog = true
+                            }
+                        )
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.PlusCircle,
+                            contentDescription = stringResource(R.string.create_game),
+                            onClick = {
+                                viewModel.playClickSound()
+                                showCreateSelectionDialog = true
+                            }
+                        )
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.Folder,
+                            contentDescription = stringResource(R.string.load_game),
+                            onClick = {
+                                viewModel.playClickSound()
+                                onBrowseClicked()
+                            }
+                        )
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.QuestionMarkCircle,
+                            contentDescription = "Help",
+                            onClick = {
+                                viewModel.playClickSound()
+                                viewModel.startTutorial()
+                            },
+                            modifier = Modifier.tutorialAnchor(
+                                "help_action",
+                                viewModel::onAnchorPositioned
+                            )
+                        )
+                    },
+                    modifier = Modifier.tutorialAnchor(
+                        "header_actions",
+                        viewModel::onAnchorPositioned
+                    )
+                )
 
-                // Game Board Area with Transition
-                Box(modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .tutorialAnchor("game_board", viewModel::onAnchorPositioned)
+                ) {
                     AnimatedContent(
                         targetState = uiState.gameSessionId,
                         transitionSpec = {
-                            fadeIn(animationSpec = tween(500)) togetherWith
-                            fadeOut(animationSpec = tween(500))
+                            fadeIn(animationSpec = tween(600, easing = EaseInOutQuart)) togetherWith
+                                    fadeOut(animationSpec = tween(400))
                         },
                         label = stringResource(R.string.gameTransition_label)
                     ) { targetSessionId: Long ->
@@ -94,47 +201,128 @@ fun MainScreen(
                             MemoryBoard(
                                 boardSize = sessionSize,
                                 cards = sessionGame!!.cards,
-                                onCardClicked = onCardClicked
+                                onCardClicked = { pos ->
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onCardClicked(pos)
+                                }
                             )
                         }
                     }
 
-                    // Loading Overlay
                     if (uiState.isLoading) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.3f)),
+                                .background(Color.Black.copy(alpha = 0.4f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(color = Color.White)
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 6.dp
+                            )
                         }
                     }
                 }
-                
-                // Spacer for Floating Bottom Bar
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.app_header_height)))
+
+                if (game != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        FloatingPill(
+                            modifier = Modifier.wrapContentWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                val movesColor =
+                                    if (game.getNumMoves() <= uiState.boardSize.getNumPairs()) {
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                                    } else {
+                                        null
+                                    }
+
+                                Row(
+                                    modifier = Modifier.tutorialAnchor(
+                                        "stats_tracking",
+                                        viewModel::onAnchorPositioned
+                                    ),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    StatBadge(
+                                        icon = EvaIcons.Outline.Flash,
+                                        value = game.getNumMoves().toString(),
+                                        tooltipText = "Moves",
+                                        containerColor = movesColor,
+                                        contentColor = if (movesColor != null) MaterialTheme.colorScheme.onPrimaryContainer else null
+                                    )
+
+                                    val pairsFinished =
+                                        game.numPairsFound == uiState.boardSize.getNumPairs()
+                                    StatBadge(
+                                        icon = EvaIcons.Outline.Layers,
+                                        value = stringResource(
+                                            R.string.pairs_progress,
+                                            game.numPairsFound,
+                                            uiState.boardSize.getNumPairs()
+                                        ),
+                                        tooltipText = "Pairs",
+                                        containerColor = if (pairsFinished) MaterialTheme.colorScheme.secondaryContainer.copy(
+                                            alpha = 0.8f
+                                        ) else null,
+                                        contentColor = if (pairsFinished) MaterialTheme.colorScheme.onSecondaryContainer else null
+                                    )
+                                }
+
+                                Row(
+                                    modifier = Modifier.tutorialAnchor(
+                                        "timer_tracking",
+                                        viewModel::onAnchorPositioned
+                                    ),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    val isBreakingRecord =
+                                        uiState.bestTime == null || uiState.timerSeconds < uiState.bestTime!!
+                                    StatBadge(
+                                        icon = EvaIcons.Outline.Clock,
+                                        value = formatDuration(uiState.timerSeconds),
+                                        tooltipText = "Timer",
+                                        containerColor = if (isBreakingRecord && game.numCardFlips > 0) MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                            alpha = 0.6f
+                                        ) else null,
+                                        contentColor = if (isBreakingRecord && game.numCardFlips > 0) MaterialTheme.colorScheme.onTertiaryContainer else null
+                                    )
+
+                                    uiState.bestTime?.let {
+                                        StatBadge(
+                                            icon = EvaIcons.Outline.Award,
+                                            value = formatDuration(it),
+                                            tooltipText = "Best Time",
+                                            containerColor = MaterialTheme.colorScheme.primary.copy(
+                                                alpha = 0.15f
+                                            ),
+                                            contentColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            // Floating Bottom Bar
-            if (game != null) {
-                FloatingControlBar(
-                    numMoves = game.getNumMoves(),
-                    numPairs = game.numPairsFound,
-                    totalPairs = uiState.boardSize.getNumPairs(),
-                    onRefresh = { viewModel.refreshGame() },
-                    onSize = { showSizeDialog = true },
-                    onCreate = { showCreateSelectionDialog = true },
-                    onDownload = { onBrowseClicked() },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-
-            // Dialogs
             if (showWinDialog) {
                 WinDialog(
                     numMoves = game?.getNumMoves() ?: 0,
+                    timeSeconds = uiState.timerSeconds,
                     isSmoothWin = game?.smoothWin() == true,
+                    bestTime = uiState.bestTime,
                     onPlayAgain = {
                         showWinDialog = false
                         viewModel.refreshGame()
@@ -158,7 +346,7 @@ fun MainScreen(
                 BoardSizeDialog(
                     currentSize = uiState.boardSize,
                     title = stringResource(R.string.create_custom_game),
-                    icon = Icons.Default.AddPhotoAlternate,
+                    icon = EvaIcons.Outline.Image,
                     onSizeSelected = {
                         onCreateClicked(it)
                         showCreateSelectionDialog = false
@@ -166,99 +354,93 @@ fun MainScreen(
                     onDismiss = { showCreateSelectionDialog = false }
                 )
             }
-        }
-    }
-}
 
-@Composable
-private fun FloatingControlBar(
-    numMoves: Int,
-    numPairs: Int,
-    totalPairs: Int,
-    onRefresh: () -> Unit,
-    onSize: () -> Unit,
-    onCreate: () -> Unit,
-    onDownload: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier
-            .padding(dimensionResource(R.dimen.spacing_medium))
-            .fillMaxWidth(),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = dimensionResource(R.dimen.spacing_small),
-        shadowElevation = dimensionResource(R.dimen.radius_medium),
-        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-    ) {
-        Row(
-            modifier = Modifier.padding(
-                horizontal = dimensionResource(R.dimen.spacing_small),
-                vertical = dimensionResource(R.dimen.spacing_tiny)
-            ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                modifier = Modifier.padding(start = dimensionResource(R.dimen.radius_medium)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.radius_medium))
-            ) {
-                StatBadge(icon = Icons.Default.DirectionsRun, value = numMoves.toString())
-                StatBadge(icon = Icons.Default.Extension, value = stringResource(R.string.pairs_progress, numPairs, totalPairs))
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                ControlIcon(icon = Icons.Default.Refresh, contentDescription = stringResource(R.string.reset_game), onClick = onRefresh)
-                ControlIcon(icon = Icons.Default.AspectRatio, contentDescription = stringResource(R.string.change_size), onClick = onSize)
-                ControlIcon(icon = Icons.Default.AddCircle, contentDescription = stringResource(R.string.create_game), onClick = onCreate)
-                ControlIcon(icon = Icons.Default.FolderOpen, contentDescription = stringResource(R.string.load_game), onClick = onDownload)
+            if (uiState.showTutorial) {
+                TutorialOverlay(
+                    steps = getMainTutorialSteps(),
+                    anchors = uiState.tutorialAnchors,
+                    onComplete = { viewModel.dismissTutorial() },
+                    onSkip = { viewModel.dismissTutorial() }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ControlIcon(icon: ImageVector, contentDescription: String, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(icon, contentDescription = contentDescription, tint = MaterialTheme.colorScheme.primary)
+fun formatDuration(seconds: Long): String {
+    val mins = seconds / 60
+    val secs = seconds % 60
+    return if (mins == 0L) {
+        stringResource(R.string.duration_seconds, secs)
+    } else {
+        stringResource(R.string.duration_minutes_seconds, mins, secs)
     }
 }
 
 @Composable
 private fun WinDialog(
     numMoves: Int,
+    timeSeconds: Long,
     isSmoothWin: Boolean,
+    bestTime: Long?,
     onPlayAgain: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AppDialog(
         onDismissRequest = onDismiss,
         title = if (isSmoothWin) stringResource(R.string.perfect_win) else stringResource(R.string.game_finished),
-        icon = if (isSmoothWin) Icons.Default.WorkspacePremium else Icons.Default.SentimentVerySatisfied
+        icon = if (isSmoothWin) EvaIcons.Outline.Award else EvaIcons.Outline.SmilingFace
     ) {
-        Text(
-            text = stringResource(R.string.win_message, numMoves),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.win_message, numMoves),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Time: ${formatDuration(timeSeconds)}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            if (bestTime != null && timeSeconds <= bestTime) {
+                Text(
+                    text = stringResource(R.string.current_record_info),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Black
+                )
+            } else if (bestTime != null) {
+                Text(
+                    text = stringResource(R.string.best_time_label, formatDuration(bestTime)),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.radius_medium))
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedButton(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Text(stringResource(R.string.close))
             }
             Button(
                 onClick = { onPlayAgain() },
                 modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Text(stringResource(R.string.play_again), fontWeight = FontWeight.Bold)
             }
@@ -270,7 +452,7 @@ private fun WinDialog(
 private fun BoardSizeDialog(
     currentSize: BoardSize,
     title: String = stringResource(R.string.choose_level),
-    icon: ImageVector = Icons.Default.Layers,
+    icon: ImageVector = EvaIcons.Outline.Layers,
     onSizeSelected: (BoardSize) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -292,69 +474,86 @@ private fun BoardSizeDialog(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.spacing_small))
+                        .padding(vertical = 4.dp)
                         .clickable { onSizeSelected(size) },
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
-                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
+                    shape = RoundedCornerShape(24.dp),
+                    color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(
+                        alpha = 0.2f
+                    ),
+                    border = if (isSelected) androidx.compose.foundation.BorderStroke(
+                        2.dp,
+                        MaterialTheme.colorScheme.primary
+                    ) else null
                 ) {
                     Row(
-                        modifier = Modifier.padding(dimensionResource(R.dimen.spacing_medium)),
+                        modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(dimensionResource(R.dimen.spacing_huge)),
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
+                            modifier = Modifier.size(44.dp),
+                            shape = RoundedCornerShape(12.dp),
                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = when(size) {
-                                        BoardSize.SUPER_DUPER_EASY -> Icons.Default.SentimentVerySatisfied
-                                        BoardSize.SUPER_EASY -> Icons.Default.Mood
-                                        BoardSize.EASY -> Icons.Default.Bolt
-                                        BoardSize.MEDIUM -> Icons.Default.FilterHdr
-                                        BoardSize.HARD -> Icons.Default.Diamond
-                                        BoardSize.SUPER_HARD -> Icons.Default.Whatshot
-                                        BoardSize.SUPER_DUPER_HARD -> Icons.Default.LocalFireDepartment
+                                    imageVector = when (size) {
+                                        BoardSize.SUPER_DUPER_EASY -> EvaIcons.Outline.SmilingFace
+                                        BoardSize.SUPER_EASY -> EvaIcons.Outline.Sun
+                                        BoardSize.EASY -> EvaIcons.Outline.Flash
+                                        BoardSize.MEDIUM -> EvaIcons.Outline.Navigation2
+                                        BoardSize.HARD -> EvaIcons.Outline.Star
+                                        BoardSize.SUPER_HARD -> EvaIcons.Outline.Activity
+                                        BoardSize.SUPER_DUPER_HARD -> EvaIcons.Outline.AlertTriangle
                                     },
                                     contentDescription = null,
                                     tint = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(with(density) { dimensionResource(R.dimen.text_large).toSp() }.value.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = size.name.replace("_", " ").lowercase(Locale.ROOT).replaceFirstChar { it.uppercase() },
+                                text = size.name.replace("_", " ").lowercase(Locale.ROOT)
+                                    .replaceFirstChar { it.uppercase() },
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = stringResource(R.string.cards_pairs_info, size.numCards, size.getNumPairs()),
+                                text = stringResource(
+                                    R.string.cards_pairs_info,
+                                    size.numCards,
+                                    size.getNumPairs()
+                                ),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                    alpha = 0.7f
+                                ) else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         if (isSelected) {
                             Icon(
-                                imageVector = Icons.Default.CheckCircle,
+                                imageVector = EvaIcons.Outline.CheckmarkCircle2,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
                 }
             }
         }
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+        Spacer(modifier = Modifier.height(24.dp))
         TextButton(
             onClick = onDismiss,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(stringResource(R.string.maybe_later), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                stringResource(R.string.maybe_later),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

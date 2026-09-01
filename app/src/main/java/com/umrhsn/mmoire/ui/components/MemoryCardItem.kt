@@ -1,9 +1,13 @@
 package com.umrhsn.mmoire.ui.components
 
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +18,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -31,9 +37,26 @@ fun MemoryCardItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Smooth scale effect on press
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "cardPressScale"
+    )
+
+    // Tactile spring rotation
     val rotation by animateFloatAsState(
         targetValue = if (memoryCard.isFaceUp) 180f else 0f,
-        animationSpec = tween(durationMillis = 400),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
         label = stringResource(R.string.cardFlip_label)
     )
 
@@ -41,13 +64,21 @@ fun MemoryCardItem(
         modifier = modifier
             .padding(dimensionResource(R.dimen.spacing_tiny))
             .aspectRatio(1f)
+            .scale(scale)
             .graphicsLayer {
                 rotationY = rotation
-                cameraDistance = 12f * density
+                cameraDistance = 15f * density
             }
-            .clickable { onClick() },
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null, // Custom visual feedback via scale
+                onClick = onClick
+            ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.spacing_tiny)),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.spacing_tiny),
+            pressedElevation = 0.dp
+        ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -56,7 +87,6 @@ fun MemoryCardItem(
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
-                    // Reverse the rotation for the content so it stays upright
                     if (rotation > 90f) rotationY = 180f
                 }
         ) {
@@ -65,9 +95,14 @@ fun MemoryCardItem(
             } else {
                 stringResource(R.string.face_down)
             }
-            val alpha = if (memoryCard.isMatched) 0.4f else 1.0f
 
-            // Show content only when appropriate in the rotation
+            // Subtle matched alpha transition
+            val matchedAlpha by animateFloatAsState(
+                targetValue = if (memoryCard.isMatched) 0.5f else 1.0f,
+                animationSpec = tween(500),
+                label = "matchedAlpha"
+            )
+
             if (rotation > 90f) {
                 if (memoryCard.imageUrl != null) {
                     AsyncImage(
@@ -75,7 +110,7 @@ fun MemoryCardItem(
                         contentDescription = contentDescription,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        alpha = alpha,
+                        alpha = matchedAlpha,
                         placeholder = painterResource(R.drawable.image_loading)
                     )
                 } else {
@@ -84,7 +119,7 @@ fun MemoryCardItem(
                         contentDescription = contentDescription,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        alpha = alpha
+                        alpha = matchedAlpha
                     )
                 }
             } else {

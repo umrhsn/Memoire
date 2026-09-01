@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.umrhsn.mmoire.R
 
@@ -40,7 +39,7 @@ fun GameInfoBar(
             text = infoLabel,
             modifier = Modifier.weight(1f)
         )
-        
+
         InfoCard(
             text = stringResource(R.string.pairs_progress, numPairs, totalPairs),
             modifier = Modifier.weight(1.5f)

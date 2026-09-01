@@ -5,16 +5,50 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -24,22 +58,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
+import com.umrhsn.mmoire.ui.components.AppHeaderIcon
+import com.umrhsn.mmoire.ui.components.getAppTextFieldColors
 import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
 import com.umrhsn.mmoire.viewmodels.CreateViewModel
+import compose.icons.EvaIcons
+import compose.icons.evaicons.Outline
+import compose.icons.evaicons.outline.AlertTriangle
+import compose.icons.evaicons.outline.ArrowBack
+import compose.icons.evaicons.outline.Award
+import compose.icons.evaicons.outline.Close
+import compose.icons.evaicons.outline.CloudUpload
+import compose.icons.evaicons.outline.Edit
+import compose.icons.evaicons.outline.Flash
+import compose.icons.evaicons.outline.Image
+import compose.icons.evaicons.outline.Plus
+import compose.icons.evaicons.outline.Save
 import kotlin.math.ceil
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScreen(
     viewModel: CreateViewModel,
     boardSize: BoardSize,
     chosenImageUris: List<Uri>,
+    oldName: String? = null,
     onBackClicked: () -> Unit,
     onPlaceholderClicked: () -> Unit,
     onImageClicked: (Int) -> Unit,
@@ -48,23 +97,26 @@ fun CreateScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var gameName by remember { mutableStateOf("") }
+    var gameName by remember { mutableStateOf(oldName ?: "") }
     val numImagesRequired = boardSize.getNumPairs()
     val context = LocalContext.current
 
     MemoireTheme {
-        Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Box(modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Header (Shared)
+                // Header
                 AppHeader(
-                    title = stringResource(R.string.new_board),
+                    title = if (oldName != null) stringResource(R.string.edit_board) else stringResource(
+                        R.string.new_board
+                    ),
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
-                        }
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            onClick = onBackClicked
+                        )
                     }
                 )
 
@@ -73,9 +125,9 @@ fun CreateScreen(
                         .weight(1f)
                         .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
                 ) {
-                    // Step 1: Info with Icon
+                    // Step 1
                     SectionHeader(
-                        icon = Icons.Default.Collections,
+                        icon = EvaIcons.Outline.Image,
                         title = stringResource(R.string.step_1_title),
                         subtitle = stringResource(R.string.step_1_subtitle, numImagesRequired)
                     )
@@ -87,16 +139,22 @@ fun CreateScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = dimensionResource(R.dimen.spacing_small))
-                            .height(dimensionResource(R.dimen.spacing_small)),
+                            .height(10.dp)
+                            .clip(CircleShape),
                         strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                        color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
+                        color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
 
                     // Grid Area
                     Box(modifier = Modifier.weight(1f)) {
-                        if (chosenImageUris.isEmpty()) {
-                            EmptySelectionState(onPlaceholderClicked)
+                        if (chosenImageUris.isEmpty() && !uiState.isLoading) {
+                            EmptySelectionState(
+                                onClick = onPlaceholderClicked,
+                                onSoundClick = { viewModel.playButtonClick() }
+                            )
+                        } else if (uiState.isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         } else {
                             DynamicImageGrid(
                                 chosenImageUris = chosenImageUris,
@@ -108,16 +166,16 @@ fun CreateScreen(
                         }
                     }
 
-                    // Step 2: Naming
+                    // Step 2
                     SectionHeader(
-                        icon = Icons.Default.DriveFileRenameOutline,
+                        icon = EvaIcons.Outline.Edit,
                         title = stringResource(R.string.step_2_title),
                         subtitle = stringResource(R.string.step_2_subtitle)
                     )
 
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 }
-                
+
                 // Bottom Control Section
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -126,7 +184,8 @@ fun CreateScreen(
                         topStart = dimensionResource(R.dimen.spacing_extra_large),
                         topEnd = dimensionResource(R.dimen.spacing_extra_large)
                     ),
-                    shadowElevation = dimensionResource(R.dimen.spacing_large)
+                    shadowElevation = 32.dp,
+                    tonalElevation = 8.dp
                 ) {
                     Column(
                         modifier = Modifier
@@ -146,47 +205,63 @@ fun CreateScreen(
                             singleLine = true,
                             enabled = !uiState.isUploading,
                             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                            ),
-                            leadingIcon = { Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null) }
+                            colors = getAppTextFieldColors(),
+                            leadingIcon = {
+                                Icon(
+                                    EvaIcons.Outline.Flash,
+                                    contentDescription = null
+                                )
+                            }
                         )
 
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
-                        Button(
-                            onClick = { onSaveClicked(gameName) },
-                            modifier = Modifier
-                                .height(dimensionResource(R.dimen.button_height_large))
-                                .fillMaxWidth(),
-                            enabled = chosenImageUris.size == numImagesRequired && 
-                                      gameName.isNotBlank() && 
-                                      gameName.length >= 3 && 
-                                      !uiState.isUploading,
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = dimensionResource(R.dimen.spacing_small))
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip {
+                                    Text(if (chosenImageUris.size < numImagesRequired) "Select all photos first" else "Finalize board")
+                                }
+                            },
+                            state = rememberTooltipState()
                         ) {
-                            if (uiState.isUploading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    strokeWidth = 3.dp
-                                )
-                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                Text(stringResource(R.string.saving_board), fontWeight = FontWeight.Black)
-                            } else {
-                                Icon(Icons.Default.CloudUpload, contentDescription = null)
-                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                Text(
-                                    text = stringResource(R.string.create_and_play),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
+                            Button(
+                                onClick = { onSaveClicked(gameName) },
+                                modifier = Modifier
+                                    .height(dimensionResource(R.dimen.button_height_large))
+                                    .fillMaxWidth(),
+                                enabled = chosenImageUris.size == numImagesRequired &&
+                                        gameName.isNotBlank() &&
+                                        gameName.length >= 3 &&
+                                        !uiState.isUploading,
+                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                            ) {
+                                if (uiState.isUploading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        strokeWidth = 3.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                    Text(
+                                        stringResource(R.string.saving_board),
+                                        fontWeight = FontWeight.Black
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = if (oldName != null) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
+                                        contentDescription = null
+                                    )
+                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                    Text(
+                                        text = if (oldName != null) stringResource(R.string.update_and_play) else stringResource(
+                                            R.string.create_and_play
+                                        ),
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.ExtraBold
+                                    )
+                                }
                             }
                         }
 
@@ -194,7 +269,9 @@ fun CreateScreen(
                             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                             LinearProgressIndicator(
                                 progress = { uiState.uploadProgress / 100f },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(CircleShape),
                                 strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
                                 color = MaterialTheme.colorScheme.primary,
                                 trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
@@ -207,9 +284,9 @@ fun CreateScreen(
             // Success Dialog
             if (uiState.isSuccess) {
                 AppDialog(
-                    onDismissRequest = {}, 
+                    onDismissRequest = {},
                     title = stringResource(R.string.board_ready_title),
-                    icon = Icons.Default.CheckCircle
+                    icon = EvaIcons.Outline.Award
                 ) {
                     Text(
                         text = stringResource(R.string.board_ready_message, uiState.gameName ?: ""),
@@ -239,7 +316,7 @@ fun CreateScreen(
                 AppDialog(
                     onDismissRequest = { viewModel.resetState() },
                     title = stringResource(R.string.name_exists_title),
-                    icon = Icons.Default.Warning
+                    icon = EvaIcons.Outline.AlertTriangle
                 ) {
                     Text(
                         text = stringResource(R.string.name_exists_message, uiState.gameName ?: ""),
@@ -275,29 +352,38 @@ private fun SectionHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
-            modifier = Modifier.size(dimensionResource(R.dimen.spacing_huge).value.dp),
+            modifier = Modifier.size(52.dp),
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large).value.dp)
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         Column {
-            Text(text = title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
 @Composable
-private fun EmptySelectionState(onClick: () -> Unit) {
+private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -307,50 +393,56 @@ private fun EmptySelectionState(onClick: () -> Unit) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+            border = androidx.compose.foundation.BorderStroke(
+                1.dp,
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
         ) {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.spacing_extra_large)),
+                modifier = Modifier.padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.PhotoLibrary,
+                    imageVector = EvaIcons.Outline.Image,
                     contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_huge)),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 )
-                
+
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                
+
                 Text(
                     text = stringResource(R.string.no_photos_yet),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Text(
                     text = stringResource(R.string.no_photos_yet_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small))
+                    modifier = Modifier.padding(top = 8.dp)
                 )
-                
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_extra_large)))
-                
+
+                Spacer(modifier = Modifier.height(32.dp))
+
                 Button(
-                    onClick = onClick,
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                    onClick = {
+                        onSoundClick()
+                        onClick()
+                    },
+                    shape = RoundedCornerShape(20.dp),
                     contentPadding = PaddingValues(
-                        horizontal = dimensionResource(R.dimen.spacing_large),
-                        vertical = dimensionResource(R.dimen.spacing_medium)
+                        horizontal = 32.dp,
+                        vertical = 16.dp
                     )
                 ) {
-                    Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
-                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                    Icon(EvaIcons.Outline.Plus, contentDescription = null)
+                    Spacer(modifier = Modifier.width(12.dp))
                     Text(stringResource(R.string.open_gallery), fontWeight = FontWeight.ExtraBold)
                 }
             }
@@ -370,22 +462,23 @@ private fun DynamicImageGrid(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        val totalSlots = chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
+        val totalSlots =
+            chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
         val spacing = dimensionResource(R.dimen.spacing_small)
-        
+
         var bestCols = 1
         var bestCardSizeValue = 0f
 
         for (cols in 1..totalSlots) {
             val rows = ceil(totalSlots.toFloat() / cols).toInt()
-            
+
             val availableWidth = maxWidth - (spacing * (cols - 1))
             val availableHeight = maxHeight - (spacing * (rows - 1))
-            
+
             val cw = availableWidth.value / cols
             val ch = availableHeight.value / rows
             val s = if (cw < ch) cw else ch
-            
+
             if (s > bestCardSizeValue) {
                 bestCardSizeValue = s
                 bestCols = cols
@@ -430,6 +523,7 @@ private fun DynamicImageGrid(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ImageItem(
     uri: Uri,
@@ -441,8 +535,8 @@ private fun ImageItem(
             .fillMaxSize()
             .aspectRatio(1f)
             .clickable { onClick() },
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.spacing_tiny))
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Box {
             AsyncImage(
@@ -451,52 +545,77 @@ private fun ImageItem(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            
+
             // Delete Icon Badge
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(dimensionResource(R.dimen.spacing_tiny))
-                    .size(dimensionResource(R.dimen.badge_size))
-                    .clickable { onRemove() },
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
-                contentColor = Color.White,
-                shadowElevation = dimensionResource(R.dimen.spacing_tiny)
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    PlainTooltip {
+                        Text(stringResource(R.string.remove))
+                    }
+                },
+                state = rememberTooltipState()
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.remove_desc),
-                        modifier = Modifier.size(dimensionResource(R.dimen.spacing_medium))
-                    )
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(28.dp)
+                        .clickable { onRemove() },
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
+                    contentColor = Color.White,
+                    shadowElevation = 8.dp
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = EvaIcons.Outline.Close,
+                            contentDescription = stringResource(R.string.remove_desc),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlaceholderItem(onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(1f)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+    TooltipBox(
+        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        tooltip = {
+            PlainTooltip {
+                Text(stringResource(R.string.add_image_desc))
+            }
+        },
+        state = rememberTooltipState()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.AddPhotoAlternate,
-                contentDescription = stringResource(R.string.add_image_desc),
-                modifier = Modifier.size(dimensionResource(R.dimen.spacing_extra_large)),
-                tint = MaterialTheme.colorScheme.primary
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+                .clickable { onClick() },
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                    alpha = 0.2f
+                )
             )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = EvaIcons.Outline.Plus,
+                    contentDescription = stringResource(R.string.add_image_desc),
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
