@@ -102,9 +102,11 @@ fun CreateScreen(
     val context = LocalContext.current
 
     MemoireTheme {
-        Box(modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Header
                 AppHeader(
@@ -157,8 +159,8 @@ fun CreateScreen(
                             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                         } else {
                             DynamicImageGrid(
+                                boardSize = boardSize,
                                 chosenImageUris = chosenImageUris,
-                                numImagesRequired = numImagesRequired,
                                 onPlaceholderClicked = onPlaceholderClicked,
                                 onImageClicked = onImageClicked,
                                 onRemoveImage = onRemoveImage
@@ -452,8 +454,8 @@ private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
 
 @Composable
 private fun DynamicImageGrid(
+    boardSize: BoardSize,
     chosenImageUris: List<Uri>,
-    numImagesRequired: Int,
     onPlaceholderClicked: () -> Unit,
     onImageClicked: (Int) -> Unit,
     onRemoveImage: (Uri) -> Unit
@@ -462,31 +464,17 @@ private fun DynamicImageGrid(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        val totalSlots =
-            chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
         val spacing = dimensionResource(R.dimen.spacing_small)
+        val numPairsRequired = boardSize.getNumPairs()
 
-        var bestCols = 1
-        var bestCardSizeValue = 0f
+        // We use the same fixed grid logic here
+        // Width for creation screen is usually 2 or 3 to keep it readable
+        val columns = if (numPairsRequired <= 4) 2 else 3
+        val rows = ceil(numPairsRequired.toFloat() / columns).toInt()
 
-        for (cols in 1..totalSlots) {
-            val rows = ceil(totalSlots.toFloat() / cols).toInt()
-
-            val availableWidth = maxWidth - (spacing * (cols - 1))
-            val availableHeight = maxHeight - (spacing * (rows - 1))
-
-            val cw = availableWidth.value / cols
-            val ch = availableHeight.value / rows
-            val s = if (cw < ch) cw else ch
-
-            if (s > bestCardSizeValue) {
-                bestCardSizeValue = s
-                bestCols = cols
-            }
-        }
-
-        val rows = ceil(totalSlots.toFloat() / bestCols).toInt()
-        val bestCardSize = bestCardSizeValue.dp
+        val cardWidth = maxWidth / columns
+        val cardHeight = maxHeight / rows
+        val bestCardSize = if (cardWidth < cardHeight) cardWidth else cardHeight
 
         Column(
             modifier = Modifier.wrapContentSize(),
@@ -499,9 +487,9 @@ private fun DynamicImageGrid(
                     horizontalArrangement = Arrangement.spacedBy(spacing),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    for (c in 0 until bestCols) {
-                        val index = r * bestCols + c
-                        if (index < totalSlots) {
+                    for (c in 0 until columns) {
+                        val index = r * columns + c
+                        if (index < numPairsRequired) {
                             Box(modifier = Modifier.size(bestCardSize)) {
                                 if (index < chosenImageUris.size) {
                                     ImageItem(
@@ -513,8 +501,6 @@ private fun DynamicImageGrid(
                                     PlaceholderItem(onClick = onPlaceholderClicked)
                                 }
                             }
-                        } else {
-                            Spacer(modifier = Modifier.width(bestCardSize))
                         }
                     }
                 }

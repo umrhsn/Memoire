@@ -23,12 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
 import kotlinx.coroutines.delay
-import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -44,28 +42,18 @@ fun MemoryBoard(
             .padding(dimensionResource(R.dimen.spacing_medium)),
         contentAlignment = Alignment.Center
     ) {
-        val scope = this
-        val maxWidth = scope.maxWidth
-        val maxHeight = scope.maxHeight
+        val maxWidth = this.maxWidth
+        val maxHeight = this.maxHeight
         val numCards = cards.size
 
-        // Dynamic Grid Sizing:
-        var bestCols = 1
-        var bestCardSize = 0.dp
+        // We use the dimensions defined in the BoardSize model for a guaranteed clean grid
+        val columns = boardSize.getWidth()
+        val rows = boardSize.getHeight()
 
-        for (cols in 1..numCards) {
-            val rows = ceil(numCards.toFloat() / cols).toInt()
-            val cardWidth = maxWidth / cols
-            val cardHeight = maxHeight / rows
-            val currentSize = if (cardWidth < cardHeight) cardWidth else cardHeight
-
-            if (currentSize > bestCardSize) {
-                bestCardSize = currentSize
-                bestCols = cols
-            }
-        }
-
-        val rows = ceil(numCards.toFloat() / bestCols).toInt()
+        // Calculate card size based on these fixed dimensions to fill the space
+        val cardWidth = maxWidth / columns
+        val cardHeight = maxHeight / rows
+        val bestCardSize = if (cardWidth < cardHeight) cardWidth else cardHeight
 
         // One-time entry animation flag
         var isVisible by remember { mutableStateOf(false) }
@@ -85,8 +73,8 @@ fun MemoryBoard(
                     modifier = Modifier.wrapContentWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    for (c in 0 until bestCols) {
-                        val index = r * bestCols + c
+                    for (c in 0 until columns) {
+                        val index = r * columns + c
                         if (index < numCards) {
                             val card = cards[index]
 
@@ -122,8 +110,6 @@ fun MemoryBoard(
                                     onClick = { onCardClicked(index) }
                                 )
                             }
-                        } else {
-                            Box(modifier = Modifier.size(bestCardSize))
                         }
                     }
                 }
