@@ -1,9 +1,54 @@
-# Memoire
-memory game app inspired by Rahul Pandey's
+# Mémoire 🧩
 
-![Screenshot_20221213-153339_Mmoire](https://user-images.githubusercontent.com/55505500/207339228-6dc38a0d-b653-4cc1-88bf-ef3d27e41cf0.jpg)
-![Screenshot_20221213-153347_Mmoire](https://user-images.githubusercontent.com/55505500/207339245-c732436d-2438-41a8-8f38-1adce0f46e04.jpg)
-![Screenshot_20221213-153357_Mmoire](https://user-images.githubusercontent.com/55505500/207339270-fca3e6b8-62ae-4730-baa5-41f543f57096.jpg)
-![Screenshot_20221213-153403_Mmoire](https://user-images.githubusercontent.com/55505500/207339279-33564c57-b3c3-4938-ad27-619802f28f26.jpg)
-![Screenshot_20221213-153435_Mmoire](https://user-images.githubusercontent.com/55505500/207339293-8d4c53e8-e65d-4c28-947a-a83027f7b9de.jpg)
-![Screenshot_20221213-153456_Mmoire](https://user-images.githubusercontent.com/55505500/207339322-d4adece0-331c-48df-a69e-ad974fd52f43.jpg)
+Mémoire is a high-fidelity, offline-first memory game for Android. It has been modernized from its original concept into a premium experience featuring fluid animations, dynamic layouts, and a robust custom game creation system.
+
+## ✨ Features
+
+-   **🎨 Pure Jetpack Compose UI**: A modern, declarative UI built entirely with Compose and Material 3.
+-   **🌓 Immersive Dark & Light Modes**: Centralized color palette with an immersive pitch-black "OLED" dark mode.
+-   **📐 Dynamic Grid Fitting**: A custom algorithm that ensures all cards fit on one screen without scrolling, regardless of the board size or device orientation.
+-   **🎭 Premium Animations**:
+    -   High-fidelity **3D Y-axis flips** for cards.
+    -   Staggered grid pop-in effects.
+    -   Cross-fade board transitions.
+    -   Celebratory confetti effects on wins.
+-   **🛠️ Custom Board Creator**:
+    -   Modern **Android Photo Picker** integration with selection limits and numeric ordering.
+    -   Local image processing and scaling for optimal performance.
+    -   Interactive grid management allowing you to swap or remove images before saving.
+-   **📂 Saved Boards Gallery**:
+    -   A dedicated page to browse your custom creations with "Sticker-style" thumbnails.
+    -   Full-screen board previews to inspect your gallery before playing.
+    -   One-tap play and deletion management.
+-   **💾 Offline-First**: Powered by **Room Database** and internal file storage. No internet connection or cloud accounts required.
+-   **🔊 Audio Feedback**: Infrastructure for low-latency sound effects (card flips, matches, failures, and wins).
+
+## 🛠️ Tech Stack
+
+-   **Language**: Kotlin (2.0.21)
+-   **UI Framework**: Jetpack Compose
+-   **Dependency Injection**: Hilt
+-   **Local Database**: Room
+-   **Image Loading**: Coil (with local Uri and Bitmap support)
+-   **Serialization**: Gson
+-   **Concurrency**: Coroutines & Flow
+-   **Build System**: Gradle 8.13.2
+
+## 🚀 Getting Started
+
+### Prerequisites
+-   Android Studio Ladybug (or newer)
+-   Android SDK 23+ (Min SDK 23, Target SDK 35)
+
+### Installation
+1.  Clone the repository.
+2.  Sync the project with Gradle files.
+3.  Add your preferred sound effects to `app/src/main/res/raw/` (Optional):
+    -   `card_flip.mp3`
+    -   `match_success.mp3`
+    -   `match_fail.mp3`
+    -   `game_win.mp3`
+4.  Run the app on an emulator or physical device.
+
+---
+*Inspired by the original concept by Rahul Pandey.*

@@ -1,0 +1,41 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml</file>
+  <line>23</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+  <problem_class id="AndroidLintLockedOrientationActivity" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Incompatible screenOrientation value</problem_class>
+  <hints />
+  <description>&lt;html&gt;Expecting &lt;code&gt;android:screenOrientation=&quot;unspecified&quot;&lt;/code&gt; or &lt;code&gt;&quot;fullSensor&quot;&lt;/code&gt; for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices&lt;/html&gt;</description>
+  <highlighted_element>android:screenOrientation=&quot;portrait&quot;</highlighted_element>
+  <language>XML</language>
+  <offset>12</offset>
+  <length>36</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml</file>
+  <line>27</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+  <problem_class id="AndroidLintLockedOrientationActivity" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Incompatible screenOrientation value</problem_class>
+  <hints />
+  <description>&lt;html&gt;Expecting &lt;code&gt;android:screenOrientation=&quot;unspecified&quot;&lt;/code&gt; or &lt;code&gt;&quot;fullSensor&quot;&lt;/code&gt; for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices&lt;/html&gt;</description>
+  <highlighted_element>android:screenOrientation=&quot;portrait&quot;</highlighted_element>
+  <language>XML</language>
+  <offset>12</offset>
+  <length>36</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml</file>
+  <line>31</line>
+  <module>Mémoire.app.main</module>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+  <problem_class id="AndroidLintLockedOrientationActivity" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Incompatible screenOrientation value</problem_class>
+  <hints />
+  <description>&lt;html&gt;Expecting &lt;code&gt;android:screenOrientation=&quot;unspecified&quot;&lt;/code&gt; or &lt;code&gt;&quot;fullSensor&quot;&lt;/code&gt; for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices&lt;/html&gt;</description>
+  <highlighted_element>android:screenOrientation=&quot;portrait&quot;</highlighted_element>
+  <language>XML</language>
+  <offset>12</offset>
+  <length>36</length>
+</problem>
+</problems>

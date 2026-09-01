@@ -6,6 +6,7 @@ const val UTF_THINKING_EMOJI = "\uD83E\uDD14" // 🤔
 
 const val EXTRA_GAME_NAME = "EXTRA_GAME_NAME"
 const val EXTRA_BOARD_SIZE = "EXTRA_BOARD_SIZE"
+const val EXTRA_EDIT_GAME_NAME = "EXTRA_EDIT_GAME_NAME"
 
 /** TODO:
  *   1- add reference, images are from [https://www.ilikewallpaper.net/].

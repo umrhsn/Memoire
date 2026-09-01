@@ -1,0 +1,122 @@
+<resources>
+    <string name="app_name">Mémoire</string>
+
+    <!-- General -->
+    <string name="cancel">Annuler</string>
+    <string name="close">Fermer</string>
+    <string name="ok">OK</string>
+    <string name="back">Retour</string>
+    <string name="remove">Retirer</string>
+    <string name="delete">Supprimer</string>
+    <string name="search">Chercher</string>
+    <string name="play">Jouer</string>
+    <string name="start_game">LANCER LE JEU</string>
+    <string name="maybe_later">PLUS TARD</string>
+    <string name="play_again">Rejouer</string>
+    <string name="next">Suivant</string>
+    <string name="finish">Terminer</string>
+    <string name="skip">Passer</string>
+    <string name="help">Aide</string>
+    <string name="settings">Paramètres</string>
+    <string name="more_options">Plus d\'options</string>
+
+    <!-- Board Sizes -->
+    <string name="size_super_duper_easy">Super Facile +</string>
+    <string name="size_super_easy">Super Facile</string>
+    <string name="size_easy">Facile</string>
+    <string name="size_medium">Moyen</string>
+    <string name="size_hard">Difficile</string>
+    <string name="size_super_hard">Super Difficile</string>
+    <string name="size_super_duper_hard">Extrême</string>
+
+    <!-- Main Screen -->
+    <string name="reset_game">Réinitialiser</string>
+    <string name="change_size">Taille</string>
+    <string name="create_game">Créer</string>
+    <string name="create_custom_game">Créer un jeu personnalisé</string>
+    <string name="load_game">Charger</string>
+    <string name="game_finished">Partie terminée !</string>
+    <string name="perfect_win">Victoire parfaite ! 🏆</string>
+    <string name="win_message">Incroyable ! Vous avez vidé le plateau en %1$d coups.</string>
+    <string name="choose_level">Choisir le niveau</string>
+    <string name="cards_count">%1$d cartes</string>
+    <string name="pairs_count">%1$d paires</string>
+    <string name="cards_pairs_info">%1$d cartes • %2$d paires</string>
+    <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="moves_count">%1$d</string>
+    <string name="edit">Modifier</string>
+    <string name="sort">Trier</string>
+    <string name="search_boards">Chercher des plateaux…</string>
+    <string name="sort_latest">Plus récents</string>
+    <string name="sort_oldest">Plus anciens</string>
+    <string name="sort_name_asc">Nom (A-Z)</string>
+    <string name="sort_name_desc">Nom (Z-A)</string>
+    <string name="sort_pairs">Nombre de paires</string>
+    <string name="created_at">Créé : %1$s</string>
+    <string name="edit_board">Modifier le plateau</string>
+    <string name="update_and_play">METTRE À JOUR &amp; JOUER</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="duration_seconds">%1$ds</string>
+    <string name="duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="best_time_label">Meilleur : %1$s</string>
+    <string name="current_record_info">Nouveau record personnel ! 🏆</string>
+    <string name="moves_tracking_label">Coups joués</string>
+    <string name="pairs_tracking_label">Paires trouvées</string>
+    <string name="timer_tracking_label">Temps écoulé</string>
+    <string name="best_time_tracking_label">Record de temps</string>
+
+    <!-- Settings -->
+    <string name="app_settings">Paramètres</string>
+    <string name="language">Langue</string>
+    <string name="lang_system">Suivre le système (dépend de la région)</string>
+    <string name="lang_ar_eg">Arabe égyptien (فاكر؟)</string>
+    <string name="lang_ar">Arabe standard (ذاكرة)</string>
+    <string name="lang_en">Anglais</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Allemand</string>
+    <string name="lang_es">Espagnol</string>
+
+    <!-- Tutorial -->
+    <string name="tut_welcome_title">Bienvenue sur Mémoire ! 🏺</string>
+    <string name="tut_welcome_desc">Un défi de mémoire premium conçu pour la concentration et la rapidité. Laissez-nous vous guider !</string>
+    <string name="tut_hub_title">Le centre de contrôle</string>
+    <string name="tut_hub_desc">Utilisez ces icônes pour réinitialiser le jeu, changer de niveau ou accéder à plus d\'options.</string>
+    <string name="tut_board_title">Plateau de jeu</string>
+    <string name="tut_board_desc">C\'est ici que tout se passe. Appuyez sur les cartes pour les retourner et trouver les paires.</string>
+    <string name="tut_stats_title">Performance en direct</string>
+    <string name="tut_stats_desc">Suivez vos coups et vos paires ici. Essayez de gagner avec le moins de coups possible !</string>
+    <string name="tut_timer_title">Temps &amp; Records</string>
+    <string name="tut_timer_desc">Gardez un œil sur le chrono ! Vos meilleurs temps sont sauvegardés automatiquement.</string>
+    <string name="tut_help_title">Besoin d\'aide ?</string>
+    <string name="tut_help_desc">Un petit rappel ? Appuyez sur l\'icône \'?\' à tout moment pour revoir ce guide.</string>
+
+    <!-- Browse Screen -->
+    <string name="saved_boards">Plateaux sauvegardés</string>
+    <string name="no_saved_games">Aucun jeu sauvegardé</string>
+    <string name="create_first_board">Créez votre premier plateau pour le voir ici.</string>
+    <string name="board_gallery">Galerie du plateau</string>
+    <string name="contains_pairs">Contient %1$d paires uniques</string>
+    <string name="pairs_label">%1$d Paires</string>
+    <string name="more_images_count">+%1$d</string>
+
+    <!-- Create Screen -->
+    <string name="new_board">Nouveau Plateau</string>
+    <string name="step_1_title">Étape 1 : Choisir les photos</string>
+    <string name="step_1_subtitle">Sélectionnez %1$d paires pour votre plateau.</string>
+    <string name="step_2_title">Étape 2 : Nommer votre jeu</string>
+    <string name="step_2_subtitle">Donnez-lui un identifiant unique.</string>
+    <string name="board_identity_label">Identité du plateau</string>
+    <string name="board_id_placeholder">ex: vacances_famille</string>
+    <string name="saving_board">SAUVEGARDE EN COURS…</string>
+    <string name="create_and_play">CRÉER &amp; JOUER</string>
+    <string name="board_ready_title">Plateau prêt ! 🎉</string>
+    <string name="board_ready_message">Votre plateau \'%1$s\' est prêt et a été sauvegardé localement.</string>
+    <string name="name_exists_title">Nom déjà pris 😕</string>
+    <string name="name_exists_message">Un plateau avec l\'ID \'%1$s\' existe déjà. Essayez un autre nom.</string>
+    <string name="change_name_action">OK, CHANGER LE NOM</string>
+    <string name="no_photos_yet">Pas encore de photos</string>
+    <string name="no_photos_yet_subtitle">Sélectionnez des images depuis votre galerie.</string>
+    <string name="open_gallery">OUVRIR LA GALERIE</string>
+    <string name="select_all_photos">Veuillez d\'abord choisir toutes les photos</string>
+    <string name="finalize_board">Finaliser le plateau</string>
+</resources>

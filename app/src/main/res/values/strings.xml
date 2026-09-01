@@ -1,32 +1,145 @@
 <resources>
     <string name="app_name">Mémoire</string>
-    <!--  board size full text for radio buttons  -->
-    <string name="super_duper_easy_fullText">Super Duper Easy (3 × 2)</string>
-    <string name="super_easy_fullText">Super Easy (4 × 2)</string>
-    <string name="easy_fullText">Easy (4 × 3)</string>
-    <string name="medium_fullText">Medium (6 × 3)</string>
-    <string name="hard_fullText">Hard (6 × 4)</string>
-    <string name="super_hard_fullText">Super Hard (9 × 4)</string>
-    <string name="super_duper_hard_fullText">Super Duper Hard (8 × 5)</string>
 
-    <!--  board size text only for text views -->
-    <string name="super_duper_easy_text">Super Duper Easy</string>
-    <string name="super_easy_text">Super Easy</string>
-    <string name="easy_text">Easy</string>
-    <string name="medium_text">Medium</string>
-    <string name="hard_text">Hard</string>
-    <string name="super_hard_text">Super Hard</string>
-    <string name="super_duper_hard_text">Super Duper Hard</string>
+    <!-- Board Sizes -->
+    <string name="size_super_duper_easy">Super Duper Easy</string>
+    <string name="size_super_easy">Super Easy</string>
+    <string name="size_easy">Easy</string>
+    <string name="size_medium">Medium</string>
+    <string name="size_hard">Hard</string>
+    <string name="size_super_hard">Super Hard</string>
+    <string name="size_super_duper_hard">Super Duper Hard</string>
 
-    <!--  board size size only for text views -->
-    <string name="super_duper_easy_size">(3 × 2)</string>
-    <string name="super_easy_size">(4 × 2)</string>
-    <string name="easy_size">(4 × 3)</string>
-    <string name="medium_size">(6 × 3)</string>
-    <string name="hard_size">(6 × 4)</string>
-    <string name="super_hard_size">(9 × 4)</string>
-    <string name="super_duper_hard_size">(8 × 5)</string>
+    <!-- General -->
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="back">Back</string>
+    <string name="remove">Remove</string>
+    <string name="delete">Delete</string>
+    <string name="search">Search</string>
+    <string name="play">Play</string>
+    <string name="start_game">START GAME</string>
+    <string name="maybe_later">MAYBE LATER</string>
+    <string name="play_again">Play Again</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+    <string name="skip">Skip</string>
+    <string name="help">Help</string>
+    <string name="settings">Settings</string>
+    <string name="more_options">More Options</string>
 
-    <!--  CreateActivity  -->
-    <string name="btn_save">Save</string>
+    <!-- Accessibility / Labels -->
+    <string name="gameTransition_label">gameTransition</string>
+    <string name="cardEntryScale_label">cardEntryScale</string>
+    <string name="cardEntryAlpha_label">cardEntryAlpha</string>
+    <string name="cardFlip_label">cardFlip</string>
+    <string name="face_up">Face up</string>
+    <string name="face_down">Face down</string>
+    <string name="preview_desc">Preview</string>
+    <string name="remove_desc">Remove</string>
+    <string name="add_image_desc">Add image</string>
+
+    <!-- Main Screen -->
+    <string name="reset_game">Reset</string>
+    <string name="change_size">Size</string>
+    <string name="create_game">Create</string>
+    <string name="create_custom_game">Create Custom Game</string>
+    <string name="load_game">Load Local</string>
+    <string name="game_finished">Game Finished!</string>
+    <string name="perfect_win">Perfect Win! 🏆</string>
+    <string name="win_message">Amazing! You cleared the board in %1$d moves.</string>
+    <string name="choose_level">Choose Level</string>
+    <string name="cards_count">%1$d cards</string>
+    <string name="pairs_count">%1$d pairs</string>
+    <string name="cards_pairs_info">%1$d cards • %2$d pairs</string>
+    <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="moves_count">%1$d</string>
+    <string name="edit">Edit</string>
+    <string name="sort">Sort</string>
+    <string name="search_boards">Search boards…</string>
+    <string name="sort_latest">Latest</string>
+    <string name="sort_oldest">Oldest</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="sort_name_desc">Name (Z-A)</string>
+    <string name="sort_pairs">Pairs Count</string>
+    <string name="created_at">Created: %1$s</string>
+    <string name="edit_board">Edit Board</string>
+    <string name="update_and_play">UPDATE &amp; PLAY</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="duration_seconds">%1$ds</string>
+    <string name="duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="best_time_label">Best: %1$s</string>
+    <string name="current_record_info">New Personal Best! 🏆</string>
+    <string name="moves_tracking_label">Moves taken</string>
+    <string name="pairs_tracking_label">Pairs found</string>
+    <string name="timer_tracking_label">Elapsed time</string>
+    <string name="best_time_tracking_label">Fastest completion</string>
+
+    <!-- Settings -->
+    <string name="app_settings">App Settings</string>
+    <string name="language">Language</string>
+    <string name="lang_system">Follow System (Region Aware)</string>
+    <string name="lang_ar_eg">Egyptian Arabic (فاكر؟)</string>
+    <string name="lang_ar">Standard Arabic (ذاكرة)</string>
+    <string name="lang_en">English</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_es">Español</string>
+
+    <!-- Tutorial -->
+    <string name="tut_welcome_title">Welcome to Mémoire! 🏺</string>
+    <string name="tut_welcome_desc">A premium memory challenge designed for focus and speed. Let\'s show you around!</string>
+    <string name="tut_hub_title">The Control Hub</string>
+    <string name="tut_hub_desc">Use these icons to reset the game, change board levels, or access more options.</string>
+    <string name="tut_board_title">Memory Board</string>
+    <string name="tut_board_desc">This is where the magic happens. Tap cards to flip them and find matching pairs.</string>
+    <string name="tut_stats_title">Live Performance</string>
+    <string name="tut_stats_desc">Track your moves and pairs here. Try to find the most efficient path to victory!</string>
+    <string name="tut_timer_title">Time &amp; Records</string>
+    <string name="tut_timer_desc">Keep an eye on the timer! Your best times are saved automatically for each board size.</string>
+    <string name="tut_help_title">Help Anytime</string>
+    <string name="tut_help_desc">Need a refresher? Tap the \'?\' icon anytime to see this guide again.</string>
+
+    <!-- Browse Screen -->
+    <string name="saved_boards">Saved Boards</string>
+    <string name="no_saved_games">No Saved Games</string>
+    <string name="create_first_board">Create your first custom memory board to see it here.</string>
+    <string name="board_gallery">Board Gallery</string>
+    <string name="contains_pairs">Contains %1$d unique pairs</string>
+    <string name="pairs_label">%1$d Pairs</string>
+    <string name="more_images_count">+%1$d</string>
+
+    <!-- Create Screen -->
+    <string name="new_board">New Board</string>
+    <string name="step_1_title">Step 1: Choose Photos</string>
+    <string name="step_1_subtitle">Select %1$d pairs for your board.</string>
+    <string name="step_2_title">Step 2: Name Your Game</string>
+    <string name="step_2_subtitle">Give it a unique ID to find it later.</string>
+    <string name="board_identity_label">Board Identity</string>
+    <string name="board_id_placeholder">e.g., Family Vacation</string>
+    <string name="saving_board">SAVING BOARD…</string>
+    <string name="create_and_play">CREATE &amp; PLAY</string>
+    <string name="board_ready_title">Board Ready! 🎉</string>
+    <string name="board_ready_message">Your custom board \'%1$s\' is ready to play. It has been saved to your local storage.</string>
+    <string name="name_exists_title">Name Exists 😕</string>
+    <string name="name_exists_message">A board with the ID \'%1$s\' is already saved. Try using a date or a unique suffix.</string>
+    <string name="change_name_action">OK, CHANGE NAME</string>
+    <string name="no_photos_yet">No Photos Yet</string>
+    <string name="no_photos_yet_subtitle">Select images from your gallery to build your board.</string>
+    <string name="open_gallery">OPEN GALLERY</string>
+    <string name="select_all_photos">Select all photos first</string>
+    <string name="finalize_board">Finalize board</string>
+
+    <!-- Toasts & Errors -->
+    <string name="already_won">You\'ve already won</string>
+    <string name="invalid_move">Invalid move!</string>
+    <string name="congratulations">You won! Congratulations!</string>
+    <string name="smooth_win_toast">Smooth! You won without a single mistake!</string>
+    <string name="nothing_to_refresh">Nothing to refresh here</string>
+    <string name="permission_denied">Permission denied. Access to photos is required.</string>
+    <string name="board_full">Board is already full</string>
+    <string name="game_not_found">Sorry we couldn\'t find such game, \'%1$s\'</string>
+    <string name="failed_to_save">Failed to save: %1$s</string>
+    <string name="failed_to_create_db">Failed to create game entry in database</string>
 </resources>

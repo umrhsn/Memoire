@@ -1,0 +1,122 @@
+<resources>
+    <string name="app_name">Gedächtnis</string>
+
+    <!-- General -->
+    <string name="cancel">Abbrechen</string>
+    <string name="close">Schließen</string>
+    <string name="ok">OK</string>
+    <string name="back">Zurück</string>
+    <string name="remove">Entfernen</string>
+    <string name="delete">Löschen</string>
+    <string name="search">Suchen</string>
+    <string name="play">Spielen</string>
+    <string name="start_game">SPIEL STARTEN</string>
+    <string name="maybe_later">VIELLEICHT SPÄTER</string>
+    <string name="play_again">Nochmal spielen</string>
+    <string name="next">Weiter</string>
+    <string name="finish">Fertig</string>
+    <string name="skip">Überspringen</string>
+    <string name="help">Hilfe</string>
+    <string name="settings">Einstellungen</string>
+    <string name="more_options">Mehr Optionen</string>
+
+    <!-- Board Sizes -->
+    <string name="size_super_duper_easy">Super Duper Einfach</string>
+    <string name="size_super_easy">Super Einfach</string>
+    <string name="size_easy">Einfach</string>
+    <string name="size_medium">Mittel</string>
+    <string name="size_hard">Schwer</string>
+    <string name="size_super_hard">Super Schwer</string>
+    <string name="size_super_duper_hard">Super Duper Schwer</string>
+
+    <!-- Main Screen -->
+    <string name="reset_game">Zurücksetzen</string>
+    <string name="change_size">Größe</string>
+    <string name="create_game">Erstellen</string>
+    <string name="create_custom_game">Eigenes Spiel erstellen</string>
+    <string name="load_game">Laden</string>
+    <string name="game_finished">Spiel beendet!</string>
+    <string name="perfect_win">Perfekter Sieg! 🏆</string>
+    <string name="win_message">Großartig! Du hast das Board in %1$d Zügen geräumt.</string>
+    <string name="choose_level">Level wählen</string>
+    <string name="cards_count">%1$d Karten</string>
+    <string name="pairs_count">%1$d Paare</string>
+    <string name="cards_pairs_info">%1$d Karten • %2$d Paare</string>
+    <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="moves_count">%1$d</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="sort">Sortieren</string>
+    <string name="search_boards">Boards suchen…</string>
+    <string name="sort_latest">Neueste</string>
+    <string name="sort_oldest">Älteste</string>
+    <string name="sort_name_asc">Name (A-Z)</string>
+    <string name="sort_name_desc">Name (Z-A)</string>
+    <string name="sort_pairs">Paaranzahl</string>
+    <string name="created_at">Erstellt: %1$s</string>
+    <string name="edit_board">Board bearbeiten</string>
+    <string name="update_and_play">AKTUALISIEREN &amp; SPIELEN</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="duration_seconds">%1$ds</string>
+    <string name="duration_minutes_seconds">%1$dm %2$ds</string>
+    <string name="best_time_label">Beste: %1$s</string>
+    <string name="current_record_info">Neue Bestzeit! 🏆</string>
+    <string name="moves_tracking_label">Züge</string>
+    <string name="pairs_tracking_label">Gefundene Paare</string>
+    <string name="timer_tracking_label">Vergangene Zeit</string>
+    <string name="best_time_tracking_label">Schnellste Zeit</string>
+
+    <!-- Settings -->
+    <string name="app_settings">Einstellungen</string>
+    <string name="language">Sprache</string>
+    <string name="lang_system">Systemsprache (regionsabhängig)</string>
+    <string name="lang_ar_eg">Ägyptisches Arabisch (فاكر؟)</string>
+    <string name="lang_ar">Standard-Arabisch (ذاكرة)</string>
+    <string name="lang_en">Englisch</string>
+    <string name="lang_fr">Französisch</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_es">Spanisch</string>
+
+    <!-- Tutorial -->
+    <string name="tut_welcome_title">Willkommen bei Mémoire! 🏺</string>
+    <string name="tut_welcome_desc">Eine erstklassige Gedächtnisherausforderung für Fokus und Geschwindigkeit. Lass uns dir alles zeigen!</string>
+    <string name="tut_hub_title">Das Kontrollzentrum</string>
+    <string name="tut_hub_desc">Nutze diese Icons, um das Spiel zurückzusetzen, das Level zu ändern oder weitere Optionen aufzurufen.</string>
+    <string name="tut_board_title">Das Spielfeld</string>
+    <string name="tut_board_desc">Hier passiert alles. Tippe auf Karten, um sie umzudrehen und Paare zu finden.</string>
+    <string name="tut_stats_title">Deine Leistung</string>
+    <string name="tut_stats_desc">Verfolge deine Züge und Paare hier. Versuche mit so wenig Zügen wie möglich zu gewinnen!</string>
+    <string name="tut_timer_title">Zeit &amp; Rekorde</string>
+    <string name="tut_timer_desc">Behalte den Timer im Auge! Deine Bestzeiten werden für jede Größe automatisch gespeichert.</string>
+    <string name="tut_help_title">Immer Hilfe bereit</string>
+    <string name="tut_help_desc">Brauchst du eine Auffrischung? Tippe jederzeit auf das \'?\' Icon, um diese Anleitung erneut zu sehen.</string>
+
+    <!-- Browse Screen -->
+    <string name="saved_boards">Gespeicherte Boards</string>
+    <string name="no_saved_games">Keine gespeicherten Spiele</string>
+    <string name="create_first_board">Erstelle dein erstes Board, um es hier zu sehen.</string>
+    <string name="board_gallery">Board-Galerie</string>
+    <string name="contains_pairs">Enthält %1$d einzigartige Paare</string>
+    <string name="pairs_label">%1$d Paare</string>
+    <string name="more_images_count">+%1$d</string>
+
+    <!-- Create Screen -->
+    <string name="new_board">Neues Board</string>
+    <string name="step_1_title">Schritt 1: Fotos wählen</string>
+    <string name="step_1_subtitle">Wähle %1$d Paare für dein Board.</string>
+    <string name="step_2_title">Schritt 2: Spiel benennen</string>
+    <string name="step_2_subtitle">Gib ihm eine ID, um es später zu finden.</string>
+    <string name="board_identity_label">Board-Identität</string>
+    <string name="board_id_placeholder">z.B. Familienurlaub</string>
+    <string name="saving_board">BOARD WIRD GESPEICHERT…</string>
+    <string name="create_and_play">ERSTELLEN &amp; SPIELEN</string>
+    <string name="board_ready_title">Board bereit! 🎉</string>
+    <string name="board_ready_message">Dein Board \'%1$s\' ist spielbereit und lokal gespeichert.</string>
+    <string name="name_exists_title">Name existiert 😕</string>
+    <string name="name_exists_message">Ein Board mit der ID \'%1$s\' existiert bereits. Probiere einen anderen Namen.</string>
+    <string name="change_name_action">OK, NAME ÄNDERN</string>
+    <string name="no_photos_yet">Noch keine Fotos</string>
+    <string name="no_photos_yet_subtitle">Wähle Bilder aus deiner Galerie.</string>
+    <string name="open_gallery">GALERIE ÖFFNEN</string>
+    <string name="select_all_photos">Wähle zuerst alle Fotos aus</string>
+    <string name="finalize_board">Board fertigstellen</string>
+</resources>

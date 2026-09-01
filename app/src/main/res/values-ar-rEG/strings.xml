@@ -1,0 +1,145 @@
+<resources>
+    <string name="app_name">فاكر؟</string>
+
+    <!-- Board Sizes -->
+    <string name="size_super_duper_easy">سهل جداً جداً</string>
+    <string name="size_super_easy">سهل جداً</string>
+    <string name="size_easy">سهل</string>
+    <string name="size_medium">متوسط</string>
+    <string name="size_hard">صعب</string>
+    <string name="size_super_hard">صعب جداً</string>
+    <string name="size_super_duper_hard">صعب جداً جداً</string>
+
+    <!-- General -->
+    <string name="cancel">إلغاء</string>
+    <string name="close">قفل</string>
+    <string name="ok">تمام</string>
+    <string name="back">رجوع</string>
+    <string name="remove">شيل</string>
+    <string name="delete">مسح</string>
+    <string name="search">تدوير</string>
+    <string name="play">لعب</string>
+    <string name="start_game">ابدأ اللعب</string>
+    <string name="maybe_later">بعدين</string>
+    <string name="play_again">إلعب تاني</string>
+    <string name="next">التالي</string>
+    <string name="finish">خلصت</string>
+    <string name="skip">فوت</string>
+    <string name="help">مساعدة</string>
+    <string name="settings">الإعدادات</string>
+    <string name="more_options">خيارات تانية</string>
+
+    <!-- Accessibility / Labels -->
+    <string name="gameTransition_label">نقلة اللعبة</string>
+    <string name="cardEntryScale_label">حجم دخول الكارت</string>
+    <string name="cardEntryAlpha_label">وضوح دخول الكارت</string>
+    <string name="cardFlip_label">قلبة الكارت</string>
+    <string name="face_up">وشه لفوق</string>
+    <string name="face_down">وشه لتحت</string>
+    <string name="preview_desc">معاينة</string>
+    <string name="remove_desc">إزالة</string>
+    <string name="add_image_desc">ضيف صورة</string>
+
+    <!-- Main Screen -->
+    <string name="reset_game">إعادة</string>
+    <string name="change_size">المستوى</string>
+    <string name="create_game">عمل</string>
+    <string name="create_custom_game">اعمل لعبة جديدة</string>
+    <string name="load_game">فتح</string>
+    <string name="game_finished">خلصت!</string>
+    <string name="perfect_win">فوز مثالي! 🏆</string>
+    <string name="win_message">عاش! خلصت اللعبة في %1$d حركات.</string>
+    <string name="choose_level">اختار المستوى</string>
+    <string name="cards_count">%1$d كروت</string>
+    <string name="pairs_count">%1$d أزواج</string>
+    <string name="cards_pairs_info">%1$d كارت • %2$d أزواج</string>
+    <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="moves_count">%1$d</string>
+    <string name="edit">تعديل</string>
+    <string name="sort">ترتيب</string>
+    <string name="search_boards">دور في الألعاب…</string>
+    <string name="sort_latest">الأجدد</string>
+    <string name="sort_oldest">الأقدم</string>
+    <string name="sort_name_asc">الاسم (أ-ي)</string>
+    <string name="sort_name_desc">الاسم (ي-أ)</string>
+    <string name="sort_pairs">عدد الكروت</string>
+    <string name="created_at">اتعملت: %1$s</string>
+    <string name="edit_board">تعديل اللعبة</string>
+    <string name="update_and_play">تحديث ولعب</string>
+    <string name="timer_format">%02d:%02d</string>
+    <string name="duration_seconds">%1$d ث</string>
+    <string name="duration_minutes_seconds">%1$d ق %2$d ث</string>
+    <string name="best_time_label">أحسن وقت: %1$s</string>
+    <string name="current_record_info">رقم قياسي جديد! 🏆</string>
+    <string name="moves_tracking_label">عدد الحركات</string>
+    <string name="pairs_tracking_label">الأزواج اللي لقيتها</string>
+    <string name="timer_tracking_label">الوقت اللي فات</string>
+    <string name="best_time_tracking_label">أسرع وقت</string>
+
+    <!-- Settings -->
+    <string name="app_settings">إعدادات التطبيق</string>
+    <string name="language">اللغة</string>
+    <string name="lang_system">زي الموبايل (حسب المنطقة)</string>
+    <string name="lang_ar_eg">عربي مصري (فاكر؟)</string>
+    <string name="lang_ar">عربي (ذاكرة)</string>
+    <string name="lang_en">English</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_es">Español</string>
+
+    <!-- Tutorial -->
+    <string name="tut_welcome_title">أهلاً بك في فاكر؟ 🏺</string>
+    <string name="tut_welcome_desc">تحدي ذاكرة فاخر مصمم للتركيز والسرعة. خلينا نفرجك!</string>
+    <string name="tut_hub_title">مركز التحكم</string>
+    <string name="tut_hub_desc">استخدم الأيقونات دي عشان تعيد اللعبة، تغير المستوى، أو تفتح خيارات تانية.</string>
+    <string name="tut_board_title">لوحة اللعب</string>
+    <string name="tut_board_desc">هنا اللعب كله. اقلب الكروت عشان تلاقي الأزواج المتشابهة.</string>
+    <string name="tut_stats_title">الأداء المباشر</string>
+    <string name="tut_stats_desc">تابع حركاتك والأزواج اللي لقيتها هنا. حاول تفوز بأقل عدد حركات!</string>
+    <string name="tut_timer_title">الوقت والأرقام القياسية</string>
+    <string name="tut_timer_desc">خلي عينك على التايمر! أحسن أوقاتك بتتحفظ أوتوماتيك لكل مستوى.</string>
+    <string name="tut_help_title">مساعدة في أي وقت</string>
+    <string name="tut_help_desc">محتاج تفتكر حاجة؟ دوس على علامة الاستفهام دي في أي وقت عشان تشوف الدليل ده تاني.</string>
+
+    <!-- Browse Screen -->
+    <string name="saved_boards">الألعاب المحفوظة</string>
+    <string name="no_saved_games">مفيش ألعاب محفوظة</string>
+    <string name="create_first_board">اعمل أول لعبة ليك عشان تظهر هنا.</string>
+    <string name="board_gallery">معرض اللعبة</string>
+    <string name="contains_pairs">فيها %1$d أزواج</string>
+    <string name="pairs_label">%1$d أزواج</string>
+    <string name="more_images_count">+%1$d</string>
+
+    <!-- Create Screen -->
+    <string name="new_board">لعبة جديدة</string>
+    <string name="step_1_title">الخطوة 1: اختار الصور</string>
+    <string name="step_1_subtitle">اختار %1$d صور للعبتك.</string>
+    <string name="step_2_title">الخطوة 2: سمي لعبتك</string>
+    <string name="step_2_subtitle">اديها اسم عشان تلاقيها بعدين.</string>
+    <string name="board_identity_label">اسم اللعبة</string>
+    <string name="board_id_placeholder">مثلاً: صور العيلة</string>
+    <string name="saving_board">بنحفظ اللعبة…</string>
+    <string name="create_and_play">اعمل والعب</string>
+    <string name="board_ready_title">اللعبة جاهزة! 🎉</string>
+    <string name="board_ready_message">لعبتك \'%1$s\' جاهزة. اتحفظت عندك في الموبايل.</string>
+    <string name="name_exists_title">الاسم موجود 😕</string>
+    <string name="name_exists_message">في لعبة تانية بنفس الاسم \'%1$s\'. جرب اسم تاني.</string>
+    <string name="change_name_action">ماشي، هغير الاسم</string>
+    <string name="no_photos_yet">لسه مفيش صور</string>
+    <string name="no_photos_yet_subtitle">اختار صور من الموبايل عشان تبدأ.</string>
+    <string name="open_gallery">افتح الصور</string>
+    <string name="select_all_photos">اختار كل الصور الأول</string>
+    <string name="finalize_board">خلص اللوحة</string>
+
+    <!-- Toasts & Errors -->
+    <string name="already_won">انت كسبت أصلاً</string>
+    <string name="invalid_move">حركة غلط!</string>
+    <string name="congratulations">مبروك! كسبت!</string>
+    <string name="smooth_win_toast">عاش! كسبت من غير ولا غلطة!</string>
+    <string name="nothing_to_refresh">مفيش حاجة تتغير هنا</string>
+    <string name="permission_denied">ممنوع. محتاجين صلاحية للصور.</string>
+    <string name="board_full">اللعبة كملت خلاص</string>
+    <string name="game_not_found">معلش مش لاقيين اللعبة دي \'%1$s\'</string>
+    <string name="failed_to_save">مش عارف أحفظ: %1$s</string>
+    <string name="failed_to_create_db">مش عارف أحفظ في قاعدة البيانات</string>
+</resources>
