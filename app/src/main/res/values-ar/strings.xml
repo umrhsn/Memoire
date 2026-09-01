@@ -68,7 +68,7 @@
     <string name="update_and_play">تحديث ولعب</string>
     <string name="timer_format">%02d:%02d</string>
     <string name="duration_seconds">%1$d ثوانٍ</string>
-    <string name="duration_minutes_seconds">%1$d دقيقة %2$d ثانية</string>
+    <string name="duration_minutes_seconds">%1$d ق %2$d ث</string>
     <string name="best_time_label">أفضل وقت: %1$s</string>
     <string name="current_record_info">رقم قياسي جديد! 🏆</string>
     <string name="moves_tracking_label">عدد الحركات</string>

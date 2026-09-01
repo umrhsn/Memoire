@@ -5,13 +5,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
@@ -44,74 +44,72 @@ fun MemoryBoard(
     ) {
         val maxWidth = this.maxWidth
         val maxHeight = this.maxHeight
-        val numCards = cards.size
 
-        // We use the dimensions defined in the BoardSize model for a guaranteed clean grid
+        // Use pre-defined dimensions for consistency
         val columns = boardSize.getWidth()
         val rows = boardSize.getHeight()
 
-        // Calculate card size based on these fixed dimensions to fill the space
+        // Calculate card size
         val cardWidth = maxWidth / columns
         val cardHeight = maxHeight / rows
         val bestCardSize = if (cardWidth < cardHeight) cardWidth else cardHeight
 
-        // One-time entry animation flag
+        // Entry animation control
         var isVisible by remember { mutableStateOf(false) }
-        LaunchedEffect(boardSize, cards.size) {
+        LaunchedEffect(boardSize) {
             isVisible = false
-            delay(50.milliseconds)
+            delay(100.milliseconds)
             isVisible = true
         }
 
-        Column(
-            modifier = Modifier.wrapContentSize(),
+        // 1. Performance Fix: Using LazyVerticalGrid for efficient layout management
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            modifier = Modifier
+                .width(bestCardSize * columns)
+                .height(bestCardSize * rows),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalArrangement = Arrangement.Center,
+            userScrollEnabled = false // Keep it static as a memory board
         ) {
-            for (r in 0 until rows) {
-                Row(
-                    modifier = Modifier.wrapContentWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    for (c in 0 until columns) {
-                        val index = r * columns + c
-                        if (index < numCards) {
-                            val card = cards[index]
+            itemsIndexed(
+                items = cards,
+                // 2. Performance Fix: Providing keys prevents unnecessary recompositions of other cards when one flips
+                key = { index, _ -> "${boardSize.name}_$index" }
+            ) { index, card ->
 
-                            val scale by animateFloatAsState(
-                                targetValue = if (isVisible) 1f else 0f,
-                                animationSpec = tween(
-                                    durationMillis = 300,
-                                    delayMillis = index * 20
-                                ),
-                                label = stringResource(R.string.cardEntryScale_label)
-                            )
+                // Entry animation state
+                val entryScale by animateFloatAsState(
+                    targetValue = if (isVisible) 1f else 0f,
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        delayMillis = index * 15
+                    ),
+                    label = "cardEntryScale"
+                )
 
-                            val alpha by animateFloatAsState(
-                                targetValue = if (isVisible) 1f else 0f,
-                                animationSpec = tween(
-                                    durationMillis = 300,
-                                    delayMillis = index * 20
-                                ),
-                                label = stringResource(R.string.cardEntryAlpha_label)
-                            )
+                val entryAlpha by animateFloatAsState(
+                    targetValue = if (isVisible) 1f else 0f,
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        delayMillis = index * 15
+                    ),
+                    label = "cardEntryAlpha"
+                )
 
-                            Box(
-                                modifier = Modifier
-                                    .size(bestCardSize)
-                                    .graphicsLayer {
-                                        scaleX = scale
-                                        scaleY = scale
-                                        this.alpha = alpha
-                                    }
-                            ) {
-                                MemoryCardItem(
-                                    memoryCard = card,
-                                    onClick = { onCardClicked(index) }
-                                )
-                            }
+                Box(
+                    modifier = Modifier
+                        .size(bestCardSize)
+                        .graphicsLayer {
+                            scaleX = entryScale
+                            scaleY = entryScale
+                            alpha = entryAlpha
                         }
-                    }
+                ) {
+                    MemoryCardItem(
+                        memoryCard = card,
+                        onClick = { onCardClicked(index) }
+                    )
                 }
             }
         }
