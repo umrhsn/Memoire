@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -30,17 +32,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 
 data class TutorialStep(
     val title: String,
@@ -60,72 +66,75 @@ fun TutorialOverlay(
     val currentStep = steps[currentStepIndex]
     val targetRect = currentStep.anchorKey?.let { anchors[it] }
 
-    Dialog(
-        onDismissRequest = onSkip,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
-        ) {
-            // Background with Spotlight
-            Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(enabled = false) { }
-            ) {
-                val spotlightPath = Path().apply {
-                    if (targetRect != null) {
-                        // Create a rounded spotlight around the target
-                        val padding = 8.dp.toPx()
-                        addRoundRect(
-                            androidx.compose.ui.geometry.RoundRect(
-                                rect = Rect(
-                                    left = targetRect.left - padding,
-                                    top = targetRect.top - padding,
-                                    right = targetRect.right + padding,
-                                    bottom = targetRect.bottom + padding
-                                ),
-                                cornerRadius = androidx.compose.ui.geometry.CornerRadius(16.dp.toPx())
-                            )
-                        )
-                    }
-                }
+    val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
 
-                clipPath(spotlightPath, clipOp = androidx.compose.ui.graphics.ClipOp.Difference) {
-                    drawRect(Color.Black.copy(alpha = 0.8f))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .zIndex(100f)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { /* Block touches */ }
+    ) {
+        // Spotlight Canvas
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val spotlightPath = Path().apply {
+                targetRect?.let { rect ->
+                    val padding = 8.dp.toPx()
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(
+                                left = rect.left - padding,
+                                top = rect.top - padding,
+                                right = rect.right + padding,
+                                bottom = rect.bottom + padding
+                            ),
+                            cornerRadius = CornerRadius(16.dp.toPx())
+                        )
+                    )
                 }
             }
 
-            // Information Card
-            val cardAlignment =
-                if (targetRect != null && targetRect.top < 400f) Alignment.BottomCenter else Alignment.Center
+            clipPath(spotlightPath, clipOp = ClipOp.Difference) {
+                drawRect(Color.Black.copy(alpha = 0.85f))
+            }
+        }
+
+        // Animated Card Positioning
+        Box(modifier = Modifier.fillMaxSize()) {
+            val cardAlignment = when {
+                targetRect == null -> Alignment.Center
+                targetRect.top < screenHeightPx / 2 -> Alignment.BottomCenter
+                else -> Alignment.TopCenter
+            }
 
             Column(
                 modifier = Modifier
                     .align(cardAlignment)
-                    .padding(32.dp)
-                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 100.dp)
+                    .widthIn(max = 400.dp)
                     .animateContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(28.dp),
+                    shape = RoundedCornerShape(32.dp),
                     color = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp,
                     shadowElevation = 24.dp
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier.padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Icon Circle
+                        // Hero Icon
                         Surface(
                             modifier = Modifier.size(64.dp),
                             shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                             contentColor = MaterialTheme.colorScheme.primary
                         ) {
                             Box(contentAlignment = Alignment.Center) {
@@ -133,12 +142,13 @@ fun TutorialOverlay(
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
                         Text(
                             text = currentStep.title,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
 
@@ -146,10 +156,10 @@ fun TutorialOverlay(
 
                         Text(
                             text = currentStep.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            lineHeight = 20.sp
+                            textAlign = TextAlign.Center,
+                            lineHeight = 22.sp
                         )
 
                         Spacer(modifier = Modifier.height(32.dp))
@@ -173,15 +183,15 @@ fun TutorialOverlay(
                                 },
                                 shape = RoundedCornerShape(16.dp)
                             ) {
-                                Text(if (currentStepIndex < steps.size - 1) "Next" else "Let's Go!")
+                                Text(if (currentStepIndex < steps.size - 1) "Next" else "Finish")
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Dots
+                // Progress Indicators
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     steps.forEachIndexed { index, _ ->
                         Box(
@@ -190,7 +200,7 @@ fun TutorialOverlay(
                                 .clip(CircleShape)
                                 .background(
                                     if (index == currentStepIndex) MaterialTheme.colorScheme.primary
-                                    else Color.White.copy(alpha = 0.5f)
+                                    else Color.White.copy(alpha = 0.4f)
                                 )
                         )
                     }
