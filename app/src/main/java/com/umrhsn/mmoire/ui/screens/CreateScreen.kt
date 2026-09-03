@@ -38,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -244,7 +245,9 @@ fun CreateScreen(
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                         TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                                positioning = TooltipAnchorPosition.Above
+                            ),
                             tooltip = {
                                 PlainTooltip {
                                     Text(
@@ -506,7 +509,9 @@ private fun ImageItem(
 
             // Delete Icon Badge
             TooltipBox(
-                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                    positioning = TooltipAnchorPosition.Above
+                ),
                 tooltip = {
                     PlainTooltip {
                         Text(stringResource(R.string.remove))
@@ -542,7 +547,9 @@ private fun ImageItem(
 @Composable
 private fun PlaceholderItem(onClick: () -> Unit) {
     TooltipBox(
-        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            positioning = TooltipAnchorPosition.Above
+        ),
         tooltip = {
             PlainTooltip {
                 Text(stringResource(R.string.add_image_desc))
