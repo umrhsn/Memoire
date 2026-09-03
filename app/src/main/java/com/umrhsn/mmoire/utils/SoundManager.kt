@@ -61,8 +61,4 @@ class SoundManager @Inject constructor(
             soundPool.play(soundId, 1f, 1f, 1, 0, 1f)
         }
     }
-
-    fun release() {
-        soundPool.release()
-    }
 }

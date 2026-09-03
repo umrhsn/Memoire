@@ -30,7 +30,7 @@ class GameRepository @Inject constructor(
         return gameDao.exists(gameName)
     }
 
-    suspend fun uploadImage(gameName: String, imageIndex: Int, imageByteArray: ByteArray): String {
+    fun uploadImage(gameName: String, imageIndex: Int, imageByteArray: ByteArray): String {
         return imageManager.saveImage(gameName, imageIndex, imageByteArray)
     }
 

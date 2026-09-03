@@ -2,10 +2,11 @@ package com.umrhsn.mmoire.activities
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import com.umrhsn.mmoire.ui.screens.BrowseScreen
 import com.umrhsn.mmoire.utils.EXTRA_EDIT_GAME_NAME
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
@@ -13,7 +14,7 @@ import com.umrhsn.mmoire.viewmodels.BrowseViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class BrowseActivity : AppCompatActivity() {
+class BrowseActivity : ComponentActivity() {
 
     private val viewModel: BrowseViewModel by viewModels()
 
@@ -34,6 +35,7 @@ class BrowseActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {

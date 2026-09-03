@@ -30,10 +30,6 @@
     <string name="more_options">خيارات تانية</string>
 
     <!-- Accessibility / Labels -->
-    <string name="gameTransition_label">نقلة اللعبة</string>
-    <string name="cardEntryScale_label">حجم دخول الكارت</string>
-    <string name="cardEntryAlpha_label">وضوح دخول الكارت</string>
-    <string name="cardFlip_label">قلبة الكارت</string>
     <string name="face_up">وشه لفوق</string>
     <string name="face_down">وشه لتحت</string>
     <string name="preview_desc">معاينة</string>
@@ -48,7 +44,14 @@
     <string name="load_game">فتح</string>
     <string name="game_finished">خلصت!</string>
     <string name="perfect_win">فوز مثالي! 🏆</string>
-    <string name="win_message">عاش! خلصت اللعبة في %1$d حركات.</string>
+    <plurals name="win_message_plural">
+        <item quantity="zero">عاش! خلصت اللعبة في %1$d حركات.</item>
+        <item quantity="one">عاش! خلصت اللعبة في حركة واحدة.</item>
+        <item quantity="two">عاش! خلصت اللعبة في حركتين.</item>
+        <item quantity="few">عاش! خلصت اللعبة في %1$d حركات.</item>
+        <item quantity="many">عاش! خلصت اللعبة في %1$d حركات.</item>
+        <item quantity="other">عاش! خلصت اللعبة في %1$d حركات.</item>
+    </plurals>
     <string name="choose_level">اختار المستوى</string>
     <string name="cards_count">%1$d كروت</string>
     <string name="pairs_count">%1$d أزواج</string>
@@ -66,7 +69,7 @@
     <string name="created_at">اتعملت: %1$s</string>
     <string name="edit_board">تعديل اللعبة</string>
     <string name="update_and_play">تحديث ولعب</string>
-    <string name="timer_format">%02d:%02d</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="duration_seconds">%1$d ث</string>
     <string name="duration_minutes_seconds">%1$d ق %2$d ث</string>
     <string name="best_time_label">أحسن وقت: %1$s</string>
@@ -106,14 +109,28 @@
     <string name="no_saved_games">مفيش ألعاب محفوظة</string>
     <string name="create_first_board">اعمل أول لعبة ليك عشان تظهر هنا.</string>
     <string name="board_gallery">معرض اللعبة</string>
-    <string name="contains_pairs">فيها %1$d أزواج</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="zero">فيها %1$d أزواج</item>
+        <item quantity="one">فيها زوج واحد</item>
+        <item quantity="two">فيها زوجين</item>
+        <item quantity="few">فيها %1$d أزواج</item>
+        <item quantity="many">فيها %1$d أزواج</item>
+        <item quantity="other">فيها %1$d أزواج</item>
+    </plurals>
     <string name="pairs_label">%1$d أزواج</string>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->
     <string name="new_board">لعبة جديدة</string>
     <string name="step_1_title">الخطوة 1: اختار الصور</string>
-    <string name="step_1_subtitle">اختار %1$d صور للعبتك.</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="zero">اختار %1$d أزواج للعبتك.</item>
+        <item quantity="one">اختار زوج واحد للعبتك.</item>
+        <item quantity="two">اختار زوجين للعبتك.</item>
+        <item quantity="few">اختار %1$d أزواج للعبتك.</item>
+        <item quantity="many">اختار %1$d أزواج للعبتك.</item>
+        <item quantity="other">اختار %1$d أزواج للعبتك.</item>
+    </plurals>
     <string name="step_2_title">الخطوة 2: سمي لعبتك</string>
     <string name="step_2_subtitle">اديها اسم عشان تلاقيها بعدين.</string>
     <string name="board_identity_label">اسم اللعبة</string>

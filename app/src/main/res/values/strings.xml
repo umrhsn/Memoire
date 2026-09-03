@@ -13,11 +13,9 @@
     <!-- General -->
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
-    <string name="ok">OK</string>
     <string name="back">Back</string>
     <string name="remove">Remove</string>
     <string name="delete">Delete</string>
-    <string name="search">Search</string>
     <string name="play">Play</string>
     <string name="start_game">START GAME</string>
     <string name="maybe_later">MAYBE LATER</string>
@@ -30,10 +28,10 @@
     <string name="more_options">More Options</string>
 
     <!-- Accessibility / Labels -->
-    <string name="gameTransition_label">gameTransition</string>
-    <string name="cardEntryScale_label">cardEntryScale</string>
-    <string name="cardEntryAlpha_label">cardEntryAlpha</string>
-    <string name="cardFlip_label">cardFlip</string>
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">Face up</string>
     <string name="face_down">Face down</string>
     <string name="preview_desc">Preview</string>
@@ -48,10 +46,11 @@
     <string name="load_game">Load Local</string>
     <string name="game_finished">Game Finished!</string>
     <string name="perfect_win">Perfect Win! 🏆</string>
-    <string name="win_message">Amazing! You cleared the board in %1$d moves.</string>
+    <plurals name="win_message_plural">
+        <item quantity="one">Amazing! You cleared the board in 1 move.</item>
+        <item quantity="other">Amazing! You cleared the board in %1$d moves.</item>
+    </plurals>
     <string name="choose_level">Choose Level</string>
-    <string name="cards_count">%1$d cards</string>
-    <string name="pairs_count">%1$d pairs</string>
     <string name="cards_pairs_info">%1$d cards • %2$d pairs</string>
     <string name="pairs_progress">%1$d/%2$d</string>
     <string name="moves_count">%1$d</string>
@@ -66,7 +65,6 @@
     <string name="created_at">Created: %1$s</string>
     <string name="edit_board">Edit Board</string>
     <string name="update_and_play">UPDATE &amp; PLAY</string>
-    <string name="timer_format">%02d:%02d</string>
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes_seconds">%1$dm %2$ds</string>
     <string name="best_time_label">Best: %1$s</string>
@@ -106,14 +104,19 @@
     <string name="no_saved_games">No Saved Games</string>
     <string name="create_first_board">Create your first custom memory board to see it here.</string>
     <string name="board_gallery">Board Gallery</string>
-    <string name="contains_pairs">Contains %1$d unique pairs</string>
-    <string name="pairs_label">%1$d Pairs</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="one">Contains 1 unique pair</item>
+        <item quantity="other">Contains %1$d unique pairs</item>
+    </plurals>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->
     <string name="new_board">New Board</string>
     <string name="step_1_title">Step 1: Choose Photos</string>
-    <string name="step_1_subtitle">Select %1$d pairs for your board.</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="one">Select 1 pair for your board.</item>
+        <item quantity="other">Select %1$d pairs for your board.</item>
+    </plurals>
     <string name="step_2_title">Step 2: Name Your Game</string>
     <string name="step_2_subtitle">Give it a unique ID to find it later.</string>
     <string name="board_identity_label">Board Identity</string>
@@ -139,7 +142,7 @@
     <string name="nothing_to_refresh">Nothing to refresh here</string>
     <string name="permission_denied">Permission denied. Access to photos is required.</string>
     <string name="board_full">Board is already full</string>
-    <string name="game_not_found">Sorry we couldn\'t find such game, \'%1$s\'</string>
+    <string name="game_not_found">Sorry, we couldn\'t find a board with the ID \'%1$s\'</string>
     <string name="failed_to_save">Failed to save: %1$s</string>
     <string name="failed_to_create_db">Failed to create game entry in database</string>
 </resources>

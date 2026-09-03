@@ -20,6 +20,13 @@
     <string name="settings">Einstellungen</string>
     <string name="more_options">Mehr Optionen</string>
 
+    <!-- Accessibility / Labels -->
+    <string name="face_up">Aufgedeckt</string>
+    <string name="face_down">Verdeckt</string>
+    <string name="preview_desc">Vorschau</string>
+    <string name="remove_desc">Entfernen</string>
+    <string name="add_image_desc">Bild hinzufügen</string>
+
     <!-- Board Sizes -->
     <string name="size_super_duper_easy">Super Duper Einfach</string>
     <string name="size_super_easy">Super Einfach</string>
@@ -37,7 +44,10 @@
     <string name="load_game">Laden</string>
     <string name="game_finished">Spiel beendet!</string>
     <string name="perfect_win">Perfekter Sieg! 🏆</string>
-    <string name="win_message">Großartig! Du hast das Board in %1$d Zügen geräumt.</string>
+    <plurals name="win_message_plural">
+        <item quantity="one">Großartig! Du hast das Board in 1 Zug geräumt.</item>
+        <item quantity="other">Großartig! Du hast das Board in %1$d Zügen geräumt.</item>
+    </plurals>
     <string name="choose_level">Level wählen</string>
     <string name="cards_count">%1$d Karten</string>
     <string name="pairs_count">%1$d Paare</string>
@@ -55,7 +65,7 @@
     <string name="created_at">Erstellt: %1$s</string>
     <string name="edit_board">Board bearbeiten</string>
     <string name="update_and_play">AKTUALISIEREN &amp; SPIELEN</string>
-    <string name="timer_format">%02d:%02d</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes_seconds">%1$dm %2$ds</string>
     <string name="best_time_label">Beste: %1$s</string>
@@ -95,14 +105,20 @@
     <string name="no_saved_games">Keine gespeicherten Spiele</string>
     <string name="create_first_board">Erstelle dein erstes Board, um es hier zu sehen.</string>
     <string name="board_gallery">Board-Galerie</string>
-    <string name="contains_pairs">Enthält %1$d einzigartige Paare</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="one">Enthält 1 einzigartiges Paar</item>
+        <item quantity="other">Enthält %1$d einzigartige Paare</item>
+    </plurals>
     <string name="pairs_label">%1$d Paare</string>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->
     <string name="new_board">Neues Board</string>
     <string name="step_1_title">Schritt 1: Fotos wählen</string>
-    <string name="step_1_subtitle">Wähle %1$d Paare für dein Board.</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="one">Wähle 1 Paar für dein Board.</item>
+        <item quantity="other">Wähle %1$d Paare für dein Board.</item>
+    </plurals>
     <string name="step_2_title">Schritt 2: Spiel benennen</string>
     <string name="step_2_subtitle">Gib ihm eine ID, um es später zu finden.</string>
     <string name="board_identity_label">Board-Identität</string>
@@ -119,4 +135,16 @@
     <string name="open_gallery">GALERIE ÖFFNEN</string>
     <string name="select_all_photos">Wähle zuerst alle Fotos aus</string>
     <string name="finalize_board">Board fertigstellen</string>
+
+    <!-- Toasts & Errors -->
+    <string name="already_won">Du hast bereits gewonnen</string>
+    <string name="invalid_move">Ungültiger Zug!</string>
+    <string name="congratulations">Du hast gewonnen! Herzlichen Glückwunsch!</string>
+    <string name="smooth_win_toast">Super! Du hast ohne einen einzigen Fehler gewonnen!</string>
+    <string name="nothing_to_refresh">Hier gibt es nichts zu aktualisieren</string>
+    <string name="permission_denied">Berechtigung verweigert. Zugriff auf Fotos ist erforderlich.</string>
+    <string name="board_full">Das Board ist bereits voll</string>
+    <string name="game_not_found">Entschuldigung, wir konnten das Spiel \'%1$s\' nicht finden</string>
+    <string name="failed_to_save">Speichern fehlgeschlagen: %1$s</string>
+    <string name="failed_to_create_db">Fehler beim Erstellen des Spieleintrags in der Datenbank</string>
 </resources>

@@ -42,7 +42,6 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,12 +54,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
@@ -90,15 +91,15 @@ fun CreateScreen(
     viewModel: CreateViewModel,
     boardSize: BoardSize,
     chosenImageUris: List<Uri>,
+    modifier: Modifier = Modifier,
     oldName: String? = null,
     onBackClicked: () -> Unit,
     onPlaceholderClicked: () -> Unit,
     onImageClicked: (Int) -> Unit,
     onRemoveImage: (Uri) -> Unit,
-    onSaveClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onSaveClicked: (String) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var gameName by remember { mutableStateOf(oldName ?: "") }
     val numImagesRequired = boardSize.getNumPairs()
     val context = LocalContext.current
@@ -133,7 +134,11 @@ fun CreateScreen(
                     SectionHeader(
                         icon = EvaIcons.Outline.Image,
                         title = stringResource(R.string.step_1_title),
-                        subtitle = stringResource(R.string.step_1_subtitle, numImagesRequired)
+                        subtitle = pluralStringResource(
+                            R.plurals.step_1_subtitle_plural,
+                            numImagesRequired,
+                            numImagesRequired
+                        )
                     )
 
                     // Selection Progress Bar

@@ -20,6 +20,13 @@
     <string name="settings">Paramètres</string>
     <string name="more_options">Plus d\'options</string>
 
+    <!-- Accessibility / Labels -->
+    <string name="face_up">Face visible</string>
+    <string name="face_down">Face cachée</string>
+    <string name="preview_desc">Aperçu</string>
+    <string name="remove_desc">Retirer</string>
+    <string name="add_image_desc">Ajouter une image</string>
+
     <!-- Board Sizes -->
     <string name="size_super_duper_easy">Super Facile +</string>
     <string name="size_super_easy">Super Facile</string>
@@ -37,7 +44,11 @@
     <string name="load_game">Charger</string>
     <string name="game_finished">Partie terminée !</string>
     <string name="perfect_win">Victoire parfaite ! 🏆</string>
-    <string name="win_message">Incroyable ! Vous avez vidé le plateau en %1$d coups.</string>
+    <plurals name="win_message_plural">
+        <item quantity="one">Incroyable ! Vous avez vidé le plateau en %1$d coup.</item>
+        <item quantity="many">Incroyable ! Vous avez vidé le plateau en %1$d coups.</item>
+        <item quantity="other">Incroyable ! Vous avez vidé le plateau en %1$d coups.</item>
+    </plurals>
     <string name="choose_level">Choisir le niveau</string>
     <string name="cards_count">%1$d cartes</string>
     <string name="pairs_count">%1$d paires</string>
@@ -55,7 +66,7 @@
     <string name="created_at">Créé : %1$s</string>
     <string name="edit_board">Modifier le plateau</string>
     <string name="update_and_play">METTRE À JOUR &amp; JOUER</string>
-    <string name="timer_format">%02d:%02d</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes_seconds">%1$dm %2$ds</string>
     <string name="best_time_label">Meilleur : %1$s</string>
@@ -95,14 +106,22 @@
     <string name="no_saved_games">Aucun jeu sauvegardé</string>
     <string name="create_first_board">Créez votre premier plateau pour le voir ici.</string>
     <string name="board_gallery">Galerie du plateau</string>
-    <string name="contains_pairs">Contient %1$d paires uniques</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="one">Contient %1$d paire unique</item>
+        <item quantity="many">Contient %1$d paires uniques</item>
+        <item quantity="other">Contient %1$d paires uniques</item>
+    </plurals>
     <string name="pairs_label">%1$d Paires</string>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->
     <string name="new_board">Nouveau Plateau</string>
     <string name="step_1_title">Étape 1 : Choisir les photos</string>
-    <string name="step_1_subtitle">Sélectionnez %1$d paires pour votre plateau.</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="one">Sélectionnez %1$d paire pour votre plateau.</item>
+        <item quantity="many">Sélectionnez %1$d paires pour votre plateau.</item>
+        <item quantity="other">Sélectionnez %1$d paires pour votre plateau.</item>
+    </plurals>
     <string name="step_2_title">Étape 2 : Nommer votre jeu</string>
     <string name="step_2_subtitle">Donnez-lui un identifiant unique.</string>
     <string name="board_identity_label">Identité du plateau</string>
@@ -119,4 +138,16 @@
     <string name="open_gallery">OUVRIR LA GALERIE</string>
     <string name="select_all_photos">Veuillez d\'abord choisir toutes les photos</string>
     <string name="finalize_board">Finaliser le plateau</string>
+
+    <!-- Toasts & Errors -->
+    <string name="already_won">Vous avez déjà gagné</string>
+    <string name="invalid_move">Mouvement invalide !</string>
+    <string name="congratulations">Vous avez gagné ! Félicitations !</string>
+    <string name="smooth_win_toast">Impressionnant ! Vous avez gagné sans faire une seule erreur !</string>
+    <string name="nothing_to_refresh">Rien à rafraîchir ici</string>
+    <string name="permission_denied">Autorisation refusée. L\'accès aux photos est requis.</string>
+    <string name="board_full">Le plateau est déjà plein</string>
+    <string name="game_not_found">Désolé, nous n\'avons pas pu trouver le jeu \'%1$s\'</string>
+    <string name="failed_to_save">Échec de la sauvegarde : %1$s</string>
+    <string name="failed_to_create_db">Échec de la création de l\'entrée du jeu dans la base de données</string>
 </resources>

@@ -38,7 +38,7 @@ data class MemoryGame(
         val newNumCardFlips = numCardFlips + 1
         var newCards = cards.toMutableList()
         var newNumPairsFound = numPairsFound
-        var newIndexOfSingleSelectedCard: Int? = null
+        val newIndexOfSingleSelectedCard: Int?
         var foundMatch = false
 
         if (indexOfSingleSelectedCard == null) {
@@ -73,8 +73,6 @@ data class MemoryGame(
             foundMatch
         )
     }
-
-    fun isCardFaceUp(position: Int): Boolean = cards[position].isFaceUp
 
     fun getNumMoves(): Int = numCardFlips / 2
 

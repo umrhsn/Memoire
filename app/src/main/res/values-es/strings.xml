@@ -20,6 +20,13 @@
     <string name="settings">Ajustes</string>
     <string name="more_options">Más opciones</string>
 
+    <!-- Accessibility / Labels -->
+    <string name="face_up">Bocarriba</string>
+    <string name="face_down">Bocabajo</string>
+    <string name="preview_desc">Vista previa</string>
+    <string name="remove_desc">Quitar</string>
+    <string name="add_image_desc">Añadir imagen</string>
+
     <!-- Board Sizes -->
     <string name="size_super_duper_easy">Súper Fácil +</string>
     <string name="size_super_easy">Súper Fácil</string>
@@ -37,7 +44,11 @@
     <string name="load_game">Cargar</string>
     <string name="game_finished">¡Juego terminado!</string>
     <string name="perfect_win">¡Victoria perfecta! 🏆</string>
-    <string name="win_message">¡Increíble! Has despejado el tablero en %1$d movimientos.</string>
+    <plurals name="win_message_plural">
+        <item quantity="one">¡Increíble! Has despejado el tablero en 1 movimiento.</item>
+        <item quantity="many">¡Increíble! Has despejado el tablero en %1$d movimientos.</item>
+        <item quantity="other">¡Increíble! Has despejado el tablero en %1$d movimientos.</item>
+    </plurals>
     <string name="choose_level">Elegir nivel</string>
     <string name="cards_count">%1$d cartas</string>
     <string name="pairs_count">%1$d parejas</string>
@@ -55,7 +66,7 @@
     <string name="created_at">Creado: %1$s</string>
     <string name="edit_board">Editar tablero</string>
     <string name="update_and_play">ACTUALIZAR Y JUGAR</string>
-    <string name="timer_format">%02d:%02d</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes_seconds">%1$dm %2$ds</string>
     <string name="best_time_label">Mejor: %1$s</string>
@@ -95,14 +106,22 @@
     <string name="no_saved_games">No hay juegos guardados</string>
     <string name="create_first_board">Crea tu primer tablero para verlo aquí.</string>
     <string name="board_gallery">Galería del tablero</string>
-    <string name="contains_pairs">Contiene %1$d parejas únicas</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="one">Contiene 1 pareja única</item>
+        <item quantity="many">Contiene %1$d parejas únicas</item>
+        <item quantity="other">Contiene %1$d parejas únicas</item>
+    </plurals>
     <string name="pairs_label">%1$d Parejas</string>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->
     <string name="new_board">Nuevo Tablero</string>
     <string name="step_1_title">Paso 1: Elegir fotos</string>
-    <string name="step_1_subtitle">Selecciona %1$d parejas para tu tablero.</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="one">Selecciona 1 pareja para tu tablero.</item>
+        <item quantity="many">Selecciona %1$d parejas para tu tablero.</item>
+        <item quantity="other">Selecciona %1$d parejas para tu tablero.</item>
+    </plurals>
     <string name="step_2_title">Paso 2: Nombrar juego</string>
     <string name="step_2_subtitle">Dale un ID único para encontrarlo luego.</string>
     <string name="board_identity_label">Identidad del tablero</string>
@@ -119,4 +138,16 @@
     <string name="open_gallery">ABRIR GALERÍA</string>
     <string name="select_all_photos">Por favor, selecciona todas las fotos primero</string>
     <string name="finalize_board">Finalizar tablero</string>
+
+    <!-- Toasts & Errors -->
+    <string name="already_won">Ya has ganado</string>
+    <string name="invalid_move">¡Movimiento inválido!</string>
+    <string name="congratulations">¡Ganaste! ¡Felicidades!</string>
+    <string name="smooth_win_toast">¡Genial! ¡Ganaste sin cometer ni un solo error!</string>
+    <string name="nothing_to_refresh">No hay nada que actualizar aquí</string>
+    <string name="permission_denied">Permiso denegado. Se requiere acceso a las fotos.</string>
+    <string name="board_full">El tablero ya está lleno</string>
+    <string name="game_not_found">Lo sentimos, no pudimos encontrar el juego \'%1$s\'</string>
+    <string name="failed_to_save">Error al guardar: %1$s</string>
+    <string name="failed_to_create_db">Error al crear la entrada del juego en la base de datos</string>
 </resources>

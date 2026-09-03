@@ -2,6 +2,7 @@ package com.umrhsn.mmoire.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,7 +19,7 @@ class PrefsManager @Inject constructor(
     }
 
     fun setFirstTime(value: Boolean) {
-        prefs.edit().putBoolean("is_first_time", value).apply()
+        prefs.edit { putBoolean("is_first_time", value) }
     }
 
     fun getLanguage(): String? {
@@ -26,6 +27,6 @@ class PrefsManager @Inject constructor(
     }
 
     fun setLanguage(lang: String?) {
-        prefs.edit().putString("app_language", lang).apply()
+        prefs.edit { putString("app_language", lang) }
     }
 }

@@ -46,13 +46,15 @@ fun MemoryBoard(
         val maxHeight = this.maxHeight
 
         // Use pre-defined dimensions for consistency
-        val columns = boardSize.getWidth()
-        val rows = boardSize.getHeight()
+        val columns = remember(boardSize) { boardSize.getWidth() }
+        val rows = remember(boardSize) { boardSize.getHeight() }
 
-        // Calculate card size
-        val cardWidth = maxWidth / columns
-        val cardHeight = maxHeight / rows
-        val bestCardSize = if (cardWidth < cardHeight) cardWidth else cardHeight
+        // Calculate card size once per size change
+        val bestCardSize = remember(maxWidth, maxHeight, columns, rows) {
+            val cardWidth = maxWidth / columns
+            val cardHeight = maxHeight / rows
+            if (cardWidth < cardHeight) cardWidth else cardHeight
+        }
 
         // Entry animation control
         var isVisible by remember { mutableStateOf(false) }
@@ -74,7 +76,7 @@ fun MemoryBoard(
         ) {
             itemsIndexed(
                 items = cards,
-                // 2. Performance Fix: Providing keys prevents unnecessary recompositions of other cards when one flips
+                // 2. Performance Fix: Providing stable keys prevents unnecessary item replacement
                 key = { index, _ -> "${boardSize.name}_$index" }
             ) { index, card ->
 

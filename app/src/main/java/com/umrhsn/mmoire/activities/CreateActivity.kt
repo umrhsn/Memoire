@@ -1,7 +1,6 @@
 package com.umrhsn.mmoire.activities
 
 import android.Manifest
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -9,15 +8,18 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.content.IntentCompat
+import androidx.core.graphics.createBitmap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.networking.BitmapScaler
@@ -30,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 
 @AndroidEntryPoint
-class CreateActivity : AppCompatActivity() {
+class CreateActivity : ComponentActivity() {
 
     private val viewModel: CreateViewModel by viewModels()
     private var boardSize: BoardSize? = null
@@ -39,40 +41,19 @@ class CreateActivity : AppCompatActivity() {
     private var replaceIndex: Int = -1
     private var oldGameName: String? = null
 
-    private val photoPickerLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK && result.data != null) {
-                val data = result.data!!
-                val clipData = data.clipData
-                val selectedUri = data.data
-
-                if (replaceIndex != -1) {
-                    val newUri =
-                        clipData?.let { if (it.itemCount > 0) it.getItemAt(0).uri else null }
-                            ?: selectedUri
-                    if (newUri != null && replaceIndex < chosenImageUris.size) {
-                        chosenImageUris[replaceIndex] = newUri
-                    }
-                } else {
-                    if (clipData != null) {
-                        for (i in 0 until clipData.itemCount) {
-                            val uri = clipData.getItemAt(i).uri
-                            if (chosenImageUris.size < numImagesRequired && !chosenImageUris.contains(
-                                    uri
-                                )
-                            ) {
-                                chosenImageUris.add(uri)
-                            }
-                        }
-                    } else if (selectedUri != null) {
-                        if (chosenImageUris.size < numImagesRequired && !chosenImageUris.contains(
-                                selectedUri
-                            )
-                        ) {
-                            chosenImageUris.add(selectedUri)
-                        }
-                    }
+    private val multiplePhotoPickerLauncher =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
+            uris.forEach { uri ->
+                if (chosenImageUris.size < numImagesRequired && !chosenImageUris.contains(uri)) {
+                    chosenImageUris.add(uri)
                 }
+            }
+        }
+
+    private val singlePhotoPickerLauncher =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null && replaceIndex != -1 && replaceIndex < chosenImageUris.size) {
+                chosenImageUris[replaceIndex] = uri
             }
         }
 
@@ -87,6 +68,7 @@ class CreateActivity : AppCompatActivity() {
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         oldGameName = intent.getStringExtra(EXTRA_EDIT_GAME_NAME)
@@ -98,7 +80,7 @@ class CreateActivity : AppCompatActivity() {
         }
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             // Sync local state with loaded game
             LaunchedEffect(uiState.initialUris) {
@@ -165,36 +147,15 @@ class CreateActivity : AppCompatActivity() {
     private fun launchPhotoPicker(index: Int) {
         val pickerLimit = if (index != -1) 1 else (numImagesRequired - chosenImageUris.size)
 
-        if (pickerLimit <= 0 && index == -1) {
+        if (pickerLimit <= 0) {
             Toast.makeText(this, getString(R.string.board_full), Toast.LENGTH_SHORT).show()
             return
         }
 
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Intent(MediaStore.ACTION_PICK_IMAGES).apply {
-                type = "image/*"
-                if (pickerLimit > 1) {
-                    putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, pickerLimit)
-                }
-                if (Build.VERSION.SDK_INT >= 34 && pickerLimit > 1) {
-                    putExtra("android.provider.extra.PICK_IMAGES_IN_ORDER", true)
-                }
-            }
+        if (index != -1) {
+            singlePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         } else {
-            Intent(Intent.ACTION_PICK).apply {
-                type = "image/*"
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            }
-        }
-
-        try {
-            photoPickerLauncher.launch(intent)
-        } catch (e: Exception) {
-            val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-                putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            }
-            photoPickerLauncher.launch(fallbackIntent)
+            multiplePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     }
 
@@ -215,7 +176,7 @@ class CreateActivity : AppCompatActivity() {
                 MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
             }
         } catch (e: Exception) {
-            Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         }
         val scaledBitmap = BitmapScaler.scaleToFitHeight(originalBitmap, 250)
         val byteOutputStream = ByteArrayOutputStream()

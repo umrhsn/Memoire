@@ -38,7 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,13 +47,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.repository.UserImageListWithId
@@ -87,10 +87,9 @@ fun BrowseScreen(
     viewModel: BrowseViewModel,
     onBackClicked: () -> Unit,
     onGameSelected: (String) -> Unit,
-    onEditSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onEditSelected: (String) -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var previewGame by remember { mutableStateOf<UserImageListWithId?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
 
@@ -162,7 +161,7 @@ fun BrowseScreen(
                                         .background(MaterialTheme.colorScheme.surface)
                                         .width(200.dp)
                                 ) {
-                                    SortOrder.values().forEach { order ->
+                                    SortOrder.entries.forEach { order ->
                                         val isSelected = uiState.sortOrder == order
                                         DropdownMenuItem(
                                             text = {
@@ -268,7 +267,6 @@ private fun GameItem(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val density = LocalDensity.current
     val relativeDate = DateUtils.getRelativeTimeSpanString(game.createdAt).toString()
 
     Surface(
@@ -403,7 +401,11 @@ private fun BoardPreviewDialog(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = stringResource(R.string.contains_pairs, game.images.size),
+                text = pluralStringResource(
+                    R.plurals.contains_pairs_plural,
+                    game.images.size,
+                    game.images.size
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large))

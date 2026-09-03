@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,13 +48,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.ui.components.AppDialog
@@ -101,7 +101,7 @@ fun MainScreen(
     onWin: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val game = uiState.memoryGame
     val haptic = LocalHapticFeedback.current
 
@@ -206,8 +206,7 @@ fun MainScreen(
                                         onClick = {
                                             showMoreMenu = false
                                             showSettingsDialog = true
-                                        },
-                                        iconTint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        }
                                     )
                                     AppDropdownItem(
                                         text = stringResource(R.string.help),
@@ -216,7 +215,6 @@ fun MainScreen(
                                             showMoreMenu = false
                                             viewModel.startTutorial()
                                         },
-                                        iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.tutorialAnchor(
                                             "help_action",
                                             viewModel::onAnchorPositioned
@@ -520,7 +518,7 @@ private fun WinDialog(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(R.string.win_message, numMoves),
+                text = pluralStringResource(R.plurals.win_message_plural, numMoves, numMoves),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -587,7 +585,6 @@ private fun BoardSizeDialog(
         title = title,
         icon = icon
     ) {
-        val density = LocalDensity.current
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
@@ -595,7 +592,7 @@ private fun BoardSizeDialog(
                 .heightIn(max = dimensionResource(R.dimen.dialog_max_height))
                 .verticalScroll(scrollState)
         ) {
-            BoardSize.values().forEach { size ->
+            BoardSize.entries.forEach { size ->
                 val isSelected = size == currentSize
                 Surface(
                     modifier = Modifier

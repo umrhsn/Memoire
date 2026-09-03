@@ -4,13 +4,21 @@ import app.cash.turbine.test
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.UserImageList
 import com.umrhsn.mmoire.repository.GameRepository
+import com.umrhsn.mmoire.utils.PrefsManager
+import com.umrhsn.mmoire.utils.SoundManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -18,13 +26,18 @@ import org.mockito.kotlin.whenever
 class MainViewModelTest {
 
     private val repository: GameRepository = mock()
+    private val soundManager: SoundManager = mock()
+    private val prefs: PrefsManager = mock()
     private lateinit var viewModel: MainViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
-    fun setUp() {
+    fun setUp() = runTest(testDispatcher) {
         Dispatchers.setMain(testDispatcher)
-        viewModel = MainViewModel(repository)
+        whenever(prefs.getLanguage()).thenReturn("en")
+        whenever(prefs.isFirstTime()).thenReturn(false)
+        whenever(repository.getRecord(any())).thenReturn(null)
+        viewModel = MainViewModel(repository, soundManager, prefs)
     }
 
     @AfterEach
@@ -33,17 +46,17 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `initial ui state is correct`() = runTest {
+    fun `initial ui state is correct`() = runTest(testDispatcher) {
         viewModel.uiState.test {
-            val initialState = awaitItem()
-            assertEquals(BoardSize.SUPER_DUPER_EASY, initialState.boardSize)
-            assertNotNull(initialState.memoryGame)
+            val state = awaitItem()
+            assertEquals(BoardSize.SUPER_DUPER_EASY, state.boardSize)
+            assertNotNull(state.memoryGame)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `changeSize updates state`() = runTest {
+    fun `changeSize updates state`() = runTest(testDispatcher) {
         viewModel.uiState.test {
             awaitItem() // Skip initial state
             viewModel.changeSize(BoardSize.HARD)
@@ -63,18 +76,17 @@ class MainViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Initial
             viewModel.downloadGame(gameName)
-            
-            // It might emit loading then success, or just success if conflated.
-            // With Unconfined, we should see both if they are distinct emissions.
+
+            // Skip Loading state if it was emitted separately
             var lastState = awaitItem()
-            if (lastState.isLoading) {
+            while (lastState.isLoading) {
                 lastState = awaitItem()
             }
-            
+
             assertFalse(lastState.isLoading)
             assertEquals(gameName, lastState.gameName)
             assertEquals(customImages, lastState.customImages)
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -87,15 +99,15 @@ class MainViewModelTest {
         viewModel.uiState.test {
             awaitItem() // Initial
             viewModel.downloadGame(gameName)
-            
+
             var lastState = awaitItem()
-            if (lastState.isLoading) {
+            while (lastState.isLoading) {
                 lastState = awaitItem()
             }
-            
+
             assertFalse(lastState.isLoading)
             assertNotNull(lastState.errorMessage)
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }

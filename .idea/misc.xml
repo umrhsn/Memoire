@@ -3,6 +3,7 @@
   <component name="CidrRootsConfiguration">
     <excludeRoots>
       <file path="$PROJECT_DIR$/.idea" />
+      <file path="$PROJECT_DIR$/app/src/main/res" />
     </excludeRoots>
   </component>
   <component name="DesignSurface">

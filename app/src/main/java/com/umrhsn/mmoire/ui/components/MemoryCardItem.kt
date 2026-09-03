@@ -32,12 +32,15 @@ import coil.request.ImageRequest
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.MemoryCard
 
+private const val OPTIMIZED_IMAGE_SIZE = 250
+
 @Composable
 fun MemoryCardItem(
     memoryCard: MemoryCard,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -64,6 +67,19 @@ fun MemoryCardItem(
         animationSpec = tween(400),
         label = "matchedAlpha"
     )
+
+    // Performance Fix: Remember the ImageRequest to avoid rebuilding it on every recomposition
+    val imageRequest = remember(memoryCard.imageUrl) {
+        if (memoryCard.imageUrl != null) {
+            ImageRequest.Builder(context)
+                .data(memoryCard.imageUrl)
+                .crossfade(true)
+                .size(OPTIMIZED_IMAGE_SIZE, OPTIMIZED_IMAGE_SIZE) // Consistent size
+                .diskCacheKey(memoryCard.imageUrl) // Efficient caching
+                .memoryCacheKey(memoryCard.imageUrl)
+                .build()
+        } else null
+    }
 
     Card(
         modifier = modifier
@@ -105,14 +121,9 @@ fun MemoryCardItem(
             }
 
             if (rotation > 90f) {
-                if (memoryCard.imageUrl != null) {
-                    // 4. Performance Optimization: Downsample images to actual card size
+                if (imageRequest != null) {
                     AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(memoryCard.imageUrl)
-                            .crossfade(true)
-                            .size(200, 200) // Reasonable size for memory board cards
-                            .build(),
+                        model = imageRequest,
                         contentDescription = contentDescription,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,

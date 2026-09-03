@@ -53,6 +53,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -86,7 +87,6 @@ fun FloatingPill(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
     Surface(
         modifier = modifier.height(72.dp),
         shape = CircleShape,
@@ -112,9 +112,9 @@ fun FloatingPill(
 @Composable
 fun AppHeader(
     title: String,
+    modifier: Modifier = Modifier,
     navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable (RowScope.() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    actions: @Composable (RowScope.() -> Unit)? = null
 ) {
     FloatingPill(
         modifier = modifier
@@ -226,9 +226,9 @@ fun AppHeaderIcon(
     contentDescription: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    autoMirror: Boolean = true // Added this
+    autoMirror: Boolean = true
 ) {
-    val isRtl = LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     AppTooltipIconButton(
         icon = icon,
         contentDescription = contentDescription ?: "",
@@ -282,13 +282,13 @@ fun AppDropdownItem(
 fun StatBadge(
     icon: ImageVector,
     value: String,
+    modifier: Modifier = Modifier,
     tooltipText: String? = null,
     containerColor: Color? = null,
     contentColor: Color? = null,
-    modifier: Modifier = Modifier,
-    autoMirror: Boolean = false // Default to false for stats
+    autoMirror: Boolean = false
 ) {
-    val isRtl = LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl
+    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val density = LocalDensity.current
     val finalContainerColor =
         containerColor ?: MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
@@ -343,29 +343,6 @@ fun StatBadge(
         }
     } else {
         content()
-    }
-}
-
-@Composable
-fun NumericBadge(
-    number: Int,
-    modifier: Modifier = Modifier
-) {
-    val density = LocalDensity.current
-    Surface(
-        modifier = modifier.size(dimensionResource(R.dimen.badge_size)),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
-        shadowElevation = 4.dp
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = number.toString(),
-                fontSize = with(density) { dimensionResource(R.dimen.text_tiny).toSp() },
-                fontWeight = FontWeight.ExtraBold
-            )
-        }
     }
 }
 

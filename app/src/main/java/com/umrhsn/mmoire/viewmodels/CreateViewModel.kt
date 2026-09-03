@@ -48,8 +48,8 @@ class CreateViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val userImageList = repository.getGame(gameName)
             if (userImageList != null) {
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         isLoading = false,
                         gameName = gameName,
                         initialUris = userImageList.images?.map { Uri.parse(it) } ?: emptyList()

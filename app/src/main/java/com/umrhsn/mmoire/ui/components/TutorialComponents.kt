@@ -42,11 +42,13 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.umrhsn.mmoire.R
 
 data class TutorialStep(
     val title: String,
@@ -103,107 +105,111 @@ fun TutorialOverlay(
             }
         }
 
-        // Animated Card Positioning
-        Box(modifier = Modifier.fillMaxSize()) {
-            val cardAlignment = when {
-                targetRect == null -> Alignment.Center
-                targetRect.top < screenHeightPx / 2 -> Alignment.BottomCenter
-                else -> Alignment.TopCenter
-            }
+        // Information Card
+        val cardAlignment = when {
+            targetRect == null -> Alignment.Center
+            targetRect.top < screenHeightPx / 2 -> Alignment.BottomCenter
+            else -> Alignment.TopCenter
+        }
 
-            Column(
-                modifier = Modifier
-                    .align(cardAlignment)
-                    .padding(horizontal = 32.dp, vertical = 100.dp)
-                    .widthIn(max = 400.dp)
-                    .animateContentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier
+                .align(cardAlignment)
+                .padding(horizontal = 32.dp, vertical = 80.dp)
+                .widthIn(max = 400.dp)
+                .animateContentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(32.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp,
+                shadowElevation = 24.dp
             ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                    shadowElevation = 24.dp
+                Column(
+                    modifier = Modifier.padding(28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier.padding(28.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    // Hero Icon
+                    Surface(
+                        modifier = Modifier.size(64.dp),
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        contentColor = MaterialTheme.colorScheme.primary
                     ) {
-                        // Hero Icon
-                        Surface(
-                            modifier = Modifier.size(64.dp),
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                            contentColor = MaterialTheme.colorScheme.primary
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(currentStep.icon, null, modifier = Modifier.size(32.dp))
-                            }
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(currentStep.icon, null, modifier = Modifier.size(32.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = currentStep.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = currentStep.description,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = onSkip) {
+                            Text(
+                                stringResource(R.string.skip),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Text(
-                            text = currentStep.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Text(
-                            text = currentStep.description,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 22.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                        Button(
+                            onClick = {
+                                if (currentStepIndex < steps.size - 1) {
+                                    currentStepIndex++
+                                } else {
+                                    onComplete()
+                                }
+                            },
+                            shape = RoundedCornerShape(16.dp)
                         ) {
-                            TextButton(onClick = onSkip) {
-                                Text("Skip", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-
-                            Button(
-                                onClick = {
-                                    if (currentStepIndex < steps.size - 1) {
-                                        currentStepIndex++
-                                    } else {
-                                        onComplete()
-                                    }
-                                },
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Text(if (currentStepIndex < steps.size - 1) "Next" else "Finish")
-                            }
+                            val btnText = if (currentStepIndex < steps.size - 1)
+                                stringResource(R.string.next)
+                            else stringResource(R.string.finish)
+                            Text(btnText)
                         }
                     }
                 }
+            }
 
-                Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-                // Progress Indicators
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    steps.forEachIndexed { index, _ ->
-                        Box(
-                            modifier = Modifier
-                                .size(if (index == currentStepIndex) 10.dp else 6.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (index == currentStepIndex) MaterialTheme.colorScheme.primary
-                                    else Color.White.copy(alpha = 0.4f)
-                                )
-                        )
-                    }
+            // Progress Indicators
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                steps.forEachIndexed { index, _ ->
+                    Box(
+                        modifier = Modifier
+                            .size(if (index == currentStepIndex) 10.dp else 6.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (index == currentStepIndex) MaterialTheme.colorScheme.primary
+                                else Color.White.copy(alpha = 0.4f)
+                            )
+                    )
                 }
             }
         }

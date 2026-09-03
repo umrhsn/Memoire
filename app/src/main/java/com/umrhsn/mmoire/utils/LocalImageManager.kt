@@ -34,13 +34,6 @@ class LocalImageManager @Inject constructor(
         return Uri.fromFile(file).toString()
     }
 
-    fun getImages(gameName: String): List<String> {
-        val gameDir = File(imagesDir, gameName)
-        if (!gameDir.exists()) return emptyList()
-
-        return gameDir.listFiles()?.map { Uri.fromFile(it).toString() } ?: emptyList()
-    }
-
     fun deleteGameImages(gameName: String) {
         val gameDir = File(imagesDir, gameName)
         if (gameDir.exists()) {

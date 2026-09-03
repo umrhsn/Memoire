@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 data class MainUiState(
     val boardSize: BoardSize = BoardSize.SUPER_DUPER_EASY,
@@ -82,7 +83,7 @@ class MainViewModel @Inject constructor(
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
-                delay(1000)
+                delay(1.seconds)
                 _uiState.update { it.copy(timerSeconds = it.timerSeconds + 1) }
             }
         }

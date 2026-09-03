@@ -42,44 +42,44 @@ class BrowseViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val games = repository.getAllLocalGames()
-            _uiState.update { it.copy(games = games, isLoading = false) }
-            applyFilters()
+            _uiState.update { state ->
+                val newState = state.copy(games = games, isLoading = false)
+                newState.copy(filteredGames = getFilteredList(newState))
+            }
         }
     }
 
     fun onSearchQueryChanged(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-        applyFilters()
+        _uiState.update { state ->
+            val newState = state.copy(searchQuery = query)
+            newState.copy(filteredGames = getFilteredList(newState))
+        }
     }
 
     fun onSortOrderChanged(order: SortOrder) {
-        _uiState.update { it.copy(sortOrder = order) }
-        applyFilters()
+        _uiState.update { state ->
+            val newState = state.copy(sortOrder = order)
+            newState.copy(filteredGames = getFilteredList(newState))
+        }
     }
 
-    private fun applyFilters() {
-        val currentState = _uiState.value
-        var result = currentState.games
+    private fun getFilteredList(state: BrowseUiState): List<UserImageListWithId> {
+        var result = state.games
 
         // Search
-        if (currentState.searchQuery.isNotBlank()) {
-            result = result.filter { it.name.contains(currentState.searchQuery, ignoreCase = true) }
+        if (state.searchQuery.isNotBlank()) {
+            result = result.filter { it.name.contains(state.searchQuery, ignoreCase = true) }
         }
 
         // Sort
-        result = when (currentState.sortOrder) {
+        result = when (state.sortOrder) {
             SortOrder.LATEST -> result.sortedByDescending { it.createdAt }
             SortOrder.OLDEST -> result.sortedBy { it.createdAt }
             SortOrder.NAME_ASC -> result.sortedBy { it.name.lowercase() }
             SortOrder.NAME_DESC -> result.sortedByDescending { it.name.lowercase() }
             SortOrder.PAIRS_COUNT -> result.sortedByDescending { it.images.size }
         }
-
-        _uiState.update { it.copy(filteredGames = result) }
-    }
-
-    fun playButtonClick() {
-        soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK)
+        return result
     }
 
     fun deleteGame(gameName: String) {
