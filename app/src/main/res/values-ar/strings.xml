@@ -81,14 +81,18 @@
 
     <!-- Settings -->
     <string name="app_settings">إعدادات التطبيق</string>
-    <string name="language">اللغة</string>
-    <string name="lang_system">نظام الهاتف (حسب المنطقة)</string>
+    <string name="audio_settings">الصوت وردود الفعل</string>
+    <string name="sound_enabled">أصوات اللعبة</string>
+    <string name="personalization">التخصيص</string>
+    <string name="language">لغة التطبيق</string>
+    <string name="lang_system">لغة النظام</string>
     <string name="lang_ar_eg">العربية المصرية (فاكر؟)</string>
     <string name="lang_ar">العربية الفصحى (ذاكرة)</string>
     <string name="lang_en">English</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="apply_changes">تطبيق التغييرات</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">أهلاً بك في ذاكرة! 🏺</string>
@@ -101,6 +105,8 @@
     <string name="tut_stats_desc">تتبع حركاتك والأزواج هنا. حاول الفوز بأقل عدد من الحركات!</string>
     <string name="tut_timer_title">الوقت والأرقام القياسية</string>
     <string name="tut_timer_desc">راقب المؤقت! يتم حفظ أفضل أوقاتك تلقائياً لكل مستوى.</string>
+    <string name="tut_race_title">سباق اللاعبين</string>
+    <string name="tut_race_desc">تحدى صديقك! قم بتفعيل وضع اللاعبين في قائمة المستويات للتسابق جنبًا إلى جنب على نفس الجهاز.</string>
     <string name="tut_help_title">مساعدة في أي وقت</string>
     <string name="tut_help_desc">هل تحتاج لتذكير؟ اضغط على علامة الاستفهام في أي وقت لرؤية هذا الدليل مجدداً.</string>
 
@@ -159,4 +165,11 @@
     <string name="game_not_found">عذراً، لم نجد اللعبة \'%1$s\'</string>
     <string name="failed_to_save">فشل الحفظ: %1$s</string>
     <string name="failed_to_create_db">فشل إنشاء اللعبة في قاعدة البيانات</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">وضع اللاعبين</string>
+    <string name="player_n">لاعب %1$d</string>
+    <string name="score_value">النتيجة: %1$d</string>
+    <string name="winner_player_n">لاعب %1$d فاز!</string>
+    <string name="draw_game">تعادل!</string>
 </resources>

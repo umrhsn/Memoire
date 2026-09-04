@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -62,9 +63,15 @@ fun TutorialOverlay(
     steps: List<TutorialStep>,
     anchors: Map<String, Rect>,
     onComplete: () -> Unit,
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
+    onStepChanged: (Int) -> Unit = {}
 ) {
     var currentStepIndex by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(currentStepIndex) {
+        onStepChanged(currentStepIndex)
+    }
+
     val currentStep = steps[currentStepIndex]
     val targetRect = currentStep.anchorKey?.let { anchors[it] }
 

@@ -76,14 +76,18 @@
 
     <!-- Settings -->
     <string name="app_settings">App Settings</string>
-    <string name="language">Language</string>
-    <string name="lang_system">Follow System (Region Aware)</string>
+    <string name="audio_settings">Audio &amp; Feedback</string>
+    <string name="sound_enabled">Game Sounds</string>
+    <string name="personalization">Personalization</string>
+    <string name="language">App Language</string>
+    <string name="lang_system">Follow System</string>
     <string name="lang_ar_eg">Egyptian Arabic (فاكر؟)</string>
     <string name="lang_ar">Standard Arabic (ذاكرة)</string>
     <string name="lang_en">English</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="apply_changes">Apply Changes</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">Welcome to Mémoire! 🏺</string>
@@ -96,6 +100,8 @@
     <string name="tut_stats_desc">Track your moves and pairs here. Try to find the most efficient path to victory!</string>
     <string name="tut_timer_title">Time &amp; Records</string>
     <string name="tut_timer_desc">Keep an eye on the timer! Your best times are saved automatically for each board size.</string>
+    <string name="tut_race_title">2-Player Race</string>
+    <string name="tut_race_desc">Challenge a friend! Enable 2-Player mode in the Level menu to race side-by-side on the same device.</string>
     <string name="tut_help_title">Help Anytime</string>
     <string name="tut_help_desc">Need a refresher? Tap the \'?\' icon anytime to see this guide again.</string>
 
@@ -145,4 +151,11 @@
     <string name="game_not_found">Sorry, we couldn\'t find a board with the ID \'%1$s\'</string>
     <string name="failed_to_save">Failed to save: %1$s</string>
     <string name="failed_to_create_db">Failed to create game entry in database</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">2-Player Mode</string>
+    <string name="player_n">Player %1$d</string>
+    <string name="score_value">Score: %1$d</string>
+    <string name="winner_player_n">Player %1$d Wins!</string>
+    <string name="draw_game">It\'s a Draw!</string>
 </resources>

@@ -3,6 +3,7 @@ package com.umrhsn.mmoire.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -428,7 +429,7 @@ private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_extra_large)),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
-            border = androidx.compose.foundation.BorderStroke(
+            border = BorderStroke(
                 1.dp,
                 MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
             )

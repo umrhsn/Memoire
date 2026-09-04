@@ -78,14 +78,18 @@
 
     <!-- Settings -->
     <string name="app_settings">Ajustes</string>
-    <string name="language">Idioma</string>
-    <string name="lang_system">Seguir el sistema (según región)</string>
+    <string name="audio_settings">Audio y Comentarios</string>
+    <string name="sound_enabled">Sonidos del juego</string>
+    <string name="personalization">Personalización</string>
+    <string name="language">Idioma de la aplicación</string>
+    <string name="lang_system">Idioma del sistema</string>
     <string name="lang_ar_eg">Árabe egipcio (فاكر؟)</string>
     <string name="lang_ar">Árabe estándar (ذاكرة)</string>
     <string name="lang_en">Inglés</string>
     <string name="lang_fr">Francés</string>
     <string name="lang_de">Alemán</string>
     <string name="lang_es">Español</string>
+    <string name="apply_changes">Aplicar cambios</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">¡Bienvenido a Memoria! 🏺</string>
@@ -98,6 +102,8 @@
     <string name="tut_stats_desc">Sigue tus movimientos y parejas aquí. ¡Intenta ganar con la mayor eficiencia!</string>
     <string name="tut_timer_title">Tiempo y Récords</string>
     <string name="tut_timer_desc">¡No pierdas de vista el cronómetro! Tus mejores tiempos se guardan automáticamente.</string>
+    <string name="tut_race_title">Carrera de 2 jugadores</string>
+    <string name="tut_race_desc">¡Desafía a un amigo! Activa el modo de 2 jugadores en el menú de niveles para competir codo con codo en el mismo dispositivo.</string>
     <string name="tut_help_title">Ayuda siempre lista</string>
     <string name="tut_help_desc">¿Necesitas un recordatorio? Toca el icono \'?\' en cualquier momento para ver esta guía de nuevo.</string>
 
@@ -150,4 +156,11 @@
     <string name="game_not_found">Lo sentimos, no pudimos encontrar el juego \'%1$s\'</string>
     <string name="failed_to_save">Error al guardar: %1$s</string>
     <string name="failed_to_create_db">Error al crear la entrada del juego en la base de datos</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">Modo 2 jugadores</string>
+    <string name="player_n">Jugador %1$d</string>
+    <string name="score_value">Puntuación: %1$d</string>
+    <string name="winner_player_n">¡Jugador %1$d gana!</string>
+    <string name="draw_game">¡Es un empate!</string>
 </resources>

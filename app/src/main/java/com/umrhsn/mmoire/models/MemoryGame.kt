@@ -13,19 +13,23 @@ data class MemoryGame(
     companion object {
         fun create(
             boardSize: BoardSize,
-            customImages: List<String>?,
+            customImages: List<String>? = null,
+            customResources: List<Int>? = null,
             shouldShuffle: Boolean = true
         ): MemoryGame {
-            val cards = if (customImages == null) {
-                val chosenImages = DEFAULT_CARDS.let { if (shouldShuffle) it.shuffled() else it }
-                    .take(boardSize.getNumPairs())
+            val numPairs = boardSize.getNumPairs()
+            val cards = if (customImages != null) {
+                // User provided string URLs
+                val chosenImages = customImages.take(numPairs)
                 val randomizedImages =
                     (chosenImages + chosenImages).let { if (shouldShuffle) it.shuffled() else it }
-                randomizedImages.map { card -> MemoryCard(card, null) }
-            } else {
-                val randomizedImages =
-                    (customImages + customImages).let { if (shouldShuffle) it.shuffled() else it }
                 randomizedImages.map { card -> MemoryCard(card.hashCode(), card) }
+            } else {
+                // Use resource IDs
+                val chosenResources = customResources ?: DEFAULT_CARDS.shuffled().take(numPairs)
+                val randomizedResources =
+                    (chosenResources + chosenResources).let { if (shouldShuffle) it.shuffled() else it }
+                randomizedResources.map { card -> MemoryCard(card, null) }
             }
             return MemoryGame(boardSize, cards)
         }

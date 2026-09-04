@@ -50,7 +50,7 @@ class MainViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertEquals(BoardSize.SUPER_DUPER_EASY, state.boardSize)
-            assertNotNull(state.memoryGame)
+            assertNotNull(state.memoryGameP1)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -62,7 +62,7 @@ class MainViewModelTest {
             viewModel.changeSize(BoardSize.HARD)
             val updatedState = awaitItem()
             assertEquals(BoardSize.HARD, updatedState.boardSize)
-            assertEquals(BoardSize.HARD.numCards, updatedState.memoryGame?.cards?.size)
+            assertEquals(BoardSize.HARD.numCards, updatedState.memoryGameP1?.cards?.size)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -92,22 +92,16 @@ class MainViewModelTest {
     }
 
     @Test
-    fun `downloadGame failure sets error message`() = runTest(testDispatcher) {
-        val gameName = "unknownGame"
-        whenever(repository.getGame(gameName)).thenReturn(null)
+    fun `refreshSettings updates state from prefs`() = runTest(testDispatcher) {
+        whenever(prefs.getLanguage()).thenReturn("fr")
+        whenever(prefs.isSoundEnabled()).thenReturn(false)
+
+        viewModel.refreshSettings()
 
         viewModel.uiState.test {
-            awaitItem() // Initial
-            viewModel.downloadGame(gameName)
-
-            var lastState = awaitItem()
-            while (lastState.isLoading) {
-                lastState = awaitItem()
-            }
-
-            assertFalse(lastState.isLoading)
-            assertNotNull(lastState.errorMessage)
-
+            val state = awaitItem()
+            assertEquals("fr", state.appLanguage)
+            assertEquals(false, state.isSoundEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -8,6 +8,7 @@ import com.umrhsn.mmoire.db.RecordEntity
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.repository.GameRepository
+import com.umrhsn.mmoire.utils.DEFAULT_CARDS
 import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import kotlin.time.Duration.Companion.seconds
 
 data class MainUiState(
     val boardSize: BoardSize = BoardSize.SUPER_DUPER_EASY,
-    val memoryGame: MemoryGame? = null,
+    val memoryGameP1: MemoryGame? = null,
+    val memoryGameP2: MemoryGame? = null,
     val gameName: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: Int? = null,
@@ -31,11 +33,15 @@ data class MainUiState(
     val customImages: List<String>? = null,
     val gameSessionId: Long = 0L,
     val timerSeconds: Long = 0L,
+    val timerSecondsP2: Long = 0L,
     val bestTime: Long? = null,
     val isTimerRunning: Boolean = false,
     val showTutorial: Boolean = false,
     val tutorialAnchors: Map<String, Rect> = emptyMap(),
-    val appLanguage: String? = null
+    val appLanguage: String? = null,
+    val isSoundEnabled: Boolean = true,
+    val isTwoPlayerMode: Boolean = false,
+    val winner: Int? = null
 )
 
 @HiltViewModel
@@ -45,10 +51,16 @@ class MainViewModel @Inject constructor(
     private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState(appLanguage = prefs.getLanguage()))
+    private val _uiState = MutableStateFlow(
+        MainUiState(
+            appLanguage = prefs.getLanguage(),
+            isSoundEnabled = prefs.isSoundEnabled()
+        )
+    )
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    private var timerJob: Job? = null
+    private var timerJobP1: Job? = null
+    private var timerJobP2: Job? = null
 
     init {
         setupBoard(_uiState.value.boardSize)
@@ -77,21 +89,50 @@ class MainViewModel @Inject constructor(
         _uiState.update { it.copy(appLanguage = lang) }
     }
 
-    private fun startTimer() {
-        if (_uiState.value.isTimerRunning) return
-        _uiState.update { it.copy(isTimerRunning = true) }
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (true) {
-                delay(1.seconds)
-                _uiState.update { it.copy(timerSeconds = it.timerSeconds + 1) }
+    fun refreshSettings() {
+        _uiState.update {
+            it.copy(
+                appLanguage = prefs.getLanguage(),
+                isSoundEnabled = prefs.isSoundEnabled()
+            )
+        }
+    }
+
+    fun toggleSound(enabled: Boolean) {
+        prefs.setSoundEnabled(enabled)
+        _uiState.update { it.copy(isSoundEnabled = enabled) }
+    }
+
+    fun toggleTwoPlayerMode(enabled: Boolean) {
+        _uiState.update { it.copy(isTwoPlayerMode = enabled) }
+        refreshGame()
+    }
+
+    private fun startTimer(playerNumber: Int) {
+        if (playerNumber == 1) {
+            if (timerJobP1 != null) return
+            timerJobP1 = viewModelScope.launch {
+                while (true) {
+                    delay(1.seconds)
+                    _uiState.update { it.copy(timerSeconds = it.timerSeconds + 1) }
+                }
+            }
+        } else {
+            if (timerJobP2 != null) return
+            timerJobP2 = viewModelScope.launch {
+                while (true) {
+                    delay(1.seconds)
+                    _uiState.update { it.copy(timerSecondsP2 = it.timerSecondsP2 + 1) }
+                }
             }
         }
     }
 
-    private fun stopTimer() {
-        timerJob?.cancel()
-        _uiState.update { it.copy(isTimerRunning = false) }
+    private fun stopTimers() {
+        timerJobP1?.cancel()
+        timerJobP2?.cancel()
+        timerJobP1 = null
+        timerJobP2 = null
     }
 
     fun setupBoard(
@@ -99,8 +140,18 @@ class MainViewModel @Inject constructor(
         customImages: List<String>? = null,
         gameName: String? = null
     ) {
-        stopTimer()
-        val game = MemoryGame.create(boardSize, customImages)
+        stopTimers()
+
+        val numPairs = boardSize.getNumPairs()
+        val sessionResources = if (customImages == null) {
+            DEFAULT_CARDS.shuffled().take(numPairs)
+        } else null
+
+        val gameP1 = MemoryGame.create(boardSize, customImages, sessionResources)
+        val gameP2 = if (_uiState.value.isTwoPlayerMode) {
+            MemoryGame.create(boardSize, customImages, sessionResources)
+        } else null
+
         val boardId = gameName ?: boardSize.name
 
         viewModelScope.launch {
@@ -108,7 +159,8 @@ class MainViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     boardSize = boardSize,
-                    memoryGame = game,
+                    memoryGameP1 = gameP1,
+                    memoryGameP2 = gameP2,
                     customImages = customImages,
                     gameName = gameName,
                     errorMessage = null,
@@ -116,50 +168,63 @@ class MainViewModel @Inject constructor(
                     isLoading = false,
                     gameSessionId = System.currentTimeMillis(),
                     timerSeconds = 0,
-                    bestTime = record?.bestTimeSeconds
+                    timerSecondsP2 = 0,
+                    bestTime = record?.bestTimeSeconds,
+                    winner = null
                 )
             }
         }
     }
 
-    fun flipCard(position: Int): Boolean {
+    fun flipCard(position: Int, playerNumber: Int): Boolean {
         if (_uiState.value.isLoading) return false
-        val game = _uiState.value.memoryGame ?: return false
+        val state = _uiState.value
+        val game = if (playerNumber == 1) state.memoryGameP1 else state.memoryGameP2
+        if (game == null) return false
 
-        // Start timer on first flip
         if (game.numCardFlips == 0) {
-            startTimer()
+            startTimer(playerNumber)
         }
 
         val isFirstCard = game.indexOfSingleSelectedCard == null
         val (updatedGame, foundMatch) = game.flipCard(position)
 
         if (isFirstCard) {
-            soundManager.playSound(SoundManager.SoundType.CARD_FLIP)
+            if (_uiState.value.isSoundEnabled) soundManager.playSound(SoundManager.SoundType.CARD_FLIP)
         } else {
-            if (foundMatch) {
-                soundManager.playSound(SoundManager.SoundType.MATCH_SUCCESS)
-            } else {
-                soundManager.playSound(SoundManager.SoundType.MATCH_FAIL)
+            if (_uiState.value.isSoundEnabled) {
+                if (foundMatch) {
+                    soundManager.playSound(SoundManager.SoundType.MATCH_SUCCESS)
+                } else {
+                    soundManager.playSound(SoundManager.SoundType.MATCH_FAIL)
+                }
             }
         }
 
-        _uiState.update {
-            it.copy(memoryGame = updatedGame)
+        _uiState.update { currentState ->
+            if (playerNumber == 1) currentState.copy(memoryGameP1 = updatedGame)
+            else currentState.copy(memoryGameP2 = updatedGame)
         }
 
         if (updatedGame.haveWonGame()) {
-            handleWin()
+            handleWin(playerNumber)
         }
 
         return foundMatch
     }
 
-    private fun handleWin() {
-        stopTimer()
-        val boardId = _uiState.value.gameName ?: _uiState.value.boardSize.name
-        val currentTime = _uiState.value.timerSeconds
-        val currentMoves = _uiState.value.memoryGame?.getNumMoves() ?: 0
+    private fun handleWin(winnerPlayer: Int) {
+        stopTimers()
+        val state = _uiState.value
+        val boardId = state.gameName ?: state.boardSize.name
+        val currentTime = if (winnerPlayer == 1) state.timerSeconds else state.timerSecondsP2
+        val currentMoves =
+            (if (winnerPlayer == 1) state.memoryGameP1 else state.memoryGameP2)?.getNumMoves() ?: 0
+
+        if (state.isTwoPlayerMode) {
+            _uiState.update { it.copy(winner = winnerPlayer) }
+            return
+        }
 
         viewModelScope.launch {
             val oldRecord = repository.getRecord(boardId)
@@ -192,11 +257,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun playWinSound() {
-        soundManager.playSound(SoundManager.SoundType.GAME_WIN)
+        if (_uiState.value.isSoundEnabled) soundManager.playSound(SoundManager.SoundType.GAME_WIN)
     }
 
     fun playClickSound() {
-        soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK)
+        if (_uiState.value.isSoundEnabled) soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK)
     }
 
     fun refreshGame() {

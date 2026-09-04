@@ -77,14 +77,18 @@
 
     <!-- Settings -->
     <string name="app_settings">Einstellungen</string>
-    <string name="language">Sprache</string>
-    <string name="lang_system">Systemsprache (regionsabhängig)</string>
+    <string name="audio_settings">Audio &amp; Feedback</string>
+    <string name="sound_enabled">App-Töne</string>
+    <string name="personalization">Personalisierung</string>
+    <string name="language">App-Sprache</string>
+    <string name="lang_system">Systemsprache</string>
     <string name="lang_ar_eg">Ägyptisches Arabisch (فاكر؟)</string>
     <string name="lang_ar">Standard-Arabisch (ذاكرة)</string>
     <string name="lang_en">Englisch</string>
     <string name="lang_fr">Französisch</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Spanisch</string>
+    <string name="apply_changes">Änderungen anwenden</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">Willkommen bei Mémoire! 🏺</string>
@@ -97,6 +101,8 @@
     <string name="tut_stats_desc">Verfolge deine Züge und Paare hier. Versuche mit so wenig Zügen wie möglich zu gewinnen!</string>
     <string name="tut_timer_title">Zeit &amp; Rekorde</string>
     <string name="tut_timer_desc">Behalte den Timer im Auge! Deine Bestzeiten werden für jede Größe automatisch gespeichert.</string>
+    <string name="tut_race_title">2-Spieler-Rennen</string>
+    <string name="tut_race_desc">Fordere einen Freund heraus! Aktiviere den 2-Spieler-Modus im Level-Menü, um nebeneinander auf demselben Gerät um die Wette zu spielen.</string>
     <string name="tut_help_title">Immer Hilfe bereit</string>
     <string name="tut_help_desc">Brauchst du eine Auffrischung? Tippe jederzeit auf das \'?\' Icon, um diese Anleitung erneut zu sehen.</string>
 
@@ -147,4 +153,11 @@
     <string name="game_not_found">Entschuldigung, wir konnten das Spiel \'%1$s\' nicht finden</string>
     <string name="failed_to_save">Speichern fehlgeschlagen: %1$s</string>
     <string name="failed_to_create_db">Fehler beim Erstellen des Spieleintrags in der Datenbank</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">2-Spieler-Modus</string>
+    <string name="player_n">Spieler %1$d</string>
+    <string name="score_value">Punktzahl: %1$d</string>
+    <string name="winner_player_n">Spieler %1$d gewinnt!</string>
+    <string name="draw_game">Unentschieden!</string>
 </resources>

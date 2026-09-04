@@ -25,17 +25,22 @@ enum class BoardSize(val numCards: Int) {
         SUPER_DUPER_HARD -> R.string.size_super_duper_hard
     }
 
-    fun getWidth(): Int = when (this) {
-        SUPER_DUPER_EASY -> 2
-        SUPER_EASY -> 2
-        EASY -> 3
-        MEDIUM -> 3
-        HARD -> 4
-        SUPER_HARD -> 4
-        SUPER_DUPER_HARD -> 5
+    fun getWidth(isTwoPlayerMode: Boolean = false): Int {
+        val width = when (this) {
+            SUPER_DUPER_EASY -> 2
+            SUPER_EASY -> 2
+            EASY -> 3
+            MEDIUM -> 3
+            HARD -> 4
+            SUPER_HARD -> 4
+            SUPER_DUPER_HARD -> 5
+        }
+        return if (isTwoPlayerMode) numCards / width else width
     }
 
-    fun getHeight(): Int = numCards / getWidth()
+    fun getHeight(isTwoPlayerMode: Boolean = false): Int {
+        return numCards / getWidth(isTwoPlayerMode)
+    }
 
     fun getNumPairs(): Int = numCards / 2
 }

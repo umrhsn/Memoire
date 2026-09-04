@@ -29,4 +29,12 @@ class PrefsManager @Inject constructor(
     fun setLanguage(lang: String?) {
         prefs.edit { putString("app_language", lang) }
     }
+
+    fun isSoundEnabled(): Boolean {
+        return prefs.getBoolean("is_sound_enabled", true)
+    }
+
+    fun setSoundEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean("is_sound_enabled", enabled) }
+    }
 }

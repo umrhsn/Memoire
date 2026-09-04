@@ -81,14 +81,18 @@
 
     <!-- Settings -->
     <string name="app_settings">إعدادات التطبيق</string>
-    <string name="language">اللغة</string>
-    <string name="lang_system">زي الموبايل (حسب المنطقة)</string>
+    <string name="audio_settings">الصوت وردود الفعل</string>
+    <string name="sound_enabled">أصوات اللعبة</string>
+    <string name="personalization">التخصيص</string>
+    <string name="language">لغة التطبيق</string>
+    <string name="lang_system">زي الموبايل</string>
     <string name="lang_ar_eg">عربي مصري (فاكر؟)</string>
     <string name="lang_ar">عربي (ذاكرة)</string>
     <string name="lang_en">English</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="apply_changes">حفظ</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">أهلاً بك في فاكر؟ 🏺</string>
@@ -101,6 +105,8 @@
     <string name="tut_stats_desc">تابع حركاتك والأزواج اللي لقيتها هنا. حاول تفوز بأقل عدد حركات!</string>
     <string name="tut_timer_title">الوقت والأرقام القياسية</string>
     <string name="tut_timer_desc">خلي عينك على التايمر! أحسن أوقاتك بتتحفظ أوتوماتيك لكل مستوى.</string>
+    <string name="tut_race_title">سباق مع حد</string>
+    <string name="tut_race_desc">تحدى صاحبك! شغل وضع الـ 2-Player من قائمة المستويات وابقوا في سباق مع بعض على نفس الموبايل.</string>
     <string name="tut_help_title">مساعدة في أي وقت</string>
     <string name="tut_help_desc">محتاج تفتكر حاجة؟ دوس على علامة الاستفهام دي في أي وقت عشان تشوف الدليل ده تاني.</string>
 
@@ -159,4 +165,11 @@
     <string name="game_not_found">معلش مش لاقيين اللعبة دي \'%1$s\'</string>
     <string name="failed_to_save">مش عارف أحفظ: %1$s</string>
     <string name="failed_to_create_db">مش عارف أحفظ في قاعدة البيانات</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">لعب مع حد</string>
+    <string name="player_n">لاعب %1$d</string>
+    <string name="score_value">نقط: %1$d</string>
+    <string name="winner_player_n">لاعب %1$d كسب!</string>
+    <string name="draw_game">تعادل يا رجالة!</string>
 </resources>

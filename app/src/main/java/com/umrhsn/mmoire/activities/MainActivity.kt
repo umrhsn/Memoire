@@ -2,11 +2,11 @@ package com.umrhsn.mmoire.activities
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,9 +24,14 @@ import com.umrhsn.mmoire.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.refreshSettings()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -37,8 +42,16 @@ class MainActivity : ComponentActivity() {
 
             // Handle Language Change
             LaunchedEffect(uiState.appLanguage) {
-                val appLocales = LocaleListCompat.forLanguageTags(uiState.appLanguage ?: "")
-                AppCompatDelegate.setApplicationLocales(appLocales)
+                val currentLocales = AppCompatDelegate.getApplicationLocales()
+                val targetLanguage = uiState.appLanguage ?: ""
+                if (currentLocales.toLanguageTags() != targetLanguage) {
+                    val appLocales = if (targetLanguage.isNotEmpty()) {
+                        LocaleListCompat.forLanguageTags(targetLanguage)
+                    } else {
+                        LocaleListCompat.getEmptyLocaleList()
+                    }
+                    AppCompatDelegate.setApplicationLocales(appLocales)
+                }
             }
 
             MainScreen(
@@ -54,7 +67,11 @@ class MainActivity : ComponentActivity() {
                     val intent = Intent(this, BrowseActivity::class.java)
                     resultLauncher.launch(intent)
                 },
-                onCardClicked = { position -> viewModel.flipCard(position) },
+                onSettingsClicked = {
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                },
+                onCardClicked = { position, player -> viewModel.flipCard(position, player) },
                 onWin = { isSmoothWin -> triggerWinEffects(isSmoothWin) }
             )
         }

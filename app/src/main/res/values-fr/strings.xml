@@ -78,14 +78,18 @@
 
     <!-- Settings -->
     <string name="app_settings">Paramètres</string>
-    <string name="language">Langue</string>
-    <string name="lang_system">Suivre le système (dépend de la région)</string>
+    <string name="audio_settings">Audio et retours</string>
+    <string name="sound_enabled">Sons du jeu</string>
+    <string name="personalization">Personnalisation</string>
+    <string name="language">Langue de l\'application</string>
+    <string name="lang_system">Langue du système</string>
     <string name="lang_ar_eg">Arabe égyptien (فاكر؟)</string>
     <string name="lang_ar">Arabe standard (ذاكرة)</string>
     <string name="lang_en">Anglais</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Allemand</string>
     <string name="lang_es">Espagnol</string>
+    <string name="apply_changes">Appliquer les modifications</string>
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">Bienvenue sur Mémoire ! 🏺</string>
@@ -98,6 +102,8 @@
     <string name="tut_stats_desc">Suivez vos coups et vos paires ici. Essayez de gagner avec le moins de coups possible !</string>
     <string name="tut_timer_title">Temps &amp; Records</string>
     <string name="tut_timer_desc">Gardez un œil sur le chrono ! Vos meilleurs temps sont sauvegardés automatiquement.</string>
+    <string name="tut_race_title">Course à 2 joueurs</string>
+    <string name="tut_race_desc">Défiez un ami ! Activez le mode 2 joueurs dans le menu Niveau pour faire la course côte à côte sur le même appareil.</string>
     <string name="tut_help_title">Besoin d\'aide ?</string>
     <string name="tut_help_desc">Un petit rappel ? Appuyez sur l\'icône \'?\' à tout moment pour revoir ce guide.</string>
 
@@ -150,4 +156,11 @@
     <string name="game_not_found">Désolé, nous n\'avons pas pu trouver le jeu \'%1$s\'</string>
     <string name="failed_to_save">Échec de la sauvegarde : %1$s</string>
     <string name="failed_to_create_db">Échec de la création de l\'entrée du jeu dans la base de données</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">Mode 2 joueurs</string>
+    <string name="player_n">Joueur %1$d</string>
+    <string name="score_value">Score: %1$d</string>
+    <string name="winner_player_n">Joueur %1$d gagne!</string>
+    <string name="draw_game">C\'est un match nul!</string>
 </resources>

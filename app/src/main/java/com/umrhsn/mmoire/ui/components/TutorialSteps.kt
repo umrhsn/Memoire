@@ -9,6 +9,7 @@ import compose.icons.evaicons.outline.Clock
 import compose.icons.evaicons.outline.Flash
 import compose.icons.evaicons.outline.Grid
 import compose.icons.evaicons.outline.Layout
+import compose.icons.evaicons.outline.Person
 import compose.icons.evaicons.outline.QuestionMarkCircle
 import compose.icons.evaicons.outline.SmilingFace
 
@@ -42,6 +43,12 @@ fun getMainTutorialSteps(): List<TutorialStep> = listOf(
         description = stringResource(R.string.tut_timer_desc),
         icon = EvaIcons.Outline.Clock,
         anchorKey = "timer_tracking"
+    ),
+    TutorialStep(
+        title = stringResource(R.string.tut_race_title),
+        description = stringResource(R.string.tut_race_desc),
+        icon = EvaIcons.Outline.Person,
+        anchorKey = "race_toggle"
     ),
     TutorialStep(
         title = stringResource(R.string.tut_help_title),

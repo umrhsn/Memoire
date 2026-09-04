@@ -34,7 +34,8 @@ fun MemoryBoard(
     boardSize: BoardSize,
     cards: List<MemoryCard>,
     onCardClicked: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isTwoPlayerMode: Boolean = false
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -46,8 +47,8 @@ fun MemoryBoard(
         val maxHeight = this.maxHeight
 
         // Use pre-defined dimensions for consistency
-        val columns = remember(boardSize) { boardSize.getWidth() }
-        val rows = remember(boardSize) { boardSize.getHeight() }
+        val columns = remember(boardSize, isTwoPlayerMode) { boardSize.getWidth(isTwoPlayerMode) }
+        val rows = remember(boardSize, isTwoPlayerMode) { boardSize.getHeight(isTwoPlayerMode) }
 
         // Calculate card size once per size change
         val bestCardSize = remember(maxWidth, maxHeight, columns, rows) {
