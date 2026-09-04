@@ -54,6 +54,6 @@ fun getMainTutorialSteps(): List<TutorialStep> = listOf(
         title = stringResource(R.string.tut_help_title),
         description = stringResource(R.string.tut_help_desc),
         icon = EvaIcons.Outline.QuestionMarkCircle,
-        anchorKey = "help_action"
+        anchorKey = "more_options"
     )
 )

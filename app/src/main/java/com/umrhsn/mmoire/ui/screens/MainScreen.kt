@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.ui.components.AppDialog
@@ -102,6 +103,7 @@ import compose.icons.evaicons.outline.Sun
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
+    appTheme: AppTheme,
     onCreateClicked: (BoardSize) -> Unit,
     onBrowseClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
@@ -176,7 +178,12 @@ fun MainScreen(
                             AppHeaderIcon(
                                 icon = EvaIcons.Outline.MoreVertical,
                                 contentDescription = stringResource(R.string.more_options),
-                                onClick = { showMoreMenu = true }
+                                onClick = { showMoreMenu = true },
+                                modifier = Modifier.tutorialAnchor(
+                                    "more_options",
+                                    viewModel::onAnchorPositioned,
+                                    viewModel::onAnchorRemoved
+                                )
                             )
 
                             MaterialTheme(
@@ -230,11 +237,7 @@ fun MainScreen(
                                         onClick = {
                                             showMoreMenu = false
                                             viewModel.startTutorial()
-                                        },
-                                        modifier = Modifier.tutorialAnchor(
-                                            "help_action",
-                                            viewModel::onAnchorPositioned
-                                        )
+                                        }
                                     )
                                 }
                             }
@@ -242,14 +245,19 @@ fun MainScreen(
                     },
                     modifier = Modifier.tutorialAnchor(
                         "header_actions",
-                        viewModel::onAnchorPositioned
+                        viewModel::onAnchorPositioned,
+                        viewModel::onAnchorRemoved
                     )
                 )
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .tutorialAnchor("game_board", viewModel::onAnchorPositioned)
+                        .tutorialAnchor(
+                            "game_board",
+                            viewModel::onAnchorPositioned,
+                            viewModel::onAnchorRemoved
+                        )
                 ) {
                     if (uiState.isTwoPlayerMode) {
                         Column(modifier = Modifier.fillMaxSize()) {
@@ -364,7 +372,8 @@ fun MainScreen(
                                 Row(
                                     modifier = Modifier.tutorialAnchor(
                                         "stats_tracking",
-                                        viewModel::onAnchorPositioned
+                                        viewModel::onAnchorPositioned,
+                                        viewModel::onAnchorRemoved
                                     ),
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
@@ -400,7 +409,8 @@ fun MainScreen(
                                 Row(
                                     modifier = Modifier.tutorialAnchor(
                                         "timer_tracking",
-                                        viewModel::onAnchorPositioned
+                                        viewModel::onAnchorPositioned,
+                                        viewModel::onAnchorRemoved
                                     ),
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
@@ -456,6 +466,7 @@ fun MainScreen(
                     isTwoPlayerMode = uiState.isTwoPlayerMode,
                     onToggleTwoPlayerMode = { viewModel.toggleTwoPlayerMode(it) },
                     onAnchorPositioned = viewModel::onAnchorPositioned,
+                    onAnchorRemoved = viewModel::onAnchorRemoved,
                     onSizeSelected = {
                         viewModel.changeSize(it)
                         showSizeDialog = false
@@ -488,6 +499,11 @@ fun MainScreen(
                         val step = steps.getOrNull(index)
                         if (step?.anchorKey == "race_toggle") {
                             showSizeDialog = true
+                            if (!uiState.isTwoPlayerMode) {
+                                viewModel.toggleTwoPlayerMode(true)
+                            }
+                        } else {
+                            showSizeDialog = false
                         }
                     }
                 )
@@ -679,6 +695,7 @@ private fun BoardSizeDialog(
     isTwoPlayerMode: Boolean = false,
     onToggleTwoPlayerMode: ((Boolean) -> Unit)? = null,
     onAnchorPositioned: ((String, Rect) -> Unit)? = null,
+    onAnchorRemoved: ((String) -> Unit)? = null,
     onSizeSelected: (BoardSize) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -727,7 +744,11 @@ private fun BoardSizeDialog(
                             onCheckedChange = onToggleTwoPlayerMode,
                             modifier = Modifier.then(
                                 if (onAnchorPositioned != null) {
-                                    Modifier.tutorialAnchor("race_toggle", onAnchorPositioned)
+                                    Modifier.tutorialAnchor(
+                                        "race_toggle",
+                                        onAnchorPositioned,
+                                        onAnchorRemoved
+                                    )
                                 } else Modifier
                             ),
                             colors = SwitchDefaults.colors(

@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
@@ -57,15 +58,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.umrhsn.mmoire.R
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.composed
 
 fun Modifier.tutorialAnchor(
     key: String,
-    onPositioned: (String, Rect) -> Unit
-) = this.onGloballyPositioned { coordinates ->
-    onPositioned(key, coordinates.boundsInWindow())
+    onPositioned: (String, Rect) -> Unit,
+    onRemoved: ((String) -> Unit)? = null
+) = this.composed {
+    if (onRemoved != null) {
+        DisposableEffect(key) {
+            onDispose { onRemoved(key) }
+        }
+    }
+    this.onGloballyPositioned { coordinates ->
+        val screenPos = coordinates.positionOnScreen()
+        val size = coordinates.size.toSize()
+        onPositioned(key, Rect(screenPos, size))
+    }
 }
 
 @Composable

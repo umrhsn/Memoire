@@ -80,6 +80,10 @@
     <string name="audio_settings">Audio &amp; Feedback</string>
     <string name="sound_enabled">App-Töne</string>
     <string name="personalization">Personalisierung</string>
+    <string name="theme">App-Design</string>
+    <string name="theme_system">System folgen</string>
+    <string name="theme_light">Heller Modus</string>
+    <string name="theme_dark">Dunkler Modus</string>
     <string name="language">App-Sprache</string>
     <string name="lang_system">Systemsprache</string>
     <string name="lang_ar_eg">Ägyptisches Arabisch (فاكر؟)</string>

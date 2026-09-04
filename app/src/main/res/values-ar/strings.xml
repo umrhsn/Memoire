@@ -84,6 +84,10 @@
     <string name="audio_settings">الصوت وردود الفعل</string>
     <string name="sound_enabled">أصوات اللعبة</string>
     <string name="personalization">التخصيص</string>
+    <string name="theme">سمة التطبيق</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">الوضع الفاتح</string>
+    <string name="theme_dark">الوضع الداكن</string>
     <string name="language">لغة التطبيق</string>
     <string name="lang_system">لغة النظام</string>
     <string name="lang_ar_eg">العربية المصرية (فاكر؟)</string>

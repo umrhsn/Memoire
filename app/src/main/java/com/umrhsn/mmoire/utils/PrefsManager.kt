@@ -3,6 +3,7 @@ package com.umrhsn.mmoire.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.umrhsn.mmoire.models.AppTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,5 +37,18 @@ class PrefsManager @Inject constructor(
 
     fun setSoundEnabled(enabled: Boolean) {
         prefs.edit { putBoolean("is_sound_enabled", enabled) }
+    }
+
+    fun getTheme(): AppTheme {
+        val themeName = prefs.getString("app_theme", AppTheme.SYSTEM.name)
+        return try {
+            AppTheme.valueOf(themeName ?: AppTheme.SYSTEM.name)
+        } catch (e: Exception) {
+            AppTheme.SYSTEM
+        }
+    }
+
+    fun setTheme(theme: AppTheme) {
+        prefs.edit { putString("app_theme", theme.name) }
     }
 }

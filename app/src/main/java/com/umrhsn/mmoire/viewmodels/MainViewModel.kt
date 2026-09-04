@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.db.RecordEntity
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.repository.GameRepository
@@ -39,6 +40,7 @@ data class MainUiState(
     val showTutorial: Boolean = false,
     val tutorialAnchors: Map<String, Rect> = emptyMap(),
     val appLanguage: String? = null,
+    val appTheme: AppTheme = AppTheme.SYSTEM,
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
     val winner: Int? = null
@@ -54,6 +56,7 @@ class MainViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         MainUiState(
             appLanguage = prefs.getLanguage(),
+            appTheme = prefs.getTheme(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
     )
@@ -75,6 +78,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun onAnchorRemoved(key: String) {
+        _uiState.update {
+            it.copy(tutorialAnchors = it.tutorialAnchors - key)
+        }
+    }
+
     fun startTutorial() {
         _uiState.update { it.copy(showTutorial = true) }
     }
@@ -93,6 +102,7 @@ class MainViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 appLanguage = prefs.getLanguage(),
+                appTheme = prefs.getTheme(),
                 isSoundEnabled = prefs.isSoundEnabled()
             )
         }

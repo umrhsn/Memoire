@@ -13,9 +13,11 @@
     <!-- General -->
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
+    <string name="ok">OK</string>
     <string name="back">Back</string>
     <string name="remove">Remove</string>
     <string name="delete">Delete</string>
+    <string name="search">Search</string>
     <string name="play">Play</string>
     <string name="start_game">START GAME</string>
     <string name="maybe_later">MAYBE LATER</string>
@@ -51,6 +53,8 @@
         <item quantity="other">Amazing! You cleared the board in %1$d moves.</item>
     </plurals>
     <string name="choose_level">Choose Level</string>
+    <string name="cards_count">%1$d cards</string>
+    <string name="pairs_count">%1$d pairs</string>
     <string name="cards_pairs_info">%1$d cards • %2$d pairs</string>
     <string name="pairs_progress">%1$d/%2$d</string>
     <string name="moves_count">%1$d</string>
@@ -65,6 +69,7 @@
     <string name="created_at">Created: %1$s</string>
     <string name="edit_board">Edit Board</string>
     <string name="update_and_play">UPDATE &amp; PLAY</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
     <string name="duration_seconds">%1$ds</string>
     <string name="duration_minutes_seconds">%1$dm %2$ds</string>
     <string name="best_time_label">Best: %1$s</string>
@@ -79,6 +84,10 @@
     <string name="audio_settings">Audio &amp; Feedback</string>
     <string name="sound_enabled">Game Sounds</string>
     <string name="personalization">Personalization</string>
+    <string name="theme">App Theme</string>
+    <string name="theme_system">Follow System</string>
+    <string name="theme_light">Light Mode</string>
+    <string name="theme_dark">Dark Mode</string>
     <string name="language">App Language</string>
     <string name="lang_system">Follow System</string>
     <string name="lang_ar_eg">Egyptian Arabic (فاكر؟)</string>
@@ -114,6 +123,7 @@
         <item quantity="one">Contains 1 unique pair</item>
         <item quantity="other">Contains %1$d unique pairs</item>
     </plurals>
+    <string name="pairs_label">%1$d Pairs</string>
     <string name="more_images_count">+%1$d</string>
 
     <!-- Create Screen -->

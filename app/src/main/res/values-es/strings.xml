@@ -81,6 +81,10 @@
     <string name="audio_settings">Audio y Comentarios</string>
     <string name="sound_enabled">Sonidos del juego</string>
     <string name="personalization">Personalización</string>
+    <string name="theme">Tema de la aplicación</string>
+    <string name="theme_system">Seguir el sistema</string>
+    <string name="theme_light">Modo claro</string>
+    <string name="theme_dark">Modo oscuro</string>
     <string name="language">Idioma de la aplicación</string>
     <string name="lang_system">Idioma del sistema</string>
     <string name="lang_ar_eg">Árabe egipcio (فاكر؟)</string>

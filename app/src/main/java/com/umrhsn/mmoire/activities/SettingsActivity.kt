@@ -40,7 +40,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
 
-            MemoireTheme {
+            MemoireTheme(appTheme = uiState.currentTheme) {
                 SettingsScreen(
                     viewModel = viewModel,
                     onBackClicked = { finish() }

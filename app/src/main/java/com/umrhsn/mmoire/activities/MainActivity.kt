@@ -1,7 +1,9 @@
 package com.umrhsn.mmoire.activities
 
+import android.R
 import android.content.Intent
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,7 +14,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.umrhsn.mmoire.activities.BrowseActivity
+import com.umrhsn.mmoire.activities.CreateActivity
+import com.umrhsn.mmoire.activities.SettingsActivity
 import com.umrhsn.mmoire.ui.screens.MainScreen
+import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
 import com.umrhsn.mmoire.utils.explosionConfettiArray
@@ -40,45 +46,34 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            // Handle Language Change
-            LaunchedEffect(uiState.appLanguage) {
-                val currentLocales = AppCompatDelegate.getApplicationLocales()
-                val targetLanguage = uiState.appLanguage ?: ""
-                if (currentLocales.toLanguageTags() != targetLanguage) {
-                    val appLocales = if (targetLanguage.isNotEmpty()) {
-                        LocaleListCompat.forLanguageTags(targetLanguage)
-                    } else {
-                        LocaleListCompat.getEmptyLocaleList()
-                    }
-                    AppCompatDelegate.setApplicationLocales(appLocales)
-                }
+            MemoireTheme(appTheme = uiState.appTheme) {
+                MainScreen(
+                    viewModel = viewModel,
+                    appTheme = uiState.appTheme,
+                    onCreateClicked = { desiredSize ->
+                        val intent = Intent(this, CreateActivity::class.java).putExtra(
+                            EXTRA_BOARD_SIZE,
+                            desiredSize
+                        )
+                        resultLauncher.launch(intent)
+                    },
+                    onBrowseClicked = {
+                        val intent = Intent(this, BrowseActivity::class.java)
+                        resultLauncher.launch(intent)
+                    },
+                    onSettingsClicked = {
+                        val intent = Intent(this, SettingsActivity::class.java)
+                        startActivity(intent)
+                    },
+                    onCardClicked = { position, player -> viewModel.flipCard(position, player) },
+                    onWin = { isSmoothWin -> triggerWinEffects(isSmoothWin) }
+                )
             }
-
-            MainScreen(
-                viewModel = viewModel,
-                onCreateClicked = { desiredSize ->
-                    val intent = Intent(this, CreateActivity::class.java).putExtra(
-                        EXTRA_BOARD_SIZE,
-                        desiredSize
-                    )
-                    resultLauncher.launch(intent)
-                },
-                onBrowseClicked = {
-                    val intent = Intent(this, BrowseActivity::class.java)
-                    resultLauncher.launch(intent)
-                },
-                onSettingsClicked = {
-                    val intent = Intent(this, SettingsActivity::class.java)
-                    startActivity(intent)
-                },
-                onCardClicked = { position, player -> viewModel.flipCard(position, player) },
-                onWin = { isSmoothWin -> triggerWinEffects(isSmoothWin) }
-            )
         }
     }
 
     private fun triggerWinEffects(isSmoothWin: Boolean) {
-        val rootView = window.decorView.findViewById<android.view.ViewGroup>(android.R.id.content)
+        val rootView = window.decorView.findViewById<ViewGroup>(R.id.content)
         if (isSmoothWin) {
             showToastSmoothWin(this)
             rainingConfettiLong(rootView)
