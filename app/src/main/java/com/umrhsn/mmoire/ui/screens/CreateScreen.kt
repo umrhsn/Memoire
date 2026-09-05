@@ -106,7 +106,7 @@ fun CreateScreen(
     val numImagesRequired = boardSize.getNumPairs()
     val context = LocalContext.current
 
-    MemoireTheme {
+    MemoireTheme(appTheme = uiState.appTheme) {
         Box(
             modifier = modifier
                 .fillMaxSize()

@@ -5,6 +5,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.umrhsn.mmoire.models.AppTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,6 +17,9 @@ class PrefsManager @Inject constructor(
 ) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("memoire_prefs", Context.MODE_PRIVATE)
+
+    private val _themeFlow = MutableStateFlow(getThemeInternal())
+    val themeFlow: StateFlow<AppTheme> = _themeFlow.asStateFlow()
 
     fun isFirstTime(): Boolean {
         return prefs.getBoolean("is_first_time", true)
@@ -40,6 +46,10 @@ class PrefsManager @Inject constructor(
     }
 
     fun getTheme(): AppTheme {
+        return _themeFlow.value
+    }
+
+    private fun getThemeInternal(): AppTheme {
         val themeName = prefs.getString("app_theme", AppTheme.SYSTEM.name)
         return try {
             AppTheme.valueOf(themeName ?: AppTheme.SYSTEM.name)
@@ -50,5 +60,6 @@ class PrefsManager @Inject constructor(
 
     fun setTheme(theme: AppTheme) {
         prefs.edit { putString("app_theme", theme.name) }
+        _themeFlow.value = theme
     }
 }

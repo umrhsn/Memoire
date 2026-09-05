@@ -93,7 +93,7 @@ fun BrowseScreen(
     var previewGame by remember { mutableStateOf<UserImageListWithId?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
 
-    MemoireTheme {
+    MemoireTheme(appTheme = uiState.appTheme) {
         Scaffold(
             topBar = {
                 Column {

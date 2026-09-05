@@ -18,7 +18,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,18 +47,12 @@ import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.viewmodels.SettingsViewModel
 import compose.icons.EvaIcons
 import compose.icons.evaicons.Outline
-import compose.icons.evaicons.outline.AlertTriangle
 import compose.icons.evaicons.outline.ArrowBack
 import compose.icons.evaicons.outline.CheckmarkCircle2
 import compose.icons.evaicons.outline.ColorPalette
-import compose.icons.evaicons.outline.Flash
-import compose.icons.evaicons.outline.Globe2
 import compose.icons.evaicons.outline.Layout
-import compose.icons.evaicons.outline.Monitor
 import compose.icons.evaicons.outline.Moon
 import compose.icons.evaicons.outline.Music
-import compose.icons.evaicons.outline.Navigation2
-import compose.icons.evaicons.outline.Settings
 import compose.icons.evaicons.outline.Sun
 import compose.icons.evaicons.outline.VolumeOff
 import compose.icons.evaicons.outline.VolumeUp
@@ -181,36 +174,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        // Apply Button Area
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            tonalElevation = 8.dp,
-            shadowElevation = 16.dp,
-            color = MaterialTheme.colorScheme.surface
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(20.dp)
-                    .padding(bottom = 8.dp) // Extra padding for system nav bar if not edge-to-edge
-            ) {
-                Button(
-                    onClick = { viewModel.applyChanges() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    enabled = uiState.hasChanges,
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.apply_changes),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

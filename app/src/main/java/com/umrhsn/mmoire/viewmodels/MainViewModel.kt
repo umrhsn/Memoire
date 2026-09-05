@@ -10,6 +10,7 @@ import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.utils.DEFAULT_CARDS
+import com.umrhsn.mmoire.utils.LocaleManager
 import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,12 +51,13 @@ data class MainUiState(
 class MainViewModel @Inject constructor(
     private val repository: GameRepository,
     private val soundManager: SoundManager,
-    private val prefs: PrefsManager
+    private val prefs: PrefsManager,
+    private val localeManager: LocaleManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         MainUiState(
-            appLanguage = prefs.getLanguage(),
+            appLanguage = localeManager.getSelectedLanguageTag(),
             appTheme = prefs.getTheme(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
@@ -69,6 +71,13 @@ class MainViewModel @Inject constructor(
         setupBoard(_uiState.value.boardSize)
         if (prefs.isFirstTime()) {
             _uiState.update { it.copy(showTutorial = true) }
+        }
+
+        // Observe theme changes globally
+        viewModelScope.launch {
+            prefs.themeFlow.collect { theme ->
+                _uiState.update { it.copy(appTheme = theme) }
+            }
         }
     }
 
@@ -94,14 +103,14 @@ class MainViewModel @Inject constructor(
     }
 
     fun changeLanguage(lang: String?) {
-        prefs.setLanguage(lang)
+        localeManager.applyLanguageTag(lang)
         _uiState.update { it.copy(appLanguage = lang) }
     }
 
     fun refreshSettings() {
         _uiState.update {
             it.copy(
-                appLanguage = prefs.getLanguage(),
+                appLanguage = localeManager.getSelectedLanguageTag(),
                 appTheme = prefs.getTheme(),
                 isSoundEnabled = prefs.isSoundEnabled()
             )

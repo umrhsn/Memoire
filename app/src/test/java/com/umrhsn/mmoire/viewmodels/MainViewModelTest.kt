@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.UserImageList
 import com.umrhsn.mmoire.repository.GameRepository
+import com.umrhsn.mmoire.utils.LocaleManager
 import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import kotlinx.coroutines.Dispatchers
@@ -28,16 +29,19 @@ class MainViewModelTest {
     private val repository: GameRepository = mock()
     private val soundManager: SoundManager = mock()
     private val prefs: PrefsManager = mock()
+    private val localeManager: LocaleManager = mock()
     private lateinit var viewModel: MainViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeEach
     fun setUp() = runTest(testDispatcher) {
         Dispatchers.setMain(testDispatcher)
-        whenever(prefs.getLanguage()).thenReturn("en")
+        whenever(localeManager.getSelectedLanguageTag()).thenReturn("en")
+        whenever(prefs.getTheme()).thenReturn(com.umrhsn.mmoire.models.AppTheme.SYSTEM)
+        whenever(prefs.isSoundEnabled()).thenReturn(true)
         whenever(prefs.isFirstTime()).thenReturn(false)
         whenever(repository.getRecord(any())).thenReturn(null)
-        viewModel = MainViewModel(repository, soundManager, prefs)
+        viewModel = MainViewModel(repository, soundManager, prefs, localeManager)
     }
 
     @AfterEach
@@ -51,6 +55,8 @@ class MainViewModelTest {
             val state = awaitItem()
             assertEquals(BoardSize.SUPER_DUPER_EASY, state.boardSize)
             assertNotNull(state.memoryGameP1)
+            assertEquals(com.umrhsn.mmoire.models.AppTheme.SYSTEM, state.appTheme)
+            assertEquals("en", state.appLanguage)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -93,8 +99,9 @@ class MainViewModelTest {
 
     @Test
     fun `refreshSettings updates state from prefs`() = runTest(testDispatcher) {
-        whenever(prefs.getLanguage()).thenReturn("fr")
+        whenever(localeManager.getSelectedLanguageTag()).thenReturn("fr")
         whenever(prefs.isSoundEnabled()).thenReturn(false)
+        whenever(prefs.getTheme()).thenReturn(com.umrhsn.mmoire.models.AppTheme.DARK)
 
         viewModel.refreshSettings()
 
@@ -102,6 +109,7 @@ class MainViewModelTest {
             val state = awaitItem()
             assertEquals("fr", state.appLanguage)
             assertEquals(false, state.isSoundEnabled)
+            assertEquals(com.umrhsn.mmoire.models.AppTheme.DARK, state.appTheme)
             cancelAndIgnoreRemainingEvents()
         }
     }

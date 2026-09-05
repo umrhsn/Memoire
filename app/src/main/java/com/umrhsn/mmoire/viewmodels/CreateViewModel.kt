@@ -4,7 +4,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.repository.GameRepository
+import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,17 +25,28 @@ data class CreateUiState(
     val errorArg: String? = null,
     val gameName: String? = null,
     val initialUris: List<Uri> = emptyList(),
-    val nameTaken: Boolean = false
+    val nameTaken: Boolean = false,
+    val appTheme: AppTheme = AppTheme.SYSTEM
 )
 
 @HiltViewModel
 class CreateViewModel @Inject constructor(
     private val repository: GameRepository,
-    private val soundManager: SoundManager
+    private val soundManager: SoundManager,
+    private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CreateUiState())
+    private val _uiState = MutableStateFlow(CreateUiState(appTheme = prefs.getTheme()))
     val uiState: StateFlow<CreateUiState> = _uiState.asStateFlow()
+
+    init {
+        // Observe theme changes globally
+        viewModelScope.launch {
+            prefs.themeFlow.collect { theme ->
+                _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+    }
 
     fun resetState() {
         _uiState.update { CreateUiState() }

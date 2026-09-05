@@ -144,7 +144,7 @@ fun MainScreen(
         }
     }
 
-    MemoireTheme {
+    MemoireTheme(appTheme = appTheme) {
         Box(
             modifier = modifier
                 .fillMaxSize()

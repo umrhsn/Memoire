@@ -17,22 +17,27 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mémoire"
         tools:targetApi="33">
         <activity
             android:name=".activities.CreateActivity"
+            android:configChanges="uiMode"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activities.BrowseActivity"
+            android:configChanges="uiMode"
             android:exported="false" />
         <activity
             android:name=".activities.SettingsActivity"
+            android:configChanges="uiMode"
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
+            android:configChanges="uiMode"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,7 +48,7 @@
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
-            android:enabled="false"
+            android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="androidx.appcompat.app.AppLocalesMetadataHolderService" />

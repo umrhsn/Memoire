@@ -2,6 +2,9 @@ package com.umrhsn.mmoire.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,11 +12,12 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import com.umrhsn.mmoire.models.AppTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import com.umrhsn.mmoire.models.AppTheme
 
 private val DarkColorScheme = darkColorScheme(
     primary = MemoirePrimaryDark,
@@ -76,9 +80,25 @@ fun MemoireTheme(
         AppTheme.LIGHT -> false
         AppTheme.DARK -> true
     }
+
+    val context = LocalContext.current
+
+    // Smoothly update system bars without activity recreation
+    LaunchedEffect(darkTheme) {
+        (context as? ComponentActivity)?.enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT,
+            ) { darkTheme },
+            navigationBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.argb(0xe6, 0xff, 0xff, 0xff),
+                android.graphics.Color.argb(0x80, 0x1b, 0x1b, 0x1b),
+            ) { darkTheme }
+        )
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 

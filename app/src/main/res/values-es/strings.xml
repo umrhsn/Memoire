@@ -21,6 +21,10 @@
     <string name="more_options">Más opciones</string>
 
     <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">Bocarriba</string>
     <string name="face_down">Bocabajo</string>
     <string name="preview_desc">Vista previa</string>
@@ -93,7 +97,7 @@
     <string name="lang_fr">Francés</string>
     <string name="lang_de">Alemán</string>
     <string name="lang_es">Español</string>
-    <string name="apply_changes">Aplicar cambios</string>
+
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">¡Bienvenido a Memoria! 🏺</string>

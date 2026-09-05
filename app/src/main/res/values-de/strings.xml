@@ -21,6 +21,10 @@
     <string name="more_options">Mehr Optionen</string>
 
     <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">Aufgedeckt</string>
     <string name="face_down">Verdeckt</string>
     <string name="preview_desc">Vorschau</string>
@@ -92,7 +96,7 @@
     <string name="lang_fr">Französisch</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Spanisch</string>
-    <string name="apply_changes">Änderungen anwenden</string>
+
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">Willkommen bei Mémoire! 🏺</string>

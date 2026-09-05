@@ -2,13 +2,13 @@
     <string name="app_name">فاكر؟</string>
 
     <!-- Board Sizes -->
-    <string name="size_super_duper_easy">سهل جداً جداً</string>
-    <string name="size_super_easy">سهل جداً</string>
+    <string name="size_super_duper_easy">سهل أوي أوي</string>
+    <string name="size_super_easy">سهل أوي</string>
     <string name="size_easy">سهل</string>
     <string name="size_medium">متوسط</string>
     <string name="size_hard">صعب</string>
-    <string name="size_super_hard">صعب جداً</string>
-    <string name="size_super_duper_hard">صعب جداً جداً</string>
+    <string name="size_super_hard">صعب أوي</string>
+    <string name="size_super_duper_hard">صعب أوي أوي</string>
 
     <!-- General -->
     <string name="cancel">إلغاء</string>
@@ -17,11 +17,11 @@
     <string name="back">رجوع</string>
     <string name="remove">شيل</string>
     <string name="delete">مسح</string>
-    <string name="search">تدوير</string>
+    <string name="search">دور</string>
     <string name="play">لعب</string>
     <string name="start_game">ابدأ اللعب</string>
     <string name="maybe_later">بعدين</string>
-    <string name="play_again">إلعب تاني</string>
+    <string name="play_again">العب تاني</string>
     <string name="next">التالي</string>
     <string name="finish">خلصت</string>
     <string name="skip">فوت</string>
@@ -30,16 +30,20 @@
     <string name="more_options">خيارات تانية</string>
 
     <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">وشه لفوق</string>
     <string name="face_down">وشه لتحت</string>
     <string name="preview_desc">معاينة</string>
-    <string name="remove_desc">إزالة</string>
+    <string name="remove_desc">شيل</string>
     <string name="add_image_desc">ضيف صورة</string>
 
     <!-- Main Screen -->
-    <string name="reset_game">إعادة</string>
+    <string name="reset_game">من الأول</string>
     <string name="change_size">المستوى</string>
-    <string name="create_game">عمل</string>
+    <string name="create_game">اعمل</string>
     <string name="create_custom_game">اعمل لعبة جديدة</string>
     <string name="load_game">فتح</string>
     <string name="game_finished">خلصت!</string>
@@ -65,7 +69,7 @@
     <string name="sort_oldest">الأقدم</string>
     <string name="sort_name_asc">الاسم (أ-ي)</string>
     <string name="sort_name_desc">الاسم (ي-أ)</string>
-    <string name="sort_pairs">عدد الكروت</string>
+    <string name="sort_pairs">عدد الأزواج</string>
     <string name="created_at">اتعملت: %1$s</string>
     <string name="edit_board">تعديل اللعبة</string>
     <string name="update_and_play">تحديث ولعب</string>
@@ -84,6 +88,10 @@
     <string name="audio_settings">الصوت وردود الفعل</string>
     <string name="sound_enabled">أصوات اللعبة</string>
     <string name="personalization">التخصيص</string>
+    <string name="theme">شكل التطبيق</string>
+    <string name="theme_system">زي الموبايل</string>
+    <string name="theme_light">وضع فاتح</string>
+    <string name="theme_dark">وضع غامق</string>
     <string name="language">لغة التطبيق</string>
     <string name="lang_system">زي الموبايل</string>
     <string name="lang_ar_eg">عربي مصري (فاكر؟)</string>
@@ -92,7 +100,7 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
-    <string name="apply_changes">حفظ</string>
+
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">أهلاً بك في فاكر؟ 🏺</string>

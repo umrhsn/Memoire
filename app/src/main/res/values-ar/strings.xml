@@ -30,6 +30,10 @@
     <string name="more_options">المزيد من الخيارات</string>
 
     <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">الوجه للأعلى</string>
     <string name="face_down">الوجه للأسفل</string>
     <string name="preview_desc">معاينة</string>
@@ -96,7 +100,7 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
-    <string name="apply_changes">تطبيق التغييرات</string>
+
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">أهلاً بك في ذاكرة! 🏺</string>
@@ -150,7 +154,7 @@
     <string name="board_ready_title">اللعبة جاهزة! 🎉</string>
     <string name="board_ready_message">لعبتك \'%1$s\' جاهزة. تم حفظها في جهازك.</string>
     <string name="name_exists_title">الاسم موجود 😕</string>
-    <string name="name_exists_message">هناك لعبة أخرى بنفس الاسم \'%1$s\'. جرب اسماً آخر.</string>
+    <string name="name_exists_message">هناك لعبة أخرى بنفس الاسم \'%1$s\'. جرب اسمًا آخر.</string>
     <string name="change_name_action">حسناً، سأغير الاسم</string>
     <string name="no_photos_yet">لا توجد صور بعد</string>
     <string name="no_photos_yet_subtitle">اختر صوراً من المعرض للبدء.</string>

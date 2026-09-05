@@ -2,8 +2,10 @@ package com.umrhsn.mmoire.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.repository.UserImageListWithId
+import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +20,8 @@ data class BrowseUiState(
     val filteredGames: List<UserImageListWithId> = emptyList(),
     val isLoading: Boolean = false,
     val searchQuery: String = "",
-    val sortOrder: SortOrder = SortOrder.LATEST
+    val sortOrder: SortOrder = SortOrder.LATEST,
+    val appTheme: AppTheme = AppTheme.SYSTEM
 )
 
 enum class SortOrder {
@@ -28,14 +31,22 @@ enum class SortOrder {
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val repository: GameRepository,
-    private val soundManager: SoundManager
+    private val soundManager: SoundManager,
+    private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BrowseUiState())
+    private val _uiState = MutableStateFlow(BrowseUiState(appTheme = prefs.getTheme()))
     val uiState: StateFlow<BrowseUiState> = _uiState.asStateFlow()
 
     init {
         loadGames()
+
+        // Observe theme changes globally
+        viewModelScope.launch {
+            prefs.themeFlow.collect { theme ->
+                _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
     }
 
     fun loadGames() {

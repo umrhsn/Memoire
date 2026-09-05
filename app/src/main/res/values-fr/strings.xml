@@ -21,6 +21,10 @@
     <string name="more_options">Plus d\'options</string>
 
     <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
     <string name="face_up">Face visible</string>
     <string name="face_down">Face cachée</string>
     <string name="preview_desc">Aperçu</string>
@@ -93,7 +97,7 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Allemand</string>
     <string name="lang_es">Espagnol</string>
-    <string name="apply_changes">Appliquer les modifications</string>
+
 
     <!-- Tutorial -->
     <string name="tut_welcome_title">Bienvenue sur Mémoire ! 🏺</string>
@@ -164,7 +168,7 @@
     <!-- 2-Player Mode -->
     <string name="two_player_mode">Mode 2 joueurs</string>
     <string name="player_n">Joueur %1$d</string>
-    <string name="score_value">Score: %1$d</string>
-    <string name="winner_player_n">Joueur %1$d gagne!</string>
-    <string name="draw_game">C\'est un match nul!</string>
+    <string name="score_value">Score : %1$d</string>
+    <string name="winner_player_n">Joueur %1$d gagne !</string>
+    <string name="draw_game">C\'est un match nul !</string>
 </resources>
