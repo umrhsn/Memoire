@@ -4,6 +4,7 @@ import android.R
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,12 +12,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.ui.screens.MainScreen
 import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
-import com.umrhsn.mmoire.utils.LocaleContextWrapper
 import com.umrhsn.mmoire.utils.explosionConfettiArray
 import com.umrhsn.mmoire.utils.rainingConfettiLong
 import com.umrhsn.mmoire.utils.rainingConfettiShort
@@ -28,12 +29,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
     private val viewModel: MainViewModel by viewModels()
 
     override fun attachBaseContext(newBase: Context) {
-        val prefs = newBase.getSharedPreferences("memoire_prefs", MODE_PRIVATE)
-        val lang = prefs.getString("app_language", null)
-        super.attachBaseContext(LocaleContextWrapper.wrap(newBase, lang))
+        super.attachBaseContext(newBase)
     }
 
     override fun onStart() {
@@ -42,34 +42,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate: current locale=${resources.configuration.locale}")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            MemoireTheme(appTheme = uiState.appTheme) {
-                MainScreen(
-                    viewModel = viewModel,
-                    appTheme = uiState.appTheme,
-                    onCreateClicked = { desiredSize ->
-                        val intent = Intent(this, CreateActivity::class.java).putExtra(
-                            EXTRA_BOARD_SIZE,
-                            desiredSize
-                        )
-                        resultLauncher.launch(intent)
-                    },
-                    onBrowseClicked = {
-                        val intent = Intent(this, BrowseActivity::class.java)
-                        resultLauncher.launch(intent)
-                    },
-                    onSettingsClicked = {
-                        val intent = Intent(this, SettingsActivity::class.java)
-                        startActivity(intent)
-                    },
-                    onCardClicked = { position, player -> viewModel.flipCard(position, player) },
-                    onWin = { isSmoothWin -> triggerWinEffects(isSmoothWin) }
-                )
+            MemoireTheme(
+                appTheme = uiState.appTheme
+            ) {
+                key(uiState.appLanguage) {
+                    MainScreen(
+                        viewModel = viewModel,
+                        onCreateClicked = { desiredSize ->
+                            val intent = Intent(this, CreateActivity::class.java).putExtra(
+                                EXTRA_BOARD_SIZE,
+                                desiredSize
+                            )
+                            resultLauncher.launch(intent)
+                        },
+                        onBrowseClicked = {
+                            val intent = Intent(this, BrowseActivity::class.java)
+                            resultLauncher.launch(intent)
+                        },
+                        onSettingsClicked = {
+                            val intent = Intent(this, SettingsActivity::class.java)
+                            startActivity(intent)
+                        },
+                        onCardClicked = { position, player ->
+                            viewModel.flipCard(
+                                position,
+                                player
+                            )
+                        },
+                        onWin = { isSmoothWin -> triggerWinEffects(isSmoothWin) }
+                    )
+                }
             }
         }
     }

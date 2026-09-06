@@ -1,5 +1,6 @@
 package com.umrhsn.mmoire.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.ui.screens.BrowseScreen
+import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_EDIT_GAME_NAME
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
 import com.umrhsn.mmoire.viewmodels.BrowseViewModel
@@ -17,6 +21,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class BrowseActivity : ComponentActivity() {
 
     private val viewModel: BrowseViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(newBase)
+    }
 
     private val editLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -39,22 +47,28 @@ class BrowseActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            BrowseScreen(
-                viewModel = viewModel,
-                onBackClicked = { finish() },
-                onGameSelected = { gameName ->
-                    val resultData = Intent()
-                    resultData.putExtra(EXTRA_GAME_NAME, gameName)
-                    setResult(RESULT_OK, resultData)
-                    finish()
-                },
-                onEditSelected = { gameName ->
-                    val intent = Intent(this, CreateActivity::class.java).apply {
-                        putExtra(EXTRA_EDIT_GAME_NAME, gameName)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            MemoireTheme(
+                appTheme = uiState.appTheme
+            ) {
+                BrowseScreen(
+                    viewModel = viewModel,
+                    onBackClicked = { finish() },
+                    onGameSelected = { gameName ->
+                        val resultData = Intent()
+                        resultData.putExtra(EXTRA_GAME_NAME, gameName)
+                        setResult(RESULT_OK, resultData)
+                        finish()
+                    },
+                    onEditSelected = { gameName ->
+                        val intent = Intent(this, CreateActivity::class.java).apply {
+                            putExtra(EXTRA_EDIT_GAME_NAME, gameName)
+                        }
+                        editLauncher.launch(intent)
                     }
-                    editLauncher.launch(intent)
-                }
-            )
+                )
+            }
         }
     }
 }

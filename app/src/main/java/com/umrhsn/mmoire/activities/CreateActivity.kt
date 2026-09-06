@@ -1,6 +1,7 @@
 package com.umrhsn.mmoire.activities
 
 import android.Manifest
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -24,6 +25,7 @@ import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.networking.BitmapScaler
 import com.umrhsn.mmoire.ui.screens.CreateScreen
+import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
 import com.umrhsn.mmoire.utils.EXTRA_EDIT_GAME_NAME
 import com.umrhsn.mmoire.utils.isPermissionGranted
@@ -35,6 +37,11 @@ import java.io.ByteArrayOutputStream
 class CreateActivity : ComponentActivity() {
 
     private val viewModel: CreateViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(newBase)
+    }
+
     private var boardSize: BoardSize? = null
     private var numImagesRequired: Int = -1
     private val chosenImageUris = mutableStateListOf<Uri>()
@@ -82,38 +89,42 @@ class CreateActivity : ComponentActivity() {
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            // Sync local state with loaded game
-            LaunchedEffect(uiState.initialUris) {
-                if (uiState.initialUris.isNotEmpty() && chosenImageUris.isEmpty()) {
-                    chosenImageUris.addAll(uiState.initialUris)
-                    val numCards = uiState.initialUris.size * 2
-                    boardSize = BoardSize.getByValue(numCards)
+            MemoireTheme(
+                appTheme = uiState.appTheme
+            ) {
+                // Sync local state with loaded game
+                LaunchedEffect(uiState.initialUris) {
+                    if (uiState.initialUris.isNotEmpty() && chosenImageUris.isEmpty()) {
+                        chosenImageUris.addAll(uiState.initialUris)
+                        val numCards = uiState.initialUris.size * 2
+                        boardSize = BoardSize.getByValue(numCards)
+                        numImagesRequired = boardSize!!.getNumPairs()
+                    }
+                }
+
+                if (boardSize == null && oldGameName == null) {
+                    // Should not happen with proper navigation
+                    finish()
+                    return@MemoireTheme
+                }
+
+                if (boardSize != null) {
                     numImagesRequired = boardSize!!.getNumPairs()
                 }
-            }
 
-            if (boardSize == null && oldGameName == null) {
-                // Should not happen with proper navigation
-                finish()
-                return@setContent
-            }
-
-            if (boardSize != null) {
-                numImagesRequired = boardSize!!.getNumPairs()
-            }
-
-            if (boardSize != null) {
-                CreateScreen(
-                    viewModel = viewModel,
-                    boardSize = boardSize!!,
-                    chosenImageUris = chosenImageUris,
-                    oldName = oldGameName,
-                    onBackClicked = { finish() },
-                    onPlaceholderClicked = { handlePlaceholderClick(-1) },
-                    onImageClicked = { index -> handlePlaceholderClick(index) },
-                    onRemoveImage = { uri -> chosenImageUris.remove(uri) },
-                    onSaveClicked = { gameName -> handleSaveClick(gameName) }
-                )
+                if (boardSize != null) {
+                    CreateScreen(
+                        viewModel = viewModel,
+                        boardSize = boardSize!!,
+                        chosenImageUris = chosenImageUris,
+                        oldName = oldGameName,
+                        onBackClicked = { finish() },
+                        onPlaceholderClicked = { handlePlaceholderClick(-1) },
+                        onImageClicked = { index -> handlePlaceholderClick(index) },
+                        onRemoveImage = { uri -> chosenImageUris.remove(uri) },
+                        onSaveClicked = { gameName -> handleSaveClick(gameName) }
+                    )
+                }
             }
         }
     }

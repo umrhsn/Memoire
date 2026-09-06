@@ -44,7 +44,8 @@ data class MainUiState(
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
-    val winner: Int? = null
+    val winner: Int? = null,
+    val hasTriggeredWinEffects: Boolean = false
 )
 
 @HiltViewModel
@@ -73,10 +74,15 @@ class MainViewModel @Inject constructor(
             _uiState.update { it.copy(showTutorial = true) }
         }
 
-        // Observe theme changes globally
+        // Observe theme and locale changes globally
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.localeFlow.collect { lang ->
+                _uiState.update { it.copy(appLanguage = lang) }
             }
         }
     }
@@ -123,7 +129,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun toggleTwoPlayerMode(enabled: Boolean) {
-        _uiState.update { it.copy(isTwoPlayerMode = enabled) }
+        _uiState.update { it.copy(isTwoPlayerMode = enabled, hasTriggeredWinEffects = false) }
         refreshGame()
     }
 
@@ -189,7 +195,8 @@ class MainViewModel @Inject constructor(
                     timerSeconds = 0,
                     timerSecondsP2 = 0,
                     bestTime = record?.bestTimeSeconds,
-                    winner = null
+                    winner = null,
+                    hasTriggeredWinEffects = false
                 )
             }
         }
@@ -273,6 +280,10 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun setWinEffectsTriggered() {
+        _uiState.update { it.copy(hasTriggeredWinEffects = true) }
     }
 
     fun playWinSound() {

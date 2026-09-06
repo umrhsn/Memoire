@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -71,7 +72,6 @@ import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
 import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.ui.components.getAppTextFieldColors
-import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_GAME_NAME
 import com.umrhsn.mmoire.viewmodels.CreateViewModel
 import compose.icons.EvaIcons
@@ -106,267 +106,265 @@ fun CreateScreen(
     val numImagesRequired = boardSize.getNumPairs()
     val context = LocalContext.current
 
-    MemoireTheme(appTheme = uiState.appTheme) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                // Header
-                AppHeader(
-                    title = if (oldName != null) stringResource(R.string.edit_board) else stringResource(
-                        R.string.new_board
-                    ),
-                    navigationIcon = {
-                        AppHeaderIcon(
-                            icon = EvaIcons.Outline.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            onClick = onBackClicked
-                        )
-                    }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header
+            AppHeader(
+                title = if (oldName != null) stringResource(R.string.edit_board) else stringResource(
+                    R.string.new_board
+                ),
+                navigationIcon = {
+                    AppHeaderIcon(
+                        icon = EvaIcons.Outline.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        onClick = onBackClicked
+                    )
+                }
+            )
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+            ) {
+                // Step 1
+                SectionHeader(
+                    icon = EvaIcons.Outline.Image,
+                    title = stringResource(R.string.step_1_title),
+                    subtitle = pluralStringResource(
+                        R.plurals.step_1_subtitle_plural,
+                        numImagesRequired,
+                        numImagesRequired
+                    )
                 )
 
+                // Selection Progress Bar
+                val selectionProgress = chosenImageUris.size.toFloat() / numImagesRequired
+                LinearProgressIndicator(
+                    progress = { selectionProgress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(R.dimen.spacing_small))
+                        .height(10.dp)
+                        .clip(CircleShape),
+                    strokeCap = StrokeCap.Round,
+                    color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+
+                // Grid Area - Fixed Grid for creation
+                Box(modifier = Modifier.weight(1f)) {
+                    if (chosenImageUris.isEmpty() && !uiState.isLoading) {
+                        EmptySelectionState(
+                            onClick = onPlaceholderClicked,
+                            onSoundClick = { viewModel.playButtonClick() }
+                        )
+                    } else if (uiState.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3),
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            itemsIndexed(chosenImageUris) { index, uri ->
+                                ImageItem(
+                                    uri = uri,
+                                    onClick = { onImageClicked(index) },
+                                    onRemove = { onRemoveImage(uri) }
+                                )
+                            }
+                            if (chosenImageUris.size < numImagesRequired) {
+                                item {
+                                    PlaceholderItem(onClick = onPlaceholderClicked)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Step 2
+                SectionHeader(
+                    icon = EvaIcons.Outline.Edit,
+                    title = stringResource(R.string.step_2_title),
+                    subtitle = stringResource(R.string.step_2_subtitle)
+                )
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            }
+
+            // Bottom Control Section
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(
+                    topStart = dimensionResource(R.dimen.spacing_extra_large),
+                    topEnd = dimensionResource(R.dimen.spacing_extra_large)
+                ),
+                shadowElevation = 32.dp,
+                tonalElevation = 8.dp
+            ) {
                 Column(
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
+                        .padding(dimensionResource(R.dimen.spacing_large))
+                        .navigationBarsPadding()
                 ) {
-                    // Step 1
-                    SectionHeader(
-                        icon = EvaIcons.Outline.Image,
-                        title = stringResource(R.string.step_1_title),
-                        subtitle = pluralStringResource(
-                            R.plurals.step_1_subtitle_plural,
-                            numImagesRequired,
-                            numImagesRequired
+                    OutlinedTextField(
+                        value = gameName,
+                        onValueChange = { input ->
+                            if (input.length <= 24) { // Increased from 14
+                                gameName = input
+                            }
+                        },
+                        label = { Text(stringResource(R.string.board_identity_label)) },
+                        placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        enabled = !uiState.isUploading,
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                        colors = getAppTextFieldColors(),
+                        leadingIcon = {
+                            Icon(
+                                EvaIcons.Outline.Flash,
+                                contentDescription = null
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            autoCorrectEnabled = true,
+                            keyboardType = KeyboardType.Text
                         )
                     )
 
-                    // Selection Progress Bar
-                    val selectionProgress = chosenImageUris.size.toFloat() / numImagesRequired
-                    LinearProgressIndicator(
-                        progress = { selectionProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = dimensionResource(R.dimen.spacing_small))
-                            .height(10.dp)
-                            .clip(CircleShape),
-                        strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                        color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
-                    // Grid Area - Fixed Grid for creation
-                    Box(modifier = Modifier.weight(1f)) {
-                        if (chosenImageUris.isEmpty() && !uiState.isLoading) {
-                            EmptySelectionState(
-                                onClick = onPlaceholderClicked,
-                                onSoundClick = { viewModel.playButtonClick() }
-                            )
-                        } else if (uiState.isLoading) {
-                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                        } else {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(3),
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(bottom = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                itemsIndexed(chosenImageUris) { index, uri ->
-                                    ImageItem(
-                                        uri = uri,
-                                        onClick = { onImageClicked(index) },
-                                        onRemove = { onRemoveImage(uri) }
-                                    )
-                                }
-                                if (chosenImageUris.size < numImagesRequired) {
-                                    item {
-                                        PlaceholderItem(onClick = onPlaceholderClicked)
-                                    }
-                                }
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                            positioning = TooltipAnchorPosition.Above
+                        ),
+                        tooltip = {
+                            PlainTooltip {
+                                Text(
+                                    if (chosenImageUris.size < numImagesRequired)
+                                        stringResource(R.string.select_all_photos)
+                                    else stringResource(R.string.finalize_board)
+                                )
                             }
-                        }
-                    }
-
-                    // Step 2
-                    SectionHeader(
-                        icon = EvaIcons.Outline.Edit,
-                        title = stringResource(R.string.step_2_title),
-                        subtitle = stringResource(R.string.step_2_subtitle)
-                    )
-
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-                }
-
-                // Bottom Control Section
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(
-                        topStart = dimensionResource(R.dimen.spacing_extra_large),
-                        topEnd = dimensionResource(R.dimen.spacing_extra_large)
-                    ),
-                    shadowElevation = 32.dp,
-                    tonalElevation = 8.dp
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(dimensionResource(R.dimen.spacing_large))
-                            .navigationBarsPadding()
+                        },
+                        state = rememberTooltipState()
                     ) {
-                        OutlinedTextField(
-                            value = gameName,
-                            onValueChange = { input ->
-                                if (input.length <= 24) { // Increased from 14
-                                    gameName = input
-                                }
-                            },
-                            label = { Text(stringResource(R.string.board_identity_label)) },
-                            placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            enabled = !uiState.isUploading,
+                        Button(
+                            onClick = { onSaveClicked(gameName.trim()) }, // Added trim()
+                            modifier = Modifier
+                                .height(dimensionResource(R.dimen.button_height_large))
+                                .fillMaxWidth(),
+                            enabled = chosenImageUris.size == numImagesRequired &&
+                                    gameName.isNotBlank() &&
+                                    gameName.length >= 3 &&
+                                    !uiState.isUploading,
                             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                            colors = getAppTextFieldColors(),
-                            leadingIcon = {
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                        ) {
+                            if (uiState.isUploading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    strokeWidth = 3.dp
+                                )
+                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                Text(
+                                    stringResource(R.string.saving_board),
+                                    fontWeight = FontWeight.Black
+                                )
+                            } else {
                                 Icon(
-                                    EvaIcons.Outline.Flash,
+                                    imageVector = if (oldName != null) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
                                     contentDescription = null
                                 )
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Words,
-                                autoCorrectEnabled = true,
-                                keyboardType = KeyboardType.Text
-                            )
-                        )
-
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                                positioning = TooltipAnchorPosition.Above
-                            ),
-                            tooltip = {
-                                PlainTooltip {
-                                    Text(
-                                        if (chosenImageUris.size < numImagesRequired)
-                                            stringResource(R.string.select_all_photos)
-                                        else stringResource(R.string.finalize_board)
-                                    )
-                                }
-                            },
-                            state = rememberTooltipState()
-                        ) {
-                            Button(
-                                onClick = { onSaveClicked(gameName.trim()) }, // Added trim()
-                                modifier = Modifier
-                                    .height(dimensionResource(R.dimen.button_height_large))
-                                    .fillMaxWidth(),
-                                enabled = chosenImageUris.size == numImagesRequired &&
-                                        gameName.isNotBlank() &&
-                                        gameName.length >= 3 &&
-                                        !uiState.isUploading,
-                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
-                            ) {
-                                if (uiState.isUploading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        strokeWidth = 3.dp
-                                    )
-                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                    Text(
-                                        stringResource(R.string.saving_board),
-                                        fontWeight = FontWeight.Black
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = if (oldName != null) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                    Text(
-                                        text = if (oldName != null) stringResource(R.string.update_and_play) else stringResource(
-                                            R.string.create_and_play
-                                        ),
-                                        style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.ExtraBold
-                                    )
-                                }
+                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
+                                Text(
+                                    text = if (oldName != null) stringResource(R.string.update_and_play) else stringResource(
+                                        R.string.create_and_play
+                                    ),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.ExtraBold
+                                )
                             }
                         }
+                    }
 
-                        if (uiState.isUploading) {
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                            LinearProgressIndicator(
-                                progress = { uiState.uploadProgress / 100f },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(CircleShape),
-                                strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                            )
-                        }
+                    if (uiState.isUploading) {
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                        LinearProgressIndicator(
+                            progress = { uiState.uploadProgress / 100f },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(CircleShape),
+                            strokeCap = StrokeCap.Round,
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        )
                     }
                 }
             }
+        }
 
-            // Success Dialog
-            if (uiState.isSuccess) {
-                AppDialog(
-                    onDismissRequest = {},
-                    title = stringResource(R.string.board_ready_title),
-                    icon = EvaIcons.Outline.Award
+        // Success Dialog
+        if (uiState.isSuccess) {
+            AppDialog(
+                onDismissRequest = {},
+                title = stringResource(R.string.board_ready_title),
+                icon = EvaIcons.Outline.Award
+            ) {
+                Text(
+                    text = stringResource(R.string.board_ready_message, uiState.gameName ?: ""),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                Button(
+                    onClick = {
+                        val activity = context as? Activity
+                        val resultData = Intent()
+                        resultData.putExtra(EXTRA_GAME_NAME, uiState.gameName)
+                        activity?.setResult(Activity.RESULT_OK, resultData)
+                        activity?.finish()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
                 ) {
-                    Text(
-                        text = stringResource(R.string.board_ready_message, uiState.gameName ?: ""),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-                    Button(
-                        onClick = {
-                            val activity = context as? Activity
-                            val resultData = Intent()
-                            resultData.putExtra(EXTRA_GAME_NAME, uiState.gameName)
-                            activity?.setResult(Activity.RESULT_OK, resultData)
-                            activity?.finish()
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
-                    ) {
-                        Text(stringResource(R.string.start_game), fontWeight = FontWeight.Bold)
-                    }
+                    Text(stringResource(R.string.start_game), fontWeight = FontWeight.Bold)
                 }
             }
+        }
 
-            // Name Taken Dialog
-            if (uiState.nameTaken) {
-                AppDialog(
-                    onDismissRequest = { viewModel.resetState() },
-                    title = stringResource(R.string.name_exists_title),
-                    icon = EvaIcons.Outline.AlertTriangle
+        // Name Taken Dialog
+        if (uiState.nameTaken) {
+            AppDialog(
+                onDismissRequest = { viewModel.resetState() },
+                title = stringResource(R.string.name_exists_title),
+                icon = EvaIcons.Outline.AlertTriangle
+            ) {
+                Text(
+                    text = stringResource(R.string.name_exists_message, uiState.gameName ?: ""),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                Button(
+                    onClick = { viewModel.resetState() },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
                 ) {
-                    Text(
-                        text = stringResource(R.string.name_exists_message, uiState.gameName ?: ""),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-                    Button(
-                        onClick = { viewModel.resetState() },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
-                    ) {
-                        Text(stringResource(R.string.change_name_action))
-                    }
+                    Text(stringResource(R.string.change_name_action))
                 }
             }
         }

@@ -21,6 +21,9 @@ class PrefsManager @Inject constructor(
     private val _themeFlow = MutableStateFlow(getThemeInternal())
     val themeFlow: StateFlow<AppTheme> = _themeFlow.asStateFlow()
 
+    private val _localeFlow = MutableStateFlow(getLanguage())
+    val localeFlow: StateFlow<String?> = _localeFlow.asStateFlow()
+
     fun isFirstTime(): Boolean {
         return prefs.getBoolean("is_first_time", true)
     }
@@ -35,6 +38,7 @@ class PrefsManager @Inject constructor(
 
     fun setLanguage(lang: String?) {
         prefs.edit { putString("app_language", lang) }
+        _localeFlow.value = lang
     }
 
     fun isSoundEnabled(): Boolean {

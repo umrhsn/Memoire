@@ -21,7 +21,8 @@ data class BrowseUiState(
     val isLoading: Boolean = false,
     val searchQuery: String = "",
     val sortOrder: SortOrder = SortOrder.LATEST,
-    val appTheme: AppTheme = AppTheme.SYSTEM
+    val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appLanguage: String? = null
 )
 
 enum class SortOrder {
@@ -35,16 +36,26 @@ class BrowseViewModel @Inject constructor(
     private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(BrowseUiState(appTheme = prefs.getTheme()))
+    private val _uiState = MutableStateFlow(
+        BrowseUiState(
+            appTheme = prefs.getTheme(),
+            appLanguage = prefs.getLanguage()
+        )
+    )
     val uiState: StateFlow<BrowseUiState> = _uiState.asStateFlow()
 
     init {
         loadGames()
 
-        // Observe theme changes globally
+        // Observe theme and locale changes globally
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.localeFlow.collect { lang ->
+                _uiState.update { it.copy(appLanguage = lang) }
             }
         }
     }

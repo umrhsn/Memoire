@@ -62,7 +62,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
-import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
 import com.umrhsn.mmoire.ui.components.AppDialog
@@ -75,7 +74,6 @@ import com.umrhsn.mmoire.ui.components.StatBadge
 import com.umrhsn.mmoire.ui.components.TutorialOverlay
 import com.umrhsn.mmoire.ui.components.getMainTutorialSteps
 import com.umrhsn.mmoire.ui.components.tutorialAnchor
-import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.viewmodels.MainViewModel
 import compose.icons.EvaIcons
 import compose.icons.evaicons.Outline
@@ -103,7 +101,6 @@ import compose.icons.evaicons.outline.Sun
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
-    appTheme: AppTheme,
     onCreateClicked: (BoardSize) -> Unit,
     onBrowseClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
@@ -115,399 +112,400 @@ fun MainScreen(
     val haptic = LocalHapticFeedback.current
 
     var showWinDialog by remember { mutableStateOf(false) }
-    var hasTriggeredWinEffects by remember { mutableStateOf(false) }
 
     var showSizeDialog by remember { mutableStateOf(false) }
     var showCreateSelectionDialog by remember { mutableStateOf(false) }
 
     var showMoreMenu by remember { mutableStateOf(false) }
 
-    LaunchedEffect(uiState.winner) {
-        if (uiState.winner != null && !hasTriggeredWinEffects) {
-            val game = if (uiState.winner == 1) uiState.memoryGameP1 else uiState.memoryGameP2
+    LaunchedEffect(
+        uiState.winner,
+        uiState.memoryGameP1?.haveWonGame(),
+        uiState.hasTriggeredWinEffects
+    ) {
+        val isWon = if (uiState.isTwoPlayerMode) {
+            uiState.winner != null
+        } else {
+            uiState.memoryGameP1?.haveWonGame() == true
+        }
+
+        if (isWon && !uiState.hasTriggeredWinEffects) {
+            val game = if (uiState.isTwoPlayerMode) {
+                if (uiState.winner == 1) uiState.memoryGameP1 else uiState.memoryGameP2
+            } else {
+                uiState.memoryGameP1
+            }
             onWin(game?.smoothWin() == true)
             viewModel.playWinSound()
             showWinDialog = true
-            hasTriggeredWinEffects = true
-        } else if (uiState.winner == null) {
-            hasTriggeredWinEffects = false
+            viewModel.setWinEffectsTriggered()
+        } else if (!isWon) {
             showWinDialog = false
         }
     }
 
-    LaunchedEffect(uiState.memoryGameP1?.haveWonGame()) {
-        if (!uiState.isTwoPlayerMode && uiState.memoryGameP1?.haveWonGame() == true && !hasTriggeredWinEffects) {
-            onWin(uiState.memoryGameP1?.smoothWin() == true)
-            viewModel.playWinSound()
-            showWinDialog = true
-            hasTriggeredWinEffects = true
-        }
-    }
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            AppHeader(
+                title = uiState.gameName ?: stringResource(R.string.app_name),
+                actions = {
+                    // Keep primary actions visible
+                    AppHeaderIcon(
+                        icon = EvaIcons.Outline.Refresh,
+                        contentDescription = stringResource(R.string.reset_game),
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            viewModel.refreshGame()
+                        },
+                        autoMirror = true
+                    )
+                    AppHeaderIcon(
+                        icon = EvaIcons.Outline.Grid,
+                        contentDescription = stringResource(R.string.change_size),
+                        onClick = {
+                            viewModel.playClickSound()
+                            showSizeDialog = true
+                        }
+                    )
 
-    MemoireTheme(appTheme = appTheme) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                AppHeader(
-                    title = uiState.gameName ?: stringResource(R.string.app_name),
-                    actions = {
-                        // Keep primary actions visible
+                    // Overflow for less frequent actions
+                    Box {
                         AppHeaderIcon(
-                            icon = EvaIcons.Outline.Refresh,
-                            contentDescription = stringResource(R.string.reset_game),
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                viewModel.refreshGame()
-                            },
-                            autoMirror = true
-                        )
-                        AppHeaderIcon(
-                            icon = EvaIcons.Outline.Grid,
-                            contentDescription = stringResource(R.string.change_size),
-                            onClick = {
-                                viewModel.playClickSound()
-                                showSizeDialog = true
-                            }
+                            icon = EvaIcons.Outline.MoreVertical,
+                            contentDescription = stringResource(R.string.more_options),
+                            onClick = { showMoreMenu = true },
+                            modifier = Modifier.tutorialAnchor(
+                                "more_options",
+                                viewModel::onAnchorPositioned,
+                                viewModel::onAnchorRemoved
+                            )
                         )
 
-                        // Overflow for less frequent actions
-                        Box {
-                            AppHeaderIcon(
-                                icon = EvaIcons.Outline.MoreVertical,
-                                contentDescription = stringResource(R.string.more_options),
-                                onClick = { showMoreMenu = true },
-                                modifier = Modifier.tutorialAnchor(
-                                    "more_options",
-                                    viewModel::onAnchorPositioned,
-                                    viewModel::onAnchorRemoved
+                        MaterialTheme(
+                            shapes = MaterialTheme.shapes.copy(
+                                extraSmall = RoundedCornerShape(
+                                    24.dp
                                 )
                             )
-
-                            MaterialTheme(
-                                shapes = MaterialTheme.shapes.copy(
-                                    extraSmall = RoundedCornerShape(
-                                        24.dp
-                                    )
-                                )
+                        ) {
+                            DropdownMenu(
+                                expanded = showMoreMenu,
+                                onDismissRequest = { showMoreMenu = false },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .width(220.dp)
                             ) {
-                                DropdownMenu(
-                                    expanded = showMoreMenu,
-                                    onDismissRequest = { showMoreMenu = false },
-                                    modifier = Modifier
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .width(220.dp)
-                                ) {
-                                    AppDropdownItem(
-                                        text = stringResource(R.string.create_game),
-                                        icon = EvaIcons.Outline.PlusCircle,
-                                        onClick = {
-                                            showMoreMenu = false
-                                            showCreateSelectionDialog = true
-                                        }
-                                    )
-                                    AppDropdownItem(
-                                        text = stringResource(R.string.load_game),
-                                        icon = EvaIcons.Outline.Folder,
-                                        onClick = {
-                                            showMoreMenu = false
-                                            onBrowseClicked()
-                                        }
-                                    )
-                                    HorizontalDivider(
-                                        modifier = Modifier.padding(
-                                            vertical = 4.dp,
-                                            horizontal = 12.dp
-                                        ),
-                                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                                    )
-                                    AppDropdownItem(
-                                        text = stringResource(R.string.settings),
-                                        icon = EvaIcons.Outline.Settings,
-                                        onClick = {
-                                            showMoreMenu = false
-                                            onSettingsClicked()
-                                        }
-                                    )
-                                    AppDropdownItem(
-                                        text = stringResource(R.string.help),
-                                        icon = EvaIcons.Outline.QuestionMarkCircle,
-                                        onClick = {
-                                            showMoreMenu = false
-                                            viewModel.startTutorial()
-                                        }
-                                    )
-                                }
+                                AppDropdownItem(
+                                    text = stringResource(R.string.create_game),
+                                    icon = EvaIcons.Outline.PlusCircle,
+                                    onClick = {
+                                        showMoreMenu = false
+                                        showCreateSelectionDialog = true
+                                    }
+                                )
+                                AppDropdownItem(
+                                    text = stringResource(R.string.load_game),
+                                    icon = EvaIcons.Outline.Folder,
+                                    onClick = {
+                                        showMoreMenu = false
+                                        onBrowseClicked()
+                                    }
+                                )
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(
+                                        vertical = 4.dp,
+                                        horizontal = 12.dp
+                                    ),
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                                )
+                                AppDropdownItem(
+                                    text = stringResource(R.string.settings),
+                                    icon = EvaIcons.Outline.Settings,
+                                    onClick = {
+                                        showMoreMenu = false
+                                        onSettingsClicked()
+                                    }
+                                )
+                                AppDropdownItem(
+                                    text = stringResource(R.string.help),
+                                    icon = EvaIcons.Outline.QuestionMarkCircle,
+                                    onClick = {
+                                        showMoreMenu = false
+                                        viewModel.startTutorial()
+                                    }
+                                )
                             }
                         }
-                    },
-                    modifier = Modifier.tutorialAnchor(
-                        "header_actions",
+                    }
+                },
+                modifier = Modifier.tutorialAnchor(
+                    "header_actions",
+                    viewModel::onAnchorPositioned,
+                    viewModel::onAnchorRemoved
+                )
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .tutorialAnchor(
+                        "game_board",
                         viewModel::onAnchorPositioned,
                         viewModel::onAnchorRemoved
                     )
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .tutorialAnchor(
-                            "game_board",
-                            viewModel::onAnchorPositioned,
-                            viewModel::onAnchorRemoved
-                        )
-                ) {
-                    if (uiState.isTwoPlayerMode) {
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            // Player 2 Side (Top, Rotated)
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .graphicsLayer { rotationZ = 180f }
-                            ) {
-                                PlayerRaceHalf(
-                                    playerNumber = 2,
-                                    game = uiState.memoryGameP2,
-                                    boardSize = uiState.boardSize,
-                                    timeSeconds = uiState.timerSecondsP2,
-                                    onCardClicked = { onCardClicked(it, 2) }
-                                )
-                            }
-
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(
-                                    alpha = 0.5f
-                                )
-                            )
-
-                            // Player 1 Side (Bottom)
-                            Box(modifier = Modifier.weight(1f)) {
-                                PlayerRaceHalf(
-                                    playerNumber = 1,
-                                    game = uiState.memoryGameP1,
-                                    boardSize = uiState.boardSize,
-                                    timeSeconds = uiState.timerSeconds,
-                                    onCardClicked = { onCardClicked(it, 1) }
-                                )
-                            }
-                        }
-                    } else {
-                        AnimatedContent(
-                            targetState = uiState.gameSessionId,
-                            transitionSpec = {
-                                fadeIn(
-                                    animationSpec = tween(
-                                        600,
-                                        easing = EaseInOutQuart
-                                    )
-                                ) togetherWith
-                                        fadeOut(animationSpec = tween(400))
-                            },
-                            label = stringResource(R.string.gameTransition_label)
-                        ) { targetSessionId: Long ->
-                            var sessionGame by remember { mutableStateOf(uiState.memoryGameP1) }
-                            var sessionSize by remember { mutableStateOf(uiState.boardSize) }
-
-                            if (targetSessionId == uiState.gameSessionId) {
-                                sessionGame = uiState.memoryGameP1
-                                sessionSize = uiState.boardSize
-                            }
-
-                            if (sessionGame != null) {
-                                MemoryBoard(
-                                    boardSize = sessionSize,
-                                    cards = sessionGame!!.cards,
-                                    isTwoPlayerMode = uiState.isTwoPlayerMode,
-                                    onCardClicked = { pos ->
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        onCardClicked(pos, 1)
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    if (uiState.isLoading) {
+            ) {
+                if (uiState.isTwoPlayerMode) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Player 2 Side (Top, Rotated)
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.4f)),
-                            contentAlignment = Alignment.Center
+                                .weight(1f)
+                                .graphicsLayer { rotationZ = 180f }
                         ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 6.dp
+                            PlayerRaceHalf(
+                                playerNumber = 2,
+                                game = uiState.memoryGameP2,
+                                boardSize = uiState.boardSize,
+                                timeSeconds = uiState.timerSecondsP2,
+                                onCardClicked = { onCardClicked(it, 2) }
+                            )
+                        }
+
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(
+                                alpha = 0.5f
+                            )
+                        )
+
+                        // Player 1 Side (Bottom)
+                        Box(modifier = Modifier.weight(1f)) {
+                            PlayerRaceHalf(
+                                playerNumber = 1,
+                                game = uiState.memoryGameP1,
+                                boardSize = uiState.boardSize,
+                                timeSeconds = uiState.timerSeconds,
+                                onCardClicked = { onCardClicked(it, 1) }
+                            )
+                        }
+                    }
+                } else {
+                    AnimatedContent(
+                        targetState = uiState.gameSessionId,
+                        transitionSpec = {
+                            fadeIn(
+                                animationSpec = tween(
+                                    600,
+                                    easing = EaseInOutQuart
+                                )
+                            ) togetherWith
+                                    fadeOut(animationSpec = tween(400))
+                        },
+                        label = stringResource(R.string.gameTransition_label)
+                    ) { targetSessionId: Long ->
+                        var sessionGame by remember { mutableStateOf(uiState.memoryGameP1) }
+                        var sessionSize by remember { mutableStateOf(uiState.boardSize) }
+
+                        if (targetSessionId == uiState.gameSessionId) {
+                            sessionGame = uiState.memoryGameP1
+                            sessionSize = uiState.boardSize
+                        }
+
+                        if (sessionGame != null) {
+                            MemoryBoard(
+                                boardSize = sessionSize,
+                                cards = sessionGame!!.cards,
+                                isTwoPlayerMode = uiState.isTwoPlayerMode,
+                                onCardClicked = { pos ->
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onCardClicked(pos, 1)
+                                }
                             )
                         }
                     }
                 }
 
-                if (uiState.memoryGameP1 != null && !uiState.isTwoPlayerMode) {
-                    val gameP1 = uiState.memoryGameP1!!
+                if (uiState.isLoading) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 24.dp),
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        FloatingPill(
-                            modifier = Modifier.wrapContentWidth()
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 6.dp
+                        )
+                    }
+                }
+            }
+
+            if (uiState.memoryGameP1 != null && !uiState.isTwoPlayerMode) {
+                val gameP1 = uiState.memoryGameP1!!
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    FloatingPill(
+                        modifier = Modifier.wrapContentWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .padding(horizontal = 24.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .wrapContentHeight()
-                                    .padding(horizontal = 24.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                val movesColor =
-                                    if (gameP1.getNumMoves() <= uiState.boardSize.getNumPairs()) {
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
-                                    } else {
-                                        null
-                                    }
-
-                                Row(
-                                    modifier = Modifier.tutorialAnchor(
-                                        "stats_tracking",
-                                        viewModel::onAnchorPositioned,
-                                        viewModel::onAnchorRemoved
-                                    ),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    StatBadge(
-                                        icon = EvaIcons.Outline.Flash,
-                                        value = stringResource(
-                                            R.string.moves_count,
-                                            gameP1.getNumMoves()
-                                        ),
-                                        tooltipText = stringResource(R.string.moves_tracking_label),
-                                        containerColor = movesColor,
-                                        contentColor = if (movesColor != null) MaterialTheme.colorScheme.onPrimaryContainer else null
-                                    )
-
-                                    val pairsFinished =
-                                        gameP1.numPairsFound == uiState.boardSize.getNumPairs()
-                                    StatBadge(
-                                        icon = EvaIcons.Outline.Layers,
-                                        value = stringResource(
-                                            R.string.pairs_progress,
-                                            gameP1.numPairsFound,
-                                            uiState.boardSize.getNumPairs()
-                                        ),
-                                        tooltipText = stringResource(R.string.pairs_tracking_label),
-                                        containerColor = if (pairsFinished) MaterialTheme.colorScheme.secondaryContainer.copy(
-                                            alpha = 0.8f
-                                        ) else null,
-                                        contentColor = if (pairsFinished) MaterialTheme.colorScheme.onSecondaryContainer else null,
-                                        autoMirror = true
-                                    )
+                            val movesColor =
+                                if (gameP1.getNumMoves() <= uiState.boardSize.getNumPairs()) {
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+                                } else {
+                                    null
                                 }
 
-                                Row(
-                                    modifier = Modifier.tutorialAnchor(
-                                        "timer_tracking",
-                                        viewModel::onAnchorPositioned,
-                                        viewModel::onAnchorRemoved
+                            Row(
+                                modifier = Modifier.tutorialAnchor(
+                                    "stats_tracking",
+                                    viewModel::onAnchorPositioned,
+                                    viewModel::onAnchorRemoved
+                                ),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                StatBadge(
+                                    icon = EvaIcons.Outline.Flash,
+                                    value = stringResource(
+                                        R.string.moves_count,
+                                        gameP1.getNumMoves()
                                     ),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    val isBreakingRecord =
-                                        uiState.bestTime == null || uiState.timerSeconds < uiState.bestTime!!
-                                    StatBadge(
-                                        icon = EvaIcons.Outline.Clock,
-                                        value = formatDuration(uiState.timerSeconds),
-                                        tooltipText = stringResource(R.string.timer_tracking_label),
-                                        containerColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                            alpha = 0.6f
-                                        ) else null,
-                                        contentColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.onTertiaryContainer else null
-                                    )
+                                    tooltipText = stringResource(R.string.moves_tracking_label),
+                                    containerColor = movesColor,
+                                    contentColor = if (movesColor != null) MaterialTheme.colorScheme.onPrimaryContainer else null
+                                )
 
-                                    uiState.bestTime?.let {
-                                        StatBadge(
-                                            icon = EvaIcons.Outline.Award,
-                                            value = formatDuration(it),
-                                            tooltipText = stringResource(R.string.best_time_tracking_label),
-                                            containerColor = MaterialTheme.colorScheme.primary.copy(
-                                                alpha = 0.15f
-                                            ),
-                                            contentColor = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
+                                val pairsFinished =
+                                    gameP1.numPairsFound == uiState.boardSize.getNumPairs()
+                                StatBadge(
+                                    icon = EvaIcons.Outline.Layers,
+                                    value = stringResource(
+                                        R.string.pairs_progress,
+                                        gameP1.numPairsFound,
+                                        uiState.boardSize.getNumPairs()
+                                    ),
+                                    tooltipText = stringResource(R.string.pairs_tracking_label),
+                                    containerColor = if (pairsFinished) MaterialTheme.colorScheme.secondaryContainer.copy(
+                                        alpha = 0.8f
+                                    ) else null,
+                                    contentColor = if (pairsFinished) MaterialTheme.colorScheme.onSecondaryContainer else null,
+                                    autoMirror = true
+                                )
+                            }
+
+                            Row(
+                                modifier = Modifier.tutorialAnchor(
+                                    "timer_tracking",
+                                    viewModel::onAnchorPositioned,
+                                    viewModel::onAnchorRemoved
+                                ),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                val isBreakingRecord =
+                                    uiState.bestTime == null || uiState.timerSeconds < uiState.bestTime!!
+                                StatBadge(
+                                    icon = EvaIcons.Outline.Clock,
+                                    value = formatDuration(uiState.timerSeconds),
+                                    tooltipText = stringResource(R.string.timer_tracking_label),
+                                    containerColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.tertiaryContainer.copy(
+                                        alpha = 0.6f
+                                    ) else null,
+                                    contentColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.onTertiaryContainer else null
+                                )
+
+                                uiState.bestTime?.let {
+                                    StatBadge(
+                                        icon = EvaIcons.Outline.Award,
+                                        value = formatDuration(it),
+                                        tooltipText = stringResource(R.string.best_time_tracking_label),
+                                        containerColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.15f
+                                        ),
+                                        contentColor = MaterialTheme.colorScheme.primary
+                                    )
                                 }
                             }
                         }
                     }
                 }
             }
+        }
 
-            if (showWinDialog) {
-                WinDialog(
-                    numMoves = (if (uiState.winner == 2) uiState.memoryGameP2 else uiState.memoryGameP1)?.getNumMoves()
-                        ?: 0,
-                    timeSeconds = uiState.timerSeconds,
-                    isSmoothWin = (if (uiState.winner == 2) uiState.memoryGameP2 else uiState.memoryGameP1)?.smoothWin() == true,
-                    bestTime = uiState.bestTime,
-                    winner = uiState.winner,
-                    onPlayAgain = {
-                        showWinDialog = false
-                        viewModel.refreshGame()
-                    },
-                    onDismiss = { showWinDialog = false }
-                )
-            }
+        if (showWinDialog) {
+            WinDialog(
+                numMoves = (if (uiState.winner == 2) uiState.memoryGameP2 else uiState.memoryGameP1)?.getNumMoves()
+                    ?: 0,
+                timeSeconds = uiState.timerSeconds,
+                isSmoothWin = (if (uiState.winner == 2) uiState.memoryGameP2 else uiState.memoryGameP1)?.smoothWin() == true,
+                bestTime = uiState.bestTime,
+                winner = uiState.winner,
+                onPlayAgain = {
+                    showWinDialog = false
+                    viewModel.refreshGame()
+                },
+                onDismiss = { showWinDialog = false }
+            )
+        }
 
-            if (showSizeDialog) {
-                BoardSizeDialog(
-                    currentSize = uiState.boardSize,
-                    isTwoPlayerMode = uiState.isTwoPlayerMode,
-                    onToggleTwoPlayerMode = { viewModel.toggleTwoPlayerMode(it) },
-                    onAnchorPositioned = viewModel::onAnchorPositioned,
-                    onAnchorRemoved = viewModel::onAnchorRemoved,
-                    onSizeSelected = {
-                        viewModel.changeSize(it)
-                        showSizeDialog = false
-                    },
-                    onDismiss = { showSizeDialog = false }
-                )
-            }
+        if (showSizeDialog) {
+            BoardSizeDialog(
+                currentSize = uiState.boardSize,
+                isTwoPlayerMode = uiState.isTwoPlayerMode,
+                onToggleTwoPlayerMode = { viewModel.toggleTwoPlayerMode(it) },
+                onAnchorPositioned = viewModel::onAnchorPositioned,
+                onAnchorRemoved = viewModel::onAnchorRemoved,
+                onSizeSelected = {
+                    viewModel.changeSize(it)
+                    showSizeDialog = false
+                },
+                onDismiss = { showSizeDialog = false }
+            )
+        }
 
-            if (showCreateSelectionDialog) {
-                BoardSizeDialog(
-                    currentSize = uiState.boardSize,
-                    title = stringResource(R.string.create_custom_game),
-                    icon = EvaIcons.Outline.Image,
-                    onSizeSelected = {
-                        onCreateClicked(it)
-                        showCreateSelectionDialog = false
-                    },
-                    onDismiss = { showCreateSelectionDialog = false }
-                )
-            }
+        if (showCreateSelectionDialog) {
+            BoardSizeDialog(
+                currentSize = uiState.boardSize,
+                title = stringResource(R.string.create_custom_game),
+                icon = EvaIcons.Outline.Image,
+                onSizeSelected = {
+                    onCreateClicked(it)
+                    showCreateSelectionDialog = false
+                },
+                onDismiss = { showCreateSelectionDialog = false }
+            )
+        }
 
-            if (uiState.showTutorial) {
-                val steps = getMainTutorialSteps()
-                TutorialOverlay(
-                    steps = steps,
-                    anchors = uiState.tutorialAnchors,
-                    onComplete = { viewModel.dismissTutorial() },
-                    onSkip = { viewModel.dismissTutorial() },
-                    onStepChanged = { index ->
-                        val step = steps.getOrNull(index)
-                        if (step?.anchorKey == "race_toggle") {
-                            showSizeDialog = true
-                            if (!uiState.isTwoPlayerMode) {
-                                viewModel.toggleTwoPlayerMode(true)
-                            }
-                        } else {
-                            showSizeDialog = false
+        if (uiState.showTutorial) {
+            val steps = getMainTutorialSteps()
+            TutorialOverlay(
+                steps = steps,
+                anchors = uiState.tutorialAnchors,
+                onComplete = { viewModel.dismissTutorial() },
+                onSkip = { viewModel.dismissTutorial() },
+                onStepChanged = { index ->
+                    val step = steps.getOrNull(index)
+                    if (step?.anchorKey == "race_toggle") {
+                        showSizeDialog = true
+                        if (!uiState.isTwoPlayerMode) {
+                            viewModel.toggleTwoPlayerMode(true)
                         }
+                    } else {
+                        showSizeDialog = false
                     }
-                )
-            }
+                }
+            )
         }
     }
 }

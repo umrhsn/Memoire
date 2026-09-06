@@ -1,5 +1,6 @@
 package com.umrhsn.mmoire.utils
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import javax.inject.Inject
@@ -9,11 +10,16 @@ import javax.inject.Singleton
 class LocaleManager @Inject constructor(
     private val prefs: PrefsManager
 ) {
+    private val TAG = "LocaleManager"
+
     fun getSelectedLanguageTag(): String? {
-        return prefs.getLanguage()
+        val tag = prefs.getLanguage()
+        Log.d(TAG, "getSelectedLanguageTag: $tag")
+        return tag
     }
 
     fun applyLanguageTag(tag: String?) {
+        Log.d(TAG, "applyLanguageTag: $tag")
         prefs.setLanguage(tag)
         val appLocales = if (tag != null) {
             LocaleListCompat.forLanguageTags(tag)
@@ -24,6 +30,9 @@ class LocaleManager @Inject constructor(
     }
 
     fun isTagCurrent(tag: String?): Boolean {
-        return getSelectedLanguageTag() == tag
+        val current = getSelectedLanguageTag()
+        val result = current == tag
+        Log.d(TAG, "isTagCurrent: target=$tag, current=$current -> result=$result")
+        return result
     }
 }

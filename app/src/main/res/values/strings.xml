@@ -96,6 +96,9 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="restart_required_title">Restart Required</string>
+    <string name="restart_required_message">The app needs to restart to apply the new language settings. Restart now?</string>
+    <string name="restart_now">RESTART NOW</string>
 
 
     <!-- Tutorial -->

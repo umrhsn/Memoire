@@ -63,7 +63,6 @@ import com.umrhsn.mmoire.ui.components.AppHeader
 import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.ui.components.AppTooltipIconButton
 import com.umrhsn.mmoire.ui.components.getAppTextFieldColors
-import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.viewmodels.BrowseViewModel
 import com.umrhsn.mmoire.viewmodels.SortOrder
 import compose.icons.EvaIcons
@@ -93,168 +92,166 @@ fun BrowseScreen(
     var previewGame by remember { mutableStateOf<UserImageListWithId?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
 
-    MemoireTheme(appTheme = uiState.appTheme) {
-        Scaffold(
-            topBar = {
-                Column {
-                    AppHeader(
-                        title = stringResource(R.string.saved_boards),
-                        navigationIcon = {
-                            AppHeaderIcon(
-                                icon = EvaIcons.Outline.ArrowBack,
-                                contentDescription = stringResource(R.string.back),
-                                onClick = onBackClicked
+    Scaffold(
+        topBar = {
+            Column {
+                AppHeader(
+                    title = stringResource(R.string.saved_boards),
+                    navigationIcon = {
+                        AppHeaderIcon(
+                            icon = EvaIcons.Outline.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            onClick = onBackClicked
+                        )
+                    }
+                )
+
+                // Search & Sort Bar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.spacing_medium)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = uiState.searchQuery,
+                        onValueChange = { viewModel.onSearchQueryChanged(it) },
+                        placeholder = { Text(stringResource(R.string.search_boards)) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
+                        leadingIcon = {
+                            Icon(
+                                EvaIcons.Outline.Search,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
                             )
-                        }
+                        },
+                        singleLine = true,
+                        colors = getAppTextFieldColors()
                     )
 
-                    // Search & Sort Bar
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.spacing_medium)),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.searchQuery,
-                            onValueChange = { viewModel.onSearchQueryChanged(it) },
-                            placeholder = { Text(stringResource(R.string.search_boards)) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                            leadingIcon = {
-                                Icon(
-                                    EvaIcons.Outline.Search,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            },
-                            singleLine = true,
-                            colors = getAppTextFieldColors()
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box {
+                        AppTooltipIconButton(
+                            icon = EvaIcons.Outline.Options2,
+                            contentDescription = stringResource(R.string.sort),
+                            tooltipText = stringResource(R.string.sort),
+                            onClick = { showSortMenu = true },
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                                alpha = 0.4f
+                            ),
+                            modifier = Modifier.size(48.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Box {
-                            AppTooltipIconButton(
-                                icon = EvaIcons.Outline.Options2,
-                                contentDescription = stringResource(R.string.sort),
-                                tooltipText = stringResource(R.string.sort),
-                                onClick = { showSortMenu = true },
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                                    alpha = 0.4f
-                                ),
-                                modifier = Modifier.size(48.dp)
-                            )
-
-                            MaterialTheme(
-                                shapes = MaterialTheme.shapes.copy(
-                                    extraSmall = RoundedCornerShape(
-                                        20.dp
-                                    )
-                                ),
-                                colorScheme = MaterialTheme.colorScheme.copy(surface = MaterialTheme.colorScheme.surface)
+                        MaterialTheme(
+                            shapes = MaterialTheme.shapes.copy(
+                                extraSmall = RoundedCornerShape(
+                                    20.dp
+                                )
+                            ),
+                            colorScheme = MaterialTheme.colorScheme.copy(surface = MaterialTheme.colorScheme.surface)
+                        ) {
+                            DropdownMenu(
+                                expanded = showSortMenu,
+                                onDismissRequest = { showSortMenu = false },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .width(200.dp)
                             ) {
-                                DropdownMenu(
-                                    expanded = showSortMenu,
-                                    onDismissRequest = { showSortMenu = false },
-                                    modifier = Modifier
-                                        .background(MaterialTheme.colorScheme.surface)
-                                        .width(200.dp)
-                                ) {
-                                    SortOrder.entries.forEach { order ->
-                                        val isSelected = uiState.sortOrder == order
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = when (order) {
-                                                        SortOrder.LATEST -> stringResource(R.string.sort_latest)
-                                                        SortOrder.OLDEST -> stringResource(R.string.sort_oldest)
-                                                        SortOrder.NAME_ASC -> stringResource(R.string.sort_name_asc)
-                                                        SortOrder.NAME_DESC -> stringResource(R.string.sort_name_desc)
-                                                        SortOrder.PAIRS_COUNT -> stringResource(R.string.sort_pairs)
-                                                    },
-                                                    style = MaterialTheme.typography.bodyMedium,
-                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                                )
-                                            },
-                                            onClick = {
-                                                viewModel.onSortOrderChanged(order)
-                                                showSortMenu = false
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    imageVector = when (order) {
-                                                        SortOrder.LATEST -> EvaIcons.Outline.Clock
-                                                        SortOrder.OLDEST -> EvaIcons.Outline.Calendar
-                                                        SortOrder.NAME_ASC -> EvaIcons.Outline.Text
-                                                        SortOrder.NAME_DESC -> EvaIcons.Outline.Text
-                                                        SortOrder.PAIRS_COUNT -> EvaIcons.Outline.Layers
-                                                    },
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(20.dp),
-                                                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                                                )
-                                            },
-                                            trailingIcon = {
-                                                if (isSelected) {
-                                                    Icon(
-                                                        imageVector = EvaIcons.Outline.Checkmark,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(16.dp),
-                                                        tint = MaterialTheme.colorScheme.primary
-                                                    )
-                                                }
-                                            },
-                                            colors = MenuDefaults.itemColors(
-                                                textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                SortOrder.entries.forEach { order ->
+                                    val isSelected = uiState.sortOrder == order
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = when (order) {
+                                                    SortOrder.LATEST -> stringResource(R.string.sort_latest)
+                                                    SortOrder.OLDEST -> stringResource(R.string.sort_oldest)
+                                                    SortOrder.NAME_ASC -> stringResource(R.string.sort_name_asc)
+                                                    SortOrder.NAME_DESC -> stringResource(R.string.sort_name_desc)
+                                                    SortOrder.PAIRS_COUNT -> stringResource(R.string.sort_pairs)
+                                                },
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                             )
+                                        },
+                                        onClick = {
+                                            viewModel.onSortOrderChanged(order)
+                                            showSortMenu = false
+                                        },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = when (order) {
+                                                    SortOrder.LATEST -> EvaIcons.Outline.Clock
+                                                    SortOrder.OLDEST -> EvaIcons.Outline.Calendar
+                                                    SortOrder.NAME_ASC -> EvaIcons.Outline.Text
+                                                    SortOrder.NAME_DESC -> EvaIcons.Outline.Text
+                                                    SortOrder.PAIRS_COUNT -> EvaIcons.Outline.Layers
+                                                },
+                                                contentDescription = null,
+                                                modifier = Modifier.size(20.dp),
+                                                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        },
+                                        trailingIcon = {
+                                            if (isSelected) {
+                                                Icon(
+                                                    imageVector = EvaIcons.Outline.Checkmark,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(16.dp),
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
+                                        },
+                                        colors = MenuDefaults.itemColors(
+                                            textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                         )
-                                    }
+                                    )
                                 }
                             }
                         }
                     }
                 }
-            },
-            containerColor = MaterialTheme.colorScheme.background
-        ) { padding ->
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                } else if (uiState.filteredGames.isEmpty()) {
-                    EmptyState(modifier = Modifier.align(Alignment.Center))
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        items(uiState.filteredGames) { game ->
-                            GameItem(
-                                game = game,
-                                onClick = { previewGame = game },
-                                onEdit = { onEditSelected(game.name) },
-                                onDelete = { viewModel.deleteGame(game.name) }
-                            )
-                        }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (uiState.filteredGames.isEmpty()) {
+                EmptyState(modifier = Modifier.align(Alignment.Center))
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(uiState.filteredGames) { game ->
+                        GameItem(
+                            game = game,
+                            onClick = { previewGame = game },
+                            onEdit = { onEditSelected(game.name) },
+                            onDelete = { viewModel.deleteGame(game.name) }
+                        )
                     }
                 }
+            }
 
-                // Preview Dialog
-                previewGame?.let { game ->
-                    BoardPreviewDialog(
-                        game = game,
-                        onDismiss = { previewGame = null },
-                        onPlay = {
-                            onGameSelected(game.name)
-                            previewGame = null
-                        }
-                    )
-                }
+            // Preview Dialog
+            previewGame?.let { game ->
+                BoardPreviewDialog(
+                    game = game,
+                    onDismiss = { previewGame = null },
+                    onPlay = {
+                        onGameSelected(game.name)
+                        previewGame = null
+                    }
+                )
             }
         }
     }

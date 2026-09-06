@@ -26,7 +26,8 @@ data class CreateUiState(
     val gameName: String? = null,
     val initialUris: List<Uri> = emptyList(),
     val nameTaken: Boolean = false,
-    val appTheme: AppTheme = AppTheme.SYSTEM
+    val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appLanguage: String? = null
 )
 
 @HiltViewModel
@@ -36,14 +37,24 @@ class CreateViewModel @Inject constructor(
     private val prefs: PrefsManager
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(CreateUiState(appTheme = prefs.getTheme()))
+    private val _uiState = MutableStateFlow(
+        CreateUiState(
+            appTheme = prefs.getTheme(),
+            appLanguage = prefs.getLanguage()
+        )
+    )
     val uiState: StateFlow<CreateUiState> = _uiState.asStateFlow()
 
     init {
-        // Observe theme changes globally
+        // Observe theme and locale changes globally
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.localeFlow.collect { lang ->
+                _uiState.update { it.copy(appLanguage = lang) }
             }
         }
     }

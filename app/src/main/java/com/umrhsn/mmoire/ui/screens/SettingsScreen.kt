@@ -1,5 +1,6 @@
 package com.umrhsn.mmoire.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,9 +19,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.AppTheme
+import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
 import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.viewmodels.SettingsViewModel
@@ -50,9 +53,11 @@ import compose.icons.evaicons.Outline
 import compose.icons.evaicons.outline.ArrowBack
 import compose.icons.evaicons.outline.CheckmarkCircle2
 import compose.icons.evaicons.outline.ColorPalette
+import compose.icons.evaicons.outline.Globe2
 import compose.icons.evaicons.outline.Layout
 import compose.icons.evaicons.outline.Moon
 import compose.icons.evaicons.outline.Music
+import compose.icons.evaicons.outline.Refresh
 import compose.icons.evaicons.outline.Sun
 import compose.icons.evaicons.outline.VolumeOff
 import compose.icons.evaicons.outline.VolumeUp
@@ -64,6 +69,11 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+
+    Log.d(
+        "SettingsScreen",
+        "SettingsScreen recomposed: currentLanguage=${uiState.currentLanguage}, showRestartDialog=${uiState.showRestartDialog}"
+    )
 
     Column(
         modifier = Modifier
@@ -103,78 +113,104 @@ fun SettingsScreen(
                 )
             }
 
-            // Personalization Section
+            // Personalization Section (Theme)
             SettingsCategory(
                 title = stringResource(R.string.personalization),
                 icon = EvaIcons.Outline.ColorPalette
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Theme Sub-section
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = stringResource(R.string.theme),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-
-                        val themes = listOf(
-                            AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
-                            AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
-                            AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
-                        )
-
-                        themes.forEach { (themeData, icon) ->
-                            val (theme, label) = themeData
-                            SettingsOption(
-                                label = label,
-                                selected = uiState.currentTheme == theme,
-                                onClick = { viewModel.updateTheme(theme) },
-                                icon = icon
-                            )
-                        }
-                    }
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                // Theme Sub-section
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.theme),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
 
-                    // Language Sub-section
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = stringResource(R.string.language),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
+                    val themes = listOf(
+                        AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
+                        AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
+                        AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
+                    )
 
-                        val languages = listOf(
-                            null to stringResource(R.string.lang_system) to "🌐",
-                            "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
-                            "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
-                            "en" to stringResource(R.string.lang_en) to "🇺🇸",
-                            "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
-                            "de" to stringResource(R.string.lang_de) to "🇩🇪",
-                            "es" to stringResource(R.string.lang_es) to "🇪🇸"
+                    themes.forEach { (themeData, icon) ->
+                        val (theme, label) = themeData
+                        SettingsOption(
+                            label = label,
+                            selected = uiState.currentTheme == theme,
+                            onClick = { viewModel.updateTheme(theme) },
+                            icon = icon
                         )
+                    }
+                }
+            }
 
-                        languages.forEach { (langData, emoji) ->
-                            val (tag, label) = langData
-                            SettingsOption(
-                                label = label,
-                                selected = uiState.currentLanguage == tag,
-                                onClick = { viewModel.updateLanguage(tag) },
-                                emoji = emoji
-                            )
-                        }
+            // Language Section
+            SettingsCategory(
+                title = stringResource(R.string.language),
+                icon = EvaIcons.Outline.Globe2
+            ) {
+                // Language Sub-section
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val languages = listOf(
+                        null to stringResource(R.string.lang_system) to "🌐",
+                        "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
+                        "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
+                        "en" to stringResource(R.string.lang_en) to "🇺🇸",
+                        "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
+                        "de" to stringResource(R.string.lang_de) to "🇩🇪",
+                        "es" to stringResource(R.string.lang_es) to "🇪🇸"
+                    )
+
+                    languages.forEach { (langData, emoji) ->
+                        val (tag, label) = langData
+                        SettingsOption(
+                            label = label,
+                            selected = viewModel.isLanguageSelected(tag),
+                            onClick = { viewModel.updateLanguage(tag) },
+                            emoji = emoji
+                        )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+
+        if (uiState.showRestartDialog) {
+            AppDialog(
+                onDismissRequest = { viewModel.dismissRestartDialog() },
+                title = stringResource(R.string.restart_required_title),
+                icon = EvaIcons.Outline.Refresh
+            ) {
+                Text(
+                    text = stringResource(R.string.restart_required_message),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { viewModel.dismissRestartDialog() },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Button(
+                        onClick = { viewModel.confirmLanguageChange() },
+                        modifier = Modifier.weight(1.5f),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text(stringResource(R.string.restart_now), fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
     }
 }

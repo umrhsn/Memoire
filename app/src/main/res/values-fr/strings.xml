@@ -97,6 +97,9 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Allemand</string>
     <string name="lang_es">Espagnol</string>
+    <string name="restart_required_title">Redémarrage requis</string>
+    <string name="restart_required_message">L\'application doit redémarrer pour appliquer les nouveaux paramètres de langue. Redémarrer maintenant ?</string>
+    <string name="restart_now">REDÉMARRER MAINTENANT</string>
 
 
     <!-- Tutorial -->
