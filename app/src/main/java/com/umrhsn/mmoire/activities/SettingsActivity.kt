@@ -31,7 +31,9 @@ class SettingsActivity : AppCompatActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             MemoireTheme(
-                appTheme = uiState.currentTheme
+                appTheme = uiState.currentTheme,
+                appColorTheme = uiState.currentColorTheme,
+                isTintEnabled = uiState.isTintEnabled
             ) {
                 key(uiState.currentLanguage) {
                     SettingsScreen(

@@ -90,7 +90,9 @@ class CreateActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             MemoireTheme(
-                appTheme = uiState.appTheme
+                appTheme = uiState.appTheme,
+                appColorTheme = uiState.appColorTheme,
+                isTintEnabled = uiState.isTintEnabled
             ) {
                 // Sync local state with loaded game
                 LaunchedEffect(uiState.initialUris) {

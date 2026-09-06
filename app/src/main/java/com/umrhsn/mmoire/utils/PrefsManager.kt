@@ -3,6 +3,7 @@ package com.umrhsn.mmoire.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,12 @@ class PrefsManager @Inject constructor(
 
     private val _themeFlow = MutableStateFlow(getThemeInternal())
     val themeFlow: StateFlow<AppTheme> = _themeFlow.asStateFlow()
+
+    private val _colorThemeFlow = MutableStateFlow(getColorThemeInternal())
+    val colorThemeFlow: StateFlow<AppColorTheme> = _colorThemeFlow.asStateFlow()
+
+    private val _tintFlow = MutableStateFlow(isBackgroundTintEnabled())
+    val tintFlow: StateFlow<Boolean> = _tintFlow.asStateFlow()
 
     private val _localeFlow = MutableStateFlow(getLanguage())
     val localeFlow: StateFlow<String?> = _localeFlow.asStateFlow()
@@ -65,5 +72,32 @@ class PrefsManager @Inject constructor(
     fun setTheme(theme: AppTheme) {
         prefs.edit { putString("app_theme", theme.name) }
         _themeFlow.value = theme
+    }
+
+    fun getColorTheme(): AppColorTheme {
+        return _colorThemeFlow.value
+    }
+
+    private fun getColorThemeInternal(): AppColorTheme {
+        val themeName = prefs.getString("app_color_theme", AppColorTheme.DEFAULT.name)
+        return try {
+            AppColorTheme.valueOf(themeName ?: AppColorTheme.DEFAULT.name)
+        } catch (e: Exception) {
+            AppColorTheme.DEFAULT
+        }
+    }
+
+    fun setColorTheme(theme: AppColorTheme) {
+        prefs.edit { putString("app_color_theme", theme.name) }
+        _colorThemeFlow.value = theme
+    }
+
+    fun isBackgroundTintEnabled(): Boolean {
+        return prefs.getBoolean("bg_tint_enabled", false)
+    }
+
+    fun setBackgroundTintEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean("bg_tint_enabled", enabled) }
+        _tintFlow.value = enabled
     }
 }

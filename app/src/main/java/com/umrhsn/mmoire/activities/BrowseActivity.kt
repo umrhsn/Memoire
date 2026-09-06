@@ -50,7 +50,9 @@ class BrowseActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             MemoireTheme(
-                appTheme = uiState.appTheme
+                appTheme = uiState.appTheme,
+                appColorTheme = uiState.appColorTheme,
+                isTintEnabled = uiState.isTintEnabled
             ) {
                 BrowseScreen(
                     viewModel = viewModel,

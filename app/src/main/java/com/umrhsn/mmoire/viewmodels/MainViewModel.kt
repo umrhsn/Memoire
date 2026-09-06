@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.db.RecordEntity
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
@@ -42,6 +43,8 @@ data class MainUiState(
     val tutorialAnchors: Map<String, Rect> = emptyMap(),
     val appLanguage: String? = null,
     val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    val isTintEnabled: Boolean = false,
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
     val winner: Int? = null,
@@ -60,6 +63,8 @@ class MainViewModel @Inject constructor(
         MainUiState(
             appLanguage = localeManager.getSelectedLanguageTag(),
             appTheme = prefs.getTheme(),
+            appColorTheme = prefs.getColorTheme(),
+            isTintEnabled = prefs.isBackgroundTintEnabled(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
     )
@@ -78,6 +83,16 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.colorThemeFlow.collect { colorTheme ->
+                _uiState.update { it.copy(appColorTheme = colorTheme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.tintFlow.collect { enabled ->
+                _uiState.update { it.copy(isTintEnabled = enabled) }
             }
         }
         viewModelScope.launch {
@@ -118,6 +133,8 @@ class MainViewModel @Inject constructor(
             it.copy(
                 appLanguage = localeManager.getSelectedLanguageTag(),
                 appTheme = prefs.getTheme(),
+                appColorTheme = prefs.getColorTheme(),
+                isTintEnabled = prefs.isBackgroundTintEnabled(),
                 isSoundEnabled = prefs.isSoundEnabled()
             )
         }

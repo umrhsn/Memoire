@@ -2,6 +2,7 @@ package com.umrhsn.mmoire.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.utils.LocaleManager
 import com.umrhsn.mmoire.utils.PrefsManager
@@ -16,6 +17,8 @@ data class SettingsUiState(
     val currentLanguage: String? = null,
     val currentSoundEnabled: Boolean = true,
     val currentTheme: AppTheme = AppTheme.SYSTEM,
+    val currentColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    val isTintEnabled: Boolean = false,
     val pendingLanguage: String? = null,
     val showRestartDialog: Boolean = false
 )
@@ -30,7 +33,9 @@ class SettingsViewModel @Inject constructor(
         SettingsUiState(
             currentLanguage = localeManager.getSelectedLanguageTag(),
             currentSoundEnabled = prefs.isSoundEnabled(),
-            currentTheme = prefs.getTheme()
+            currentTheme = prefs.getTheme(),
+            currentColorTheme = prefs.getColorTheme(),
+            isTintEnabled = prefs.isBackgroundTintEnabled()
         )
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -76,5 +81,15 @@ class SettingsViewModel @Inject constructor(
     fun updateTheme(theme: AppTheme) {
         prefs.setTheme(theme)
         _uiState.update { it.copy(currentTheme = theme) }
+    }
+
+    fun updateColorTheme(theme: AppColorTheme) {
+        prefs.setColorTheme(theme)
+        _uiState.update { it.copy(currentColorTheme = theme) }
+    }
+
+    fun toggleBackgroundTint(enabled: Boolean) {
+        prefs.setBackgroundTintEnabled(enabled)
+        _uiState.update { it.copy(isTintEnabled = enabled) }
     }
 }

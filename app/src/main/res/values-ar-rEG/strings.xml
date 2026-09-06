@@ -100,6 +100,8 @@
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="color_theme">لون اللعبة</string>
+    <string name="background_tint">لون خفيف للخلفية</string>
     <string name="restart_required_title">محتاجين نقفل ونفتح تاني</string>
     <string name="restart_required_message">اللعبة محتاجة تقفل وتفتح تاني عشان نغير اللغة. نقفل دلوقتي؟</string>
     <string name="restart_now">اقفل دلوقتي</string>

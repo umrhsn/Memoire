@@ -2,6 +2,7 @@ package com.umrhsn.mmoire.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.repository.UserImageListWithId
@@ -22,6 +23,8 @@ data class BrowseUiState(
     val searchQuery: String = "",
     val sortOrder: SortOrder = SortOrder.LATEST,
     val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    val isTintEnabled: Boolean = false,
     val appLanguage: String? = null
 )
 
@@ -39,6 +42,8 @@ class BrowseViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         BrowseUiState(
             appTheme = prefs.getTheme(),
+            appColorTheme = prefs.getColorTheme(),
+            isTintEnabled = prefs.isBackgroundTintEnabled(),
             appLanguage = prefs.getLanguage()
         )
     )
@@ -51,6 +56,16 @@ class BrowseViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.colorThemeFlow.collect { colorTheme ->
+                _uiState.update { it.copy(appColorTheme = colorTheme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.tintFlow.collect { enabled ->
+                _uiState.update { it.copy(isTintEnabled = enabled) }
             }
         }
         viewModelScope.launch {

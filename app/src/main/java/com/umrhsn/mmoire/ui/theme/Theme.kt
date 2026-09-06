@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -17,61 +18,14 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
-
-private val DarkColorScheme = darkColorScheme(
-    primary = MemoirePrimaryDark,
-    onPrimary = Color(0xFF000033),
-    primaryContainer = MemoirePrimaryContainerDark,
-    onPrimaryContainer = Color(0xFFE0E0FF),
-
-    secondary = MemoireSecondary,
-    onSecondary = Color.Black,
-    secondaryContainer = Color(0xFF003730),
-    onSecondaryContainer = Color(0xFF6FFFD9),
-
-    tertiary = MemoireAccent,
-    onTertiary = Color.Black,
-
-    background = BackgroundDark,
-    onBackground = Color(0xFFE4E1E6),
-    surface = SurfaceDark,
-    onSurface = Color(0xFFE4E1E6),
-    surfaceVariant = SurfaceVariantDark,
-    onSurfaceVariant = Color(0xFFC4C6D0),
-
-    error = MemoireError,
-    onError = Color.White
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = MemoirePrimary,
-    onPrimary = Color.White,
-    primaryContainer = MemoirePrimaryContainer,
-    onPrimaryContainer = Color(0xFF000066),
-
-    secondary = MemoireSecondary,
-    onSecondary = Color.White,
-    secondaryContainer = MemoireSecondaryContainer,
-    onSecondaryContainer = Color(0xFF003730),
-
-    tertiary = MemoireAccent,
-    onTertiary = Color.Black,
-
-    background = BackgroundLight,
-    onBackground = Color(0xFF1B1B1F),
-    surface = SurfaceLight,
-    onSurface = Color(0xFF1B1B1F),
-    surfaceVariant = Color(0xFFE1E2EC),
-    onSurfaceVariant = Color(0xFF44474F),
-
-    error = MemoireError,
-    onError = Color.White
-)
 
 @Composable
 fun MemoireTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
+    appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    isTintEnabled: Boolean = false,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -102,8 +56,7 @@ fun MemoireTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> getColorScheme(darkTheme, appColorTheme, isTintEnabled)
     }
 
     val view = LocalView.current
@@ -121,4 +74,95 @@ fun MemoireTheme(
         typography = Typography,
         content = content
     )
+}
+
+private fun getColorScheme(
+    darkTheme: Boolean,
+    colorTheme: AppColorTheme,
+    isTintEnabled: Boolean
+): ColorScheme {
+    return if (darkTheme) {
+        val primary = when (colorTheme) {
+            AppColorTheme.DEFAULT -> MemoirePrimaryDark
+            AppColorTheme.RED -> RedPrimaryDark
+            AppColorTheme.BLUE -> BluePrimaryDark
+            AppColorTheme.GREEN -> GreenPrimaryDark
+            AppColorTheme.ORANGE -> OrangePrimaryDark
+        }
+        val primaryContainer = when (colorTheme) {
+            AppColorTheme.DEFAULT -> MemoirePrimaryContainerDark
+            AppColorTheme.RED -> RedPrimaryContainerDark
+            AppColorTheme.BLUE -> BluePrimaryContainerDark
+            AppColorTheme.GREEN -> GreenPrimaryContainerDark
+            AppColorTheme.ORANGE -> OrangePrimaryContainerDark
+        }
+
+        // Subtle background tint logic
+        val background = if (isTintEnabled) {
+            primary.copy(alpha = 0.15f).compositeOver(BackgroundDark)
+        } else BackgroundDark
+
+        val surface = if (isTintEnabled) {
+            primary.copy(alpha = 0.22f).compositeOver(SurfaceDark)
+        } else SurfaceDark
+
+        darkColorScheme(
+            primary = primary,
+            onPrimary = Color(0xFF000033),
+            primaryContainer = primaryContainer,
+            onPrimaryContainer = Color(0xFFE0E0FF),
+            secondary = MemoireSecondary,
+            onSecondary = Color.Black,
+            background = background,
+            surface = surface,
+            surfaceVariant = SurfaceVariantDark,
+            error = MemoireError,
+            onError = Color.White
+        )
+    } else {
+        val primary = when (colorTheme) {
+            AppColorTheme.DEFAULT -> MemoirePrimary
+            AppColorTheme.RED -> RedPrimary
+            AppColorTheme.BLUE -> BluePrimary
+            AppColorTheme.GREEN -> GreenPrimary
+            AppColorTheme.ORANGE -> OrangePrimary
+        }
+        val primaryContainer = when (colorTheme) {
+            AppColorTheme.DEFAULT -> MemoirePrimaryContainer
+            AppColorTheme.RED -> RedPrimaryContainer
+            AppColorTheme.BLUE -> BluePrimaryContainer
+            AppColorTheme.GREEN -> GreenPrimaryContainer
+            AppColorTheme.ORANGE -> OrangePrimaryContainer
+        }
+
+        val background = if (isTintEnabled) {
+            primary.copy(alpha = 0.10f).compositeOver(BackgroundLight)
+        } else BackgroundLight
+
+        val surface = if (isTintEnabled) {
+            primary.copy(alpha = 0.16f).compositeOver(SurfaceLight)
+        } else SurfaceLight
+
+        lightColorScheme(
+            primary = primary,
+            onPrimary = Color.White,
+            primaryContainer = primaryContainer,
+            onPrimaryContainer = Color(0xFF000066),
+            secondary = MemoireSecondary,
+            onSecondary = Color.White,
+            background = background,
+            surface = surface,
+            error = MemoireError,
+            onError = Color.White
+        )
+    }
+}
+
+// Helper to composite colors
+private fun Color.compositeOver(background: Color): Color {
+    val a = this.alpha
+    val r = this.red * a + background.red * (1 - a)
+    val g = this.green * a + background.green * (1 - a)
+    val b = this.blue * a + background.blue * (1 - a)
+    return Color(r, g, b, 1f)
 }

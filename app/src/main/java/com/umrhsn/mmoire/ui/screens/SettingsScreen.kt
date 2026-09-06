@@ -1,6 +1,5 @@
 package com.umrhsn.mmoire.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -43,16 +43,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppHeader
 import com.umrhsn.mmoire.ui.components.AppHeaderIcon
+import com.umrhsn.mmoire.ui.theme.BluePrimary
+import com.umrhsn.mmoire.ui.theme.GreenPrimary
+import com.umrhsn.mmoire.ui.theme.MemoirePrimary
+import com.umrhsn.mmoire.ui.theme.OrangePrimary
+import com.umrhsn.mmoire.ui.theme.RedPrimary
 import com.umrhsn.mmoire.viewmodels.SettingsViewModel
 import compose.icons.EvaIcons
 import compose.icons.evaicons.Outline
 import compose.icons.evaicons.outline.ArrowBack
 import compose.icons.evaicons.outline.CheckmarkCircle2
 import compose.icons.evaicons.outline.ColorPalette
+import compose.icons.evaicons.outline.Flash
 import compose.icons.evaicons.outline.Globe2
 import compose.icons.evaicons.outline.Layout
 import compose.icons.evaicons.outline.Moon
@@ -69,11 +76,6 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-
-    Log.d(
-        "SettingsScreen",
-        "SettingsScreen recomposed: currentLanguage=${uiState.currentLanguage}, showRestartDialog=${uiState.showRestartDialog}"
-    )
 
     Column(
         modifier = Modifier
@@ -113,36 +115,91 @@ fun SettingsScreen(
                 )
             }
 
-            // Personalization Section (Theme)
+            // Personalization Section (Visuals)
             SettingsCategory(
                 title = stringResource(R.string.personalization),
                 icon = EvaIcons.Outline.ColorPalette
             ) {
-                // Theme Sub-section
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = stringResource(R.string.theme),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-
-                    val themes = listOf(
-                        AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
-                        AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
-                        AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
-                    )
-
-                    themes.forEach { (themeData, icon) ->
-                        val (theme, label) = themeData
-                        SettingsOption(
-                            label = label,
-                            selected = uiState.currentTheme == theme,
-                            onClick = { viewModel.updateTheme(theme) },
-                            icon = icon
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    // Theme Mode Sub-section
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = stringResource(R.string.theme),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
+
+                        val themes = listOf(
+                            AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
+                            AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
+                            AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
+                        )
+
+                        themes.forEach { (themeData, icon) ->
+                            val (theme, label) = themeData
+                            SettingsOption(
+                                label = label,
+                                selected = uiState.currentTheme == theme,
+                                onClick = { viewModel.updateTheme(theme) },
+                                icon = icon
+                            )
+                        }
                     }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                    )
+
+                    // Color Palette Sub-section
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text(
+                            text = stringResource(R.string.color_theme),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val colorThemes = listOf(
+                                AppColorTheme.DEFAULT to MemoirePrimary,
+                                AppColorTheme.RED to RedPrimary,
+                                AppColorTheme.BLUE to BluePrimary,
+                                AppColorTheme.GREEN to GreenPrimary,
+                                AppColorTheme.ORANGE to OrangePrimary
+                            )
+
+                            colorThemes.forEach { (theme, color) ->
+                                ColorThemeCircle(
+                                    color = color,
+                                    selected = uiState.currentColorTheme == theme,
+                                    onClick = { viewModel.updateColorTheme(theme) }
+                                )
+                            }
+                        }
+                    }
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                    )
+
+                    // Tint Toggle Sub-section
+                    SettingsToggle(
+                        title = stringResource(R.string.background_tint),
+                        checked = uiState.isTintEnabled,
+                        onCheckedChange = { viewModel.toggleBackgroundTint(it) },
+                        icon = EvaIcons.Outline.Flash
+                    )
                 }
             }
 
@@ -151,7 +208,6 @@ fun SettingsScreen(
                 title = stringResource(R.string.language),
                 icon = EvaIcons.Outline.Globe2
             ) {
-                // Language Sub-section
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     val languages = listOf(
                         null to stringResource(R.string.lang_system) to "🌐",
@@ -209,6 +265,45 @@ fun SettingsScreen(
                     ) {
                         Text(stringResource(R.string.restart_now), fontWeight = FontWeight.Bold)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColorThemeCircle(
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .background(if (selected) color.copy(alpha = 0.2f) else Color.Transparent)
+            .clickable { onClick() }
+            .padding(6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            shape = CircleShape,
+            color = color,
+            border = if (selected) BorderStroke(
+                2.dp,
+                MaterialTheme.colorScheme.onSurface
+            ) else null,
+            shadowElevation = if (selected) 4.dp else 0.dp
+        ) {
+            if (selected) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = EvaIcons.Outline.CheckmarkCircle2,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }

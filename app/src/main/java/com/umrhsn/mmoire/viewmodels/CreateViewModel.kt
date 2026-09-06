@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.utils.PrefsManager
@@ -27,6 +28,8 @@ data class CreateUiState(
     val initialUris: List<Uri> = emptyList(),
     val nameTaken: Boolean = false,
     val appTheme: AppTheme = AppTheme.SYSTEM,
+    val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    val isTintEnabled: Boolean = false,
     val appLanguage: String? = null
 )
 
@@ -40,6 +43,8 @@ class CreateViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(
         CreateUiState(
             appTheme = prefs.getTheme(),
+            appColorTheme = prefs.getColorTheme(),
+            isTintEnabled = prefs.isBackgroundTintEnabled(),
             appLanguage = prefs.getLanguage()
         )
     )
@@ -50,6 +55,16 @@ class CreateViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.themeFlow.collect { theme ->
                 _uiState.update { it.copy(appTheme = theme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.colorThemeFlow.collect { colorTheme ->
+                _uiState.update { it.copy(appColorTheme = colorTheme) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.tintFlow.collect { enabled ->
+                _uiState.update { it.copy(isTintEnabled = enabled) }
             }
         }
         viewModelScope.launch {
