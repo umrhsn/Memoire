@@ -9,6 +9,7 @@ import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
+import com.umrhsn.mmoire.models.TwoPlayerLayout
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.utils.DEFAULT_CARDS
 import com.umrhsn.mmoire.utils.LocaleManager
@@ -47,6 +48,7 @@ data class MainUiState(
     val isTintEnabled: Boolean = false,
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
+    val twoPlayerLayout: TwoPlayerLayout = TwoPlayerLayout.FACE_TO_FACE,
     val winner: Int? = null,
     val hasTriggeredWinEffects: Boolean = false
 )
@@ -65,6 +67,7 @@ class MainViewModel @Inject constructor(
             appTheme = prefs.getTheme(),
             appColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
+            twoPlayerLayout = prefs.getTwoPlayerLayout(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
     )
@@ -93,6 +96,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.tintFlow.collect { enabled ->
                 _uiState.update { it.copy(isTintEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.twoPlayerLayoutFlow.collect { layout ->
+                _uiState.update { it.copy(twoPlayerLayout = layout) }
             }
         }
         viewModelScope.launch {
@@ -135,9 +143,19 @@ class MainViewModel @Inject constructor(
                 appTheme = prefs.getTheme(),
                 appColorTheme = prefs.getColorTheme(),
                 isTintEnabled = prefs.isBackgroundTintEnabled(),
+                twoPlayerLayout = prefs.getTwoPlayerLayout(),
                 isSoundEnabled = prefs.isSoundEnabled()
             )
         }
+    }
+
+    fun toggleTwoPlayerLayout() {
+        val nextLayout = when (_uiState.value.twoPlayerLayout) {
+            TwoPlayerLayout.FACE_TO_FACE -> TwoPlayerLayout.SIDE_BY_SIDE
+            TwoPlayerLayout.SIDE_BY_SIDE -> TwoPlayerLayout.OPPOSITE
+            TwoPlayerLayout.OPPOSITE -> TwoPlayerLayout.FACE_TO_FACE
+        }
+        prefs.setTwoPlayerLayout(nextLayout)
     }
 
     fun toggleSound(enabled: Boolean) {

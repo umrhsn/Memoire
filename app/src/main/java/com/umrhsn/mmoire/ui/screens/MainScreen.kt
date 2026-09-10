@@ -1,5 +1,6 @@
 package com.umrhsn.mmoire.ui.screens
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.EaseInOutQuart
 import androidx.compose.animation.core.tween
@@ -11,17 +12,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -39,6 +42,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,18 +58,22 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryGame
+import com.umrhsn.mmoire.models.TwoPlayerLayout
 import com.umrhsn.mmoire.ui.components.AppDialog
 import com.umrhsn.mmoire.ui.components.AppDropdownItem
 import com.umrhsn.mmoire.ui.components.AppHeader
@@ -74,6 +84,7 @@ import com.umrhsn.mmoire.ui.components.StatBadge
 import com.umrhsn.mmoire.ui.components.TutorialOverlay
 import com.umrhsn.mmoire.ui.components.getMainTutorialSteps
 import com.umrhsn.mmoire.ui.components.tutorialAnchor
+import com.umrhsn.mmoire.viewmodels.MainUiState
 import com.umrhsn.mmoire.viewmodels.MainViewModel
 import compose.icons.EvaIcons
 import compose.icons.evaicons.Outline
@@ -101,6 +112,7 @@ import compose.icons.evaicons.outline.Sun
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
+    windowSizeClass: WindowSizeClass,
     onCreateClicked: (BoardSize) -> Unit,
     onBrowseClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
@@ -110,6 +122,10 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val haptic = LocalHapticFeedback.current
+    val config = LocalConfiguration.current
+
+    val isTablet = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     var showWinDialog by remember { mutableStateOf(false) }
 
@@ -149,300 +165,183 @@ fun MainScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            AppHeader(
-                title = uiState.gameName ?: stringResource(R.string.app_name),
-                actions = {
-                    // Keep primary actions visible
-                    AppHeaderIcon(
-                        icon = EvaIcons.Outline.Refresh,
-                        contentDescription = stringResource(R.string.reset_game),
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            viewModel.refreshGame()
-                        },
-                        autoMirror = true
+        if (isTablet && isLandscape && !uiState.isTwoPlayerMode) {
+            // Tablet Landscape Layout: Sidebar for stats, main area for board
+            Row(modifier = Modifier.fillMaxSize()) {
+                Surface(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(16.dp)
+                        .width(280.dp)
+                        .fillMaxHeight(),
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(32.dp),
+                    tonalElevation = 2.dp,
+                    shadowElevation = 8.dp,
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
-                    AppHeaderIcon(
-                        icon = EvaIcons.Outline.Grid,
-                        contentDescription = stringResource(R.string.change_size),
-                        onClick = {
-                            viewModel.playClickSound()
-                            showSizeDialog = true
-                        }
-                    )
-
-                    // Overflow for less frequent actions
-                    Box {
-                        AppHeaderIcon(
-                            icon = EvaIcons.Outline.MoreVertical,
-                            contentDescription = stringResource(R.string.more_options),
-                            onClick = { showMoreMenu = true },
-                            modifier = Modifier.tutorialAnchor(
-                                "more_options",
-                                viewModel::onAnchorPositioned,
-                                viewModel::onAnchorRemoved
-                            )
-                        )
-
-                        MaterialTheme(
-                            shapes = MaterialTheme.shapes.copy(
-                                extraSmall = RoundedCornerShape(
-                                    24.dp
-                                )
-                            )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 24.dp)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            DropdownMenu(
-                                expanded = showMoreMenu,
-                                onDismissRequest = { showMoreMenu = false },
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surface)
-                                    .width(220.dp)
-                            ) {
-                                AppDropdownItem(
-                                    text = stringResource(R.string.create_game),
-                                    icon = EvaIcons.Outline.PlusCircle,
-                                    onClick = {
-                                        showMoreMenu = false
+                            Text(
+                                text = uiState.gameName ?: stringResource(R.string.app_name),
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Black,
+                                textAlign = TextAlign.Start,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Box {
+                                AppHeaderIcon(
+                                    icon = EvaIcons.Outline.MoreVertical,
+                                    contentDescription = stringResource(R.string.more_options),
+                                    onClick = { showMoreMenu = true }
+                                )
+
+                                OverflowDropdownMenu(
+                                    expanded = showMoreMenu,
+                                    onDismissRequest = { showMoreMenu = false },
+                                    onSettingsClicked = onSettingsClicked,
+                                    onBrowseClicked = onBrowseClicked,
+                                    showCreateSelectionDialog = {
                                         showCreateSelectionDialog = true
-                                    }
-                                )
-                                AppDropdownItem(
-                                    text = stringResource(R.string.load_game),
-                                    icon = EvaIcons.Outline.Folder,
-                                    onClick = {
-                                        showMoreMenu = false
-                                        onBrowseClicked()
-                                    }
-                                )
-                                HorizontalDivider(
-                                    modifier = Modifier.padding(
-                                        vertical = 4.dp,
-                                        horizontal = 12.dp
-                                    ),
-                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                                )
-                                AppDropdownItem(
-                                    text = stringResource(R.string.settings),
-                                    icon = EvaIcons.Outline.Settings,
-                                    onClick = {
-                                        showMoreMenu = false
-                                        onSettingsClicked()
-                                    }
-                                )
-                                AppDropdownItem(
-                                    text = stringResource(R.string.help),
-                                    icon = EvaIcons.Outline.QuestionMarkCircle,
-                                    onClick = {
-                                        showMoreMenu = false
-                                        viewModel.startTutorial()
-                                    }
+                                    },
+                                    startTutorial = { viewModel.startTutorial() }
                                 )
                             }
-                        }
-                    }
-                },
-                modifier = Modifier.tutorialAnchor(
-                    "header_actions",
-                    viewModel::onAnchorPositioned,
-                    viewModel::onAnchorRemoved
-                )
-            )
-
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .tutorialAnchor(
-                        "game_board",
-                        viewModel::onAnchorPositioned,
-                        viewModel::onAnchorRemoved
-                    )
-            ) {
-                if (uiState.isTwoPlayerMode) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        // Player 2 Side (Top, Rotated)
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .graphicsLayer { rotationZ = 180f }
-                        ) {
-                            PlayerRaceHalf(
-                                playerNumber = 2,
-                                game = uiState.memoryGameP2,
-                                boardSize = uiState.boardSize,
-                                timeSeconds = uiState.timerSecondsP2,
-                                onCardClicked = { onCardClicked(it, 2) }
-                            )
                         }
 
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.outlineVariant.copy(
-                                alpha = 0.5f
+                                alpha = 0.4f
                             )
                         )
 
-                        // Player 1 Side (Bottom)
-                        Box(modifier = Modifier.weight(1f)) {
-                            PlayerRaceHalf(
-                                playerNumber = 1,
-                                game = uiState.memoryGameP1,
-                                boardSize = uiState.boardSize,
-                                timeSeconds = uiState.timerSeconds,
-                                onCardClicked = { onCardClicked(it, 1) }
-                            )
-                        }
-                    }
-                } else {
-                    AnimatedContent(
-                        targetState = uiState.gameSessionId,
-                        transitionSpec = {
-                            fadeIn(
-                                animationSpec = tween(
-                                    600,
-                                    easing = EaseInOutQuart
-                                )
-                            ) togetherWith
-                                    fadeOut(animationSpec = tween(400))
-                        },
-                        label = stringResource(R.string.gameTransition_label)
-                    ) { targetSessionId: Long ->
-                        var sessionGame by remember { mutableStateOf(uiState.memoryGameP1) }
-                        var sessionSize by remember { mutableStateOf(uiState.boardSize) }
+                        StatsSection(uiState = uiState, isVertical = true)
 
-                        if (targetSessionId == uiState.gameSessionId) {
-                            sessionGame = uiState.memoryGameP1
-                            sessionSize = uiState.boardSize
-                        }
+                        Spacer(modifier = Modifier.weight(1f))
 
-                        if (sessionGame != null) {
-                            MemoryBoard(
-                                boardSize = sessionSize,
-                                cards = sessionGame!!.cards,
-                                isTwoPlayerMode = uiState.isTwoPlayerMode,
-                                onCardClicked = { pos ->
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Button(
+                                onClick = {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onCardClicked(pos, 1)
-                                }
-                            )
+                                    viewModel.refreshGame()
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Icon(EvaIcons.Outline.Refresh, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.reset_game))
+                            }
+
+                            Button(
+                                onClick = { showSizeDialog = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Icon(EvaIcons.Outline.Grid, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.change_size))
+                            }
                         }
                     }
                 }
 
-                if (uiState.isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.4f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 6.dp
-                        )
-                    }
+                Box(modifier = Modifier.weight(1f)) {
+                    GameBoardArea(
+                        uiState = uiState,
+                        onCardClicked = onCardClicked,
+                        haptic = haptic,
+                        isTablet = isTablet,
+                        isLandscape = isLandscape
+                    )
                 }
             }
+        } else {
+            // Phone or Tablet Portrait Layout
+            Column(modifier = Modifier.fillMaxSize()) {
+                MainHeader(
+                    uiState = uiState,
+                    haptic = haptic,
+                    viewModel = viewModel,
+                    onBrowseClicked = onBrowseClicked,
+                    onSettingsClicked = onSettingsClicked,
+                    showSizeDialog = { showSizeDialog = true },
+                    showCreateSelectionDialog = { showCreateSelectionDialog = true },
+                    showMoreMenu = showMoreMenu,
+                    onMoreMenuChange = { showMoreMenu = it }
+                )
 
-            if (uiState.memoryGameP1 != null && !uiState.isTwoPlayerMode) {
-                val gameP1 = uiState.memoryGameP1!!
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 24.dp),
-                    contentAlignment = Alignment.Center
+                        .weight(1f)
+                        .tutorialAnchor(
+                            "game_board",
+                            viewModel::onAnchorPositioned,
+                            viewModel::onAnchorRemoved
+                        )
                 ) {
-                    FloatingPill(
-                        modifier = Modifier.wrapContentWidth()
-                    ) {
-                        Row(
+                    if (uiState.isTwoPlayerMode) {
+                        TwoPlayerLayoutSwitcher(
+                            uiState = uiState,
+                            onCardClicked = onCardClicked,
+                            isTablet = isTablet,
+                            isLandscape = isLandscape
+                        )
+                    } else {
+                        GameBoardArea(
+                            uiState = uiState,
+                            onCardClicked = onCardClicked,
+                            haptic = haptic,
+                            isTablet = isTablet,
+                            isLandscape = isLandscape
+                        )
+                    }
+
+                    if (uiState.isLoading) {
+                        Box(
                             modifier = Modifier
-                                .wrapContentHeight()
-                                .padding(horizontal = 24.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.4f)),
+                            contentAlignment = Alignment.Center
                         ) {
-                            val movesColor =
-                                if (gameP1.getNumMoves() <= uiState.boardSize.getNumPairs()) {
-                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
-                                } else {
-                                    null
-                                }
-
-                            Row(
-                                modifier = Modifier.tutorialAnchor(
-                                    "stats_tracking",
-                                    viewModel::onAnchorPositioned,
-                                    viewModel::onAnchorRemoved
-                                ),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                StatBadge(
-                                    icon = EvaIcons.Outline.Flash,
-                                    value = stringResource(
-                                        R.string.moves_count,
-                                        gameP1.getNumMoves()
-                                    ),
-                                    tooltipText = stringResource(R.string.moves_tracking_label),
-                                    containerColor = movesColor,
-                                    contentColor = if (movesColor != null) MaterialTheme.colorScheme.onPrimaryContainer else null
-                                )
-
-                                val pairsFinished =
-                                    gameP1.numPairsFound == uiState.boardSize.getNumPairs()
-                                StatBadge(
-                                    icon = EvaIcons.Outline.Layers,
-                                    value = stringResource(
-                                        R.string.pairs_progress,
-                                        gameP1.numPairsFound,
-                                        uiState.boardSize.getNumPairs()
-                                    ),
-                                    tooltipText = stringResource(R.string.pairs_tracking_label),
-                                    containerColor = if (pairsFinished) MaterialTheme.colorScheme.secondaryContainer.copy(
-                                        alpha = 0.8f
-                                    ) else null,
-                                    contentColor = if (pairsFinished) MaterialTheme.colorScheme.onSecondaryContainer else null,
-                                    autoMirror = true
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier.tutorialAnchor(
-                                    "timer_tracking",
-                                    viewModel::onAnchorPositioned,
-                                    viewModel::onAnchorRemoved
-                                ),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                val isBreakingRecord =
-                                    uiState.bestTime == null || uiState.timerSeconds < uiState.bestTime!!
-                                StatBadge(
-                                    icon = EvaIcons.Outline.Clock,
-                                    value = formatDuration(uiState.timerSeconds),
-                                    tooltipText = stringResource(R.string.timer_tracking_label),
-                                    containerColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                        alpha = 0.6f
-                                    ) else null,
-                                    contentColor = if (isBreakingRecord && gameP1.numCardFlips > 0) MaterialTheme.colorScheme.onTertiaryContainer else null
-                                )
-
-                                uiState.bestTime?.let {
-                                    StatBadge(
-                                        icon = EvaIcons.Outline.Award,
-                                        value = formatDuration(it),
-                                        tooltipText = stringResource(R.string.best_time_tracking_label),
-                                        containerColor = MaterialTheme.colorScheme.primary.copy(
-                                            alpha = 0.15f
-                                        ),
-                                        contentColor = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 6.dp
+                            )
                         }
                     }
+                }
+
+                if (uiState.memoryGameP1 != null && !uiState.isTwoPlayerMode) {
+                    StatsSection(uiState = uiState, isVertical = false)
                 }
             }
         }
 
+        // Dialogs...
         if (showWinDialog) {
             WinDialog(
                 numMoves = (if (uiState.winner == 2) uiState.memoryGameP2 else uiState.memoryGameP1)?.getNumMoves()
@@ -470,7 +369,8 @@ fun MainScreen(
                     viewModel.changeSize(it)
                     showSizeDialog = false
                 },
-                onDismiss = { showSizeDialog = false }
+                onDismiss = { showSizeDialog = false },
+                isTablet = isTablet
             )
         }
 
@@ -483,29 +383,449 @@ fun MainScreen(
                     onCreateClicked(it)
                     showCreateSelectionDialog = false
                 },
-                onDismiss = { showCreateSelectionDialog = false }
+                onDismiss = { showCreateSelectionDialog = false },
+                isTablet = isTablet
             )
         }
 
         if (uiState.showTutorial) {
-            val steps = getMainTutorialSteps()
             TutorialOverlay(
-                steps = steps,
+                steps = getMainTutorialSteps(),
                 anchors = uiState.tutorialAnchors,
                 onComplete = { viewModel.dismissTutorial() },
                 onSkip = { viewModel.dismissTutorial() },
                 onStepChanged = { index ->
-                    val step = steps.getOrNull(index)
-                    if (step?.anchorKey == "race_toggle") {
-                        showSizeDialog = true
-                        if (!uiState.isTwoPlayerMode) {
-                            viewModel.toggleTwoPlayerMode(true)
-                        }
-                    } else {
-                        showSizeDialog = false
-                    }
+                    showSizeDialog = index == 5
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun TwoPlayerLayoutSwitcher(
+    uiState: MainUiState,
+    onCardClicked: (Int, Int) -> Unit,
+    isTablet: Boolean,
+    isLandscape: Boolean
+) {
+    val layout = uiState.twoPlayerLayout
+
+    // Split direction based on mode and orientation
+    val isHorizontalSplit = if (isLandscape) {
+        layout == TwoPlayerLayout.SIDE_BY_SIDE
+    } else {
+        true // Always top-bottom in portrait
+    }
+
+    if (isHorizontalSplit) {
+        // Mode: SIDE_BY_SIDE or Portrait split
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Player 2 Area (Top half)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .graphicsLayer {
+                        rotationZ =
+                            if (layout == TwoPlayerLayout.OPPOSITE || layout == TwoPlayerLayout.FACE_TO_FACE) 180f else 0f
+                    }
+            ) {
+                PlayerRaceHalf(
+                    playerNumber = 2,
+                    game = uiState.memoryGameP2,
+                    boardSize = uiState.boardSize,
+                    timeSeconds = uiState.timerSecondsP2,
+                    onCardClicked = { onCardClicked(it, 2) },
+                    isTablet = isTablet,
+                    isLandscape = isLandscape,
+                    statsInCenter = (layout != TwoPlayerLayout.SIDE_BY_SIDE)
+                )
+            }
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(horizontal = 48.dp)
+            )
+            // Player 1 Area (Bottom half)
+            Box(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()) {
+                PlayerRaceHalf(
+                    playerNumber = 1,
+                    game = uiState.memoryGameP1,
+                    boardSize = uiState.boardSize,
+                    timeSeconds = uiState.timerSeconds,
+                    onCardClicked = { onCardClicked(it, 1) },
+                    isTablet = isTablet,
+                    isLandscape = isLandscape,
+                    statsInCenter = (layout != TwoPlayerLayout.SIDE_BY_SIDE)
+                )
+            }
+        }
+    } else {
+        // Mode: FACE_TO_FACE or OPPOSITE (Landscape vertical split)
+        Row(modifier = Modifier.fillMaxSize()) {
+            // Player 2 Area (Left) - Using rotation 180 or -90 based on playerEnd sitting end
+            Box(modifier = Modifier.weight(1f)) {
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    val w = this.maxWidth
+                    val h = this.maxHeight
+                    Box(
+                        modifier = Modifier
+                            .size(h, w)
+                            .align(Alignment.Center)
+                            .graphicsLayer {
+                                rotationZ =
+                                    if (layout == TwoPlayerLayout.FACE_TO_FACE) -90f else -180f
+                            }
+                    ) {
+                        PlayerRaceHalf(
+                            playerNumber = 2,
+                            game = uiState.memoryGameP2,
+                            boardSize = uiState.boardSize,
+                            timeSeconds = uiState.timerSecondsP2,
+                            onCardClicked = { onCardClicked(it, 2) },
+                            isTablet = isTablet,
+                            isLandscape = true,
+                            statsInCenter = true
+                        )
+                    }
+                }
+            }
+
+            VerticalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(vertical = 48.dp)
+            )
+
+            // Player 1 Area (Right)
+            Box(modifier = Modifier.weight(1f)) {
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    val w = this.maxWidth
+                    val h = this.maxHeight
+                    Box(
+                        modifier = Modifier
+                            .size(h, w)
+                            .align(Alignment.Center)
+                            .graphicsLayer {
+                                rotationZ = if (layout == TwoPlayerLayout.FACE_TO_FACE) 90f else 0f
+                            }
+                    ) {
+                        PlayerRaceHalf(
+                            playerNumber = 1,
+                            game = uiState.memoryGameP1,
+                            boardSize = uiState.boardSize,
+                            timeSeconds = uiState.timerSeconds,
+                            onCardClicked = { onCardClicked(it, 1) },
+                            isTablet = isTablet,
+                            isLandscape = true,
+                            statsInCenter = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainHeader(
+    uiState: MainUiState,
+    haptic: HapticFeedback,
+    viewModel: MainViewModel,
+    onBrowseClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
+    showSizeDialog: () -> Unit,
+    showCreateSelectionDialog: () -> Unit,
+    showMoreMenu: Boolean,
+    onMoreMenuChange: (Boolean) -> Unit
+) {
+    AppHeader(
+        title = uiState.gameName ?: stringResource(R.string.app_name),
+        actions = {
+            if (uiState.isTwoPlayerMode) {
+                // Layout Toggle for 2-player mode
+                AppHeaderIcon(
+                    icon = when (uiState.twoPlayerLayout) {
+                        TwoPlayerLayout.FACE_TO_FACE -> EvaIcons.Outline.Navigation2
+                        TwoPlayerLayout.SIDE_BY_SIDE -> EvaIcons.Outline.Person
+                        TwoPlayerLayout.OPPOSITE -> EvaIcons.Outline.Flash
+                    },
+                    contentDescription = "Change Layout",
+                    onClick = { viewModel.toggleTwoPlayerLayout() }
+                )
+            }
+
+            AppHeaderIcon(
+                icon = EvaIcons.Outline.Refresh,
+                contentDescription = stringResource(R.string.reset_game),
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.refreshGame()
+                },
+                autoMirror = true
+            )
+            AppHeaderIcon(
+                icon = EvaIcons.Outline.Grid,
+                contentDescription = stringResource(R.string.change_size),
+                onClick = {
+                    viewModel.playClickSound()
+                    showSizeDialog()
+                }
+            )
+
+            Box {
+                AppHeaderIcon(
+                    icon = EvaIcons.Outline.MoreVertical,
+                    contentDescription = stringResource(R.string.more_options),
+                    onClick = { onMoreMenuChange(true) },
+                    modifier = Modifier.tutorialAnchor(
+                        "more_options",
+                        viewModel::onAnchorPositioned,
+                        viewModel::onAnchorRemoved
+                    )
+                )
+
+                OverflowDropdownMenu(
+                    expanded = showMoreMenu,
+                    onDismissRequest = { onMoreMenuChange(false) },
+                    onBrowseClicked = onBrowseClicked,
+                    onSettingsClicked = onSettingsClicked,
+                    showCreateSelectionDialog = showCreateSelectionDialog,
+                    startTutorial = { viewModel.startTutorial() }
+                )
+            }
+        },
+        modifier = Modifier.tutorialAnchor(
+            "header_actions",
+            viewModel::onAnchorPositioned,
+            viewModel::onAnchorRemoved
+        )
+    )
+}
+
+@Composable
+private fun OverflowDropdownMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onBrowseClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
+    showCreateSelectionDialog: () -> Unit,
+    startTutorial: () -> Unit
+) {
+    MaterialTheme(
+        shapes = MaterialTheme.shapes.copy(
+            extraSmall = RoundedCornerShape(24.dp)
+        )
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismissRequest,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .width(220.dp)
+        ) {
+            AppDropdownItem(
+                text = stringResource(R.string.create_game),
+                icon = EvaIcons.Outline.PlusCircle,
+                onClick = {
+                    onDismissRequest()
+                    showCreateSelectionDialog()
+                }
+            )
+            AppDropdownItem(
+                text = stringResource(R.string.load_game),
+                icon = EvaIcons.Outline.Folder,
+                onClick = {
+                    onDismissRequest()
+                    onBrowseClicked()
+                }
+            )
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 12.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+            )
+            AppDropdownItem(
+                text = stringResource(R.string.settings),
+                icon = EvaIcons.Outline.Settings,
+                onClick = {
+                    onDismissRequest()
+                    onSettingsClicked()
+                }
+            )
+            AppDropdownItem(
+                text = stringResource(R.string.help),
+                icon = EvaIcons.Outline.QuestionMarkCircle,
+                onClick = {
+                    onDismissRequest()
+                    startTutorial()
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameBoardArea(
+    uiState: MainUiState,
+    onCardClicked: (Int, Int) -> Unit,
+    haptic: HapticFeedback,
+    isTablet: Boolean,
+    isLandscape: Boolean
+) {
+    AnimatedContent(
+        targetState = uiState.gameSessionId,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(600, easing = EaseInOutQuart)) togetherWith
+                    fadeOut(animationSpec = tween(400))
+        },
+        label = stringResource(R.string.gameTransition_label)
+    ) { targetSessionId: Long ->
+        var sessionGame by remember { mutableStateOf(uiState.memoryGameP1) }
+        var sessionSize by remember { mutableStateOf(uiState.boardSize) }
+
+        if (targetSessionId == uiState.gameSessionId) {
+            sessionGame = uiState.memoryGameP1
+            sessionSize = uiState.boardSize
+        }
+
+        if (sessionGame != null) {
+            MemoryBoard(
+                boardSize = sessionSize,
+                cards = sessionGame!!.cards,
+                isTwoPlayerMode = uiState.isTwoPlayerMode,
+                onCardClicked = { pos ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onCardClicked(pos, 1)
+                },
+                isTablet = isTablet,
+                isLandscape = isLandscape
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatsSection(uiState: MainUiState, isVertical: Boolean) {
+    val gameP1 = uiState.memoryGameP1 ?: return
+
+    if (isVertical) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            StatItem(
+                icon = EvaIcons.Outline.Flash,
+                label = stringResource(R.string.moves_tracking_label),
+                value = gameP1.getNumMoves().toString()
+            )
+            StatItem(
+                icon = EvaIcons.Outline.Layers,
+                label = stringResource(R.string.pairs_tracking_label),
+                value = "${gameP1.numPairsFound}/${uiState.boardSize.getNumPairs()}"
+            )
+            StatItem(
+                icon = EvaIcons.Outline.Clock,
+                label = stringResource(R.string.timer_tracking_label),
+                value = formatDuration(uiState.timerSeconds)
+            )
+            uiState.bestTime?.let {
+                StatItem(
+                    icon = EvaIcons.Outline.Award,
+                    label = "Best Time",
+                    value = formatDuration(it),
+                    isHighlight = true
+                )
+            }
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            FloatingPill(modifier = Modifier.wrapContentWidth()) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatBadge(
+                        icon = EvaIcons.Outline.Flash,
+                        value = stringResource(R.string.moves_count, gameP1.getNumMoves()),
+                        tooltipText = stringResource(R.string.moves_tracking_label)
+                    )
+                    StatBadge(
+                        icon = EvaIcons.Outline.Layers,
+                        value = stringResource(
+                            R.string.pairs_progress,
+                            gameP1.numPairsFound,
+                            uiState.boardSize.getNumPairs()
+                        ),
+                        tooltipText = stringResource(R.string.pairs_tracking_label)
+                    )
+                    StatBadge(
+                        icon = EvaIcons.Outline.Clock,
+                        value = formatDuration(uiState.timerSeconds),
+                        tooltipText = stringResource(R.string.timer_tracking_label)
+                    )
+                    uiState.bestTime?.let {
+                        StatBadge(
+                            icon = EvaIcons.Outline.Award,
+                            value = formatDuration(it),
+                            tooltipText = stringResource(R.string.best_time_tracking_label),
+                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatItem(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    isHighlight: Boolean = false
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        color = if (isHighlight) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else Color.Transparent,
+        border = if (isHighlight) BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+        ) else null
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -522,77 +842,118 @@ fun formatDuration(seconds: Long): String {
 }
 
 @Composable
+private fun PlayerStatsContent(
+    playerNumber: Int,
+    game: MemoryGame?,
+    boardSize: BoardSize,
+    timeSeconds: Long
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                EvaIcons.Outline.Person,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.player_n, playerNumber),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Black
+        )
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        StatBadge(
+            EvaIcons.Outline.Clock,
+            formatDuration(timeSeconds),
+            tooltipText = stringResource(R.string.timer_tracking_label)
+        )
+        StatBadge(
+            EvaIcons.Outline.Flash,
+            (game?.getNumMoves() ?: 0).toString(),
+            tooltipText = stringResource(R.string.moves_tracking_label)
+        )
+        StatBadge(
+            EvaIcons.Outline.Layers,
+            "${game?.numPairsFound ?: 0}/${boardSize.getNumPairs()}",
+            tooltipText = stringResource(R.string.pairs_tracking_label)
+        )
+    }
+}
+
+@Composable
+private fun PlayerStatsHeader(
+    playerNumber: Int,
+    game: MemoryGame?,
+    boardSize: BoardSize,
+    timeSeconds: Long
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PlayerStatsContent(playerNumber, game, boardSize, timeSeconds)
+    }
+}
+
+@Composable
 private fun PlayerRaceHalf(
     playerNumber: Int,
     game: MemoryGame?,
     boardSize: BoardSize,
     timeSeconds: Long,
-    onCardClicked: (Int) -> Unit
+    onCardClicked: (Int) -> Unit,
+    isTablet: Boolean = false,
+    isLandscape: Boolean = false,
+    statsInCenter: Boolean = false
 ) {
     val haptic = LocalHapticFeedback.current
     Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = EvaIcons.Outline.Person,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+        if (statsInCenter) {
+            Box(modifier = Modifier.weight(1f)) {
+                if (game != null) {
+                    MemoryBoard(
+                        boardSize = boardSize,
+                        cards = game.cards,
+                        isTwoPlayerMode = true,
+                        onCardClicked = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onCardClicked(it)
+                        },
+                        isTablet = isTablet,
+                        isLandscape = isLandscape
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.player_n, playerNumber),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Black
-                )
             }
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                StatBadge(
-                    icon = EvaIcons.Outline.Clock,
-                    value = formatDuration(timeSeconds),
-                    tooltipText = stringResource(R.string.timer_tracking_label),
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f),
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                )
-                StatBadge(
-                    icon = EvaIcons.Outline.Flash,
-                    value = (game?.getNumMoves() ?: 0).toString(),
-                    tooltipText = stringResource(R.string.moves_tracking_label)
-                )
-                StatBadge(
-                    icon = EvaIcons.Outline.Layers,
-                    value = "${game?.numPairsFound ?: 0}/${boardSize.getNumPairs()}",
-                    tooltipText = stringResource(R.string.pairs_tracking_label)
-                )
-            }
-        }
-
-        Box(modifier = Modifier.weight(1f)) {
-            if (game != null) {
-                MemoryBoard(
-                    boardSize = boardSize,
-                    cards = game.cards,
-                    isTwoPlayerMode = true,
-                    onCardClicked = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onCardClicked(it)
-                    }
-                )
+            PlayerStatsHeader(playerNumber, game, boardSize, timeSeconds)
+        } else {
+            PlayerStatsHeader(playerNumber, game, boardSize, timeSeconds)
+            Box(modifier = Modifier.weight(1f)) {
+                if (game != null) {
+                    MemoryBoard(
+                        boardSize = boardSize,
+                        cards = game.cards,
+                        isTwoPlayerMode = true,
+                        onCardClicked = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onCardClicked(it)
+                        },
+                        isTablet = isTablet,
+                        isLandscape = isLandscape
+                    )
+                }
             }
         }
     }
@@ -615,9 +976,7 @@ private fun WinDialog(
             else stringResource(R.string.winner_player_n, winner)
         } else if (isSmoothWin) stringResource(R.string.perfect_win)
         else stringResource(R.string.game_finished),
-        icon = if (winner != null) EvaIcons.Outline.Award
-        else if (isSmoothWin) EvaIcons.Outline.Award
-        else EvaIcons.Outline.SmilingFace
+        icon = if (winner != null || isSmoothWin) EvaIcons.Outline.Award else EvaIcons.Outline.SmilingFace
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (winner != null) {
@@ -635,16 +994,13 @@ private fun WinDialog(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
                     text = stringResource(R.string.play) + ": ${formatDuration(timeSeconds)}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
-
                 if (bestTime != null && timeSeconds <= bestTime) {
                     Text(
                         text = stringResource(R.string.current_record_info),
@@ -661,7 +1017,6 @@ private fun WinDialog(
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(32.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -671,16 +1026,12 @@ private fun WinDialog(
                 onClick = onDismiss,
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(stringResource(R.string.close))
-            }
+            ) { Text(stringResource(R.string.close)) }
             Button(
                 onClick = { onPlayAgain() },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(16.dp)
-            ) {
-                Text(stringResource(R.string.play_again), fontWeight = FontWeight.Bold)
-            }
+            ) { Text(stringResource(R.string.play_again), fontWeight = FontWeight.Bold) }
         }
     }
 }
@@ -695,12 +1046,14 @@ private fun BoardSizeDialog(
     onAnchorPositioned: ((String, Rect) -> Unit)? = null,
     onAnchorRemoved: ((String) -> Unit)? = null,
     onSizeSelected: (BoardSize) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isTablet: Boolean = false
 ) {
     AppDialog(
         onDismissRequest = onDismiss,
         title = title,
-        icon = icon
+        icon = icon,
+        modifier = if (isTablet) Modifier.fillMaxWidth(0.6f) else Modifier.fillMaxWidth(0.9f)
     ) {
         val scrollState = rememberScrollState()
         Column(
@@ -726,7 +1079,7 @@ private fun BoardSizeDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = EvaIcons.Outline.Person,
+                            EvaIcons.Outline.Person,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -741,13 +1094,11 @@ private fun BoardSizeDialog(
                             checked = isTwoPlayerMode,
                             onCheckedChange = onToggleTwoPlayerMode,
                             modifier = Modifier.then(
-                                if (onAnchorPositioned != null) {
-                                    Modifier.tutorialAnchor(
-                                        "race_toggle",
-                                        onAnchorPositioned,
-                                        onAnchorRemoved
-                                    )
-                                } else Modifier
+                                if (onAnchorPositioned != null) Modifier.tutorialAnchor(
+                                    "race_toggle",
+                                    onAnchorPositioned,
+                                    onAnchorRemoved
+                                ) else Modifier
                             ),
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
@@ -824,7 +1175,7 @@ private fun BoardSizeDialog(
                         }
                         if (isSelected) {
                             Icon(
-                                imageVector = EvaIcons.Outline.CheckmarkCircle2,
+                                EvaIcons.Outline.CheckmarkCircle2,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
@@ -835,10 +1186,7 @@ private fun BoardSizeDialog(
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
-        TextButton(
-            onClick = onDismiss,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
+        TextButton(onClick = onDismiss, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(
                 stringResource(R.string.maybe_later),
                 fontWeight = FontWeight.Bold,

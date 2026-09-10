@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
@@ -35,7 +36,9 @@ fun MemoryBoard(
     cards: List<MemoryCard>,
     onCardClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    isTwoPlayerMode: Boolean = false
+    isTwoPlayerMode: Boolean = false,
+    isTablet: Boolean = false,
+    isLandscape: Boolean = false
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -46,15 +49,53 @@ fun MemoryBoard(
         val maxWidth = this.maxWidth
         val maxHeight = this.maxHeight
 
-        // Use pre-defined dimensions for consistency
-        val columns = remember(boardSize, isTwoPlayerMode) { boardSize.getWidth(isTwoPlayerMode) }
-        val rows = remember(boardSize, isTwoPlayerMode) { boardSize.getHeight(isTwoPlayerMode) }
+        // Dynamic Grid Engine: Find the (cols, rows) that results in the largest card size
+        val gridDimens = remember(boardSize, maxWidth, maxHeight, isTwoPlayerMode) {
+            val possibleGrids = boardSize.getPossibleGrids()
+            var bestCols = 1
+            var bestRows = boardSize.numCards
+            var maxCardSize = 0.dp
 
-        // Calculate card size once per size change
+            for (grid in possibleGrids) {
+                val cols = grid.first
+                val rows = grid.second
+
+                // For 2-player mode split, we generally want more rows than columns
+                // if we are splitting horizontally, or vice-versa. 
+                // But maximizing card size is usually a good proxy for "fitting well".
+
+                val cardWidth = maxWidth / cols
+                val cardHeight = maxHeight / rows
+                val size = if (cardWidth < cardHeight) cardWidth else cardHeight
+
+                if (size > maxCardSize) {
+                    maxCardSize = size
+                    bestCols = cols
+                    bestRows = rows
+                } else if (size == maxCardSize) {
+                    // Tie-breaker: Prefer layouts closer to the screen aspect ratio
+                    val screenRatio = maxWidth / maxHeight
+                    val currentGridRatio = bestCols.toFloat() / bestRows
+                    val newGridRatio = cols.toFloat() / rows
+
+                    if (Math.abs(newGridRatio - screenRatio) < Math.abs(currentGridRatio - screenRatio)) {
+                        bestCols = cols
+                        bestRows = rows
+                    }
+                }
+            }
+            bestCols to bestRows
+        }
+
+        val columns = gridDimens.first
+        val rows = gridDimens.second
+
         val bestCardSize = remember(maxWidth, maxHeight, columns, rows) {
             val cardWidth = maxWidth / columns
             val cardHeight = maxHeight / rows
-            if (cardWidth < cardHeight) cardWidth else cardHeight
+            val size = if (cardWidth < cardHeight) cardWidth else cardHeight
+            // Cap card size to prevent oversized grids on large tablets
+            if (size > 180.dp) 180.dp else size
         }
 
         // Entry animation control
@@ -65,7 +106,6 @@ fun MemoryBoard(
             isVisible = true
         }
 
-        // 1. Performance Fix: Using LazyVerticalGrid for efficient layout management
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             modifier = Modifier
@@ -73,15 +113,13 @@ fun MemoryBoard(
                 .height(bestCardSize * rows),
             verticalArrangement = Arrangement.Center,
             horizontalArrangement = Arrangement.Center,
-            userScrollEnabled = false // Keep it static as a memory board
+            userScrollEnabled = false
         ) {
             itemsIndexed(
                 items = cards,
-                // 2. Performance Fix: Providing stable keys prevents unnecessary item replacement
                 key = { index, _ -> "${boardSize.name}_$index" }
             ) { index, card ->
 
-                // Entry animation state
                 val entryScale by animateFloatAsState(
                     targetValue = if (isVisible) 1f else 0f,
                     animationSpec = tween(

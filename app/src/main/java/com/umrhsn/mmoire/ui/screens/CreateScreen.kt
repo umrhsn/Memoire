@@ -23,11 +23,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +43,8 @@ import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,8 +62,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -91,6 +91,7 @@ import compose.icons.evaicons.outline.Save
 @Composable
 fun CreateScreen(
     viewModel: CreateViewModel,
+    windowSizeClass: WindowSizeClass,
     boardSize: BoardSize,
     chosenImageUris: List<Uri>,
     modifier: Modifier = Modifier,
@@ -105,6 +106,9 @@ fun CreateScreen(
     var gameName by remember { mutableStateOf(oldName ?: "") }
     val numImagesRequired = boardSize.getNumPairs()
     val context = LocalContext.current
+
+    val isTablet = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val gridColumns = if (isTablet) 4 else 3
 
     Box(
         modifier = modifier
@@ -126,196 +130,137 @@ fun CreateScreen(
                 }
             )
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
-            ) {
-                // Step 1
-                SectionHeader(
-                    icon = EvaIcons.Outline.Image,
-                    title = stringResource(R.string.step_1_title),
-                    subtitle = pluralStringResource(
-                        R.plurals.step_1_subtitle_plural,
-                        numImagesRequired,
-                        numImagesRequired
-                    )
-                )
-
-                // Selection Progress Bar
-                val selectionProgress = chosenImageUris.size.toFloat() / numImagesRequired
-                LinearProgressIndicator(
-                    progress = { selectionProgress },
+            if (isTablet) {
+                // Tablet Layout: Horizontal Split
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = dimensionResource(R.dimen.spacing_small))
-                        .height(10.dp)
-                        .clip(CircleShape),
-                    strokeCap = StrokeCap.Round,
-                    color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-
-                // Grid Area - Fixed Grid for creation
-                Box(modifier = Modifier.weight(1f)) {
-                    if (chosenImageUris.isEmpty() && !uiState.isLoading) {
-                        EmptySelectionState(
-                            onClick = onPlaceholderClicked,
-                            onSoundClick = { viewModel.playButtonClick() }
+                        .weight(1f)
+                        .padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(32.dp)
+                ) {
+                    // Left Side: Grid
+                    Column(modifier = Modifier.weight(1.5f)) {
+                        SectionHeader(
+                            icon = EvaIcons.Outline.Image,
+                            title = stringResource(R.string.step_1_title),
+                            subtitle = pluralStringResource(
+                                R.plurals.step_1_subtitle_plural,
+                                numImagesRequired,
+                                numImagesRequired
+                            )
                         )
-                    } else if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    } else {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(3),
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            itemsIndexed(chosenImageUris) { index, uri ->
-                                ImageItem(
-                                    uri = uri,
-                                    onClick = { onImageClicked(index) },
-                                    onRemove = { onRemoveImage(uri) }
-                                )
-                            }
-                            if (chosenImageUris.size < numImagesRequired) {
-                                item {
-                                    PlaceholderItem(onClick = onPlaceholderClicked)
-                                }
-                            }
+
+                        SelectionProgressBar(chosenImageUris.size, numImagesRequired)
+
+                        Box(modifier = Modifier.weight(1f)) {
+                            ImageGrid(
+                                chosenImageUris = chosenImageUris,
+                                numImagesRequired = numImagesRequired,
+                                gridColumns = gridColumns,
+                                isLoading = uiState.isLoading,
+                                onPlaceholderClicked = onPlaceholderClicked,
+                                onImageClicked = onImageClicked,
+                                onRemoveImage = onRemoveImage,
+                                playButtonClick = viewModel::playButtonClick
+                            )
                         }
+                    }
+
+                    // Right Side: Controls
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(top = 24.dp)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        SectionHeader(
+                            icon = EvaIcons.Outline.Edit,
+                            title = stringResource(R.string.step_2_title),
+                            subtitle = stringResource(R.string.step_2_subtitle)
+                        )
+
+                        CreateControls(
+                            gameName = gameName,
+                            onNameChange = { gameName = it },
+                            isUploading = uiState.isUploading,
+                            uploadProgress = uiState.uploadProgress,
+                            numChosen = chosenImageUris.size,
+                            numRequired = numImagesRequired,
+                            isEdit = oldName != null,
+                            onSaveClicked = { onSaveClicked(gameName.trim()) }
+                        )
                     }
                 }
-
-                // Step 2
-                SectionHeader(
-                    icon = EvaIcons.Outline.Edit,
-                    title = stringResource(R.string.step_2_title),
-                    subtitle = stringResource(R.string.step_2_subtitle)
-                )
-
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-            }
-
-            // Bottom Control Section
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(
-                    topStart = dimensionResource(R.dimen.spacing_extra_large),
-                    topEnd = dimensionResource(R.dimen.spacing_extra_large)
-                ),
-                shadowElevation = 32.dp,
-                tonalElevation = 8.dp
-            ) {
+            } else {
+                // Mobile Layout: Existing Vertical Flow
                 Column(
                     modifier = Modifier
-                        .padding(dimensionResource(R.dimen.spacing_large))
-                        .navigationBarsPadding()
+                        .weight(1f)
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
                 ) {
-                    OutlinedTextField(
-                        value = gameName,
-                        onValueChange = { input ->
-                            if (input.length <= 24) { // Increased from 14
-                                gameName = input
-                            }
-                        },
-                        label = { Text(stringResource(R.string.board_identity_label)) },
-                        placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        enabled = !uiState.isUploading,
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                        colors = getAppTextFieldColors(),
-                        leadingIcon = {
-                            Icon(
-                                EvaIcons.Outline.Flash,
-                                contentDescription = null
-                            )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words,
-                            autoCorrectEnabled = true,
-                            keyboardType = KeyboardType.Text
+                    SectionHeader(
+                        icon = EvaIcons.Outline.Image,
+                        title = stringResource(R.string.step_1_title),
+                        subtitle = pluralStringResource(
+                            R.plurals.step_1_subtitle_plural,
+                            numImagesRequired,
+                            numImagesRequired
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                    SelectionProgressBar(chosenImageUris.size, numImagesRequired)
 
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
-                            positioning = TooltipAnchorPosition.Above
-                        ),
-                        tooltip = {
-                            PlainTooltip {
-                                Text(
-                                    if (chosenImageUris.size < numImagesRequired)
-                                        stringResource(R.string.select_all_photos)
-                                    else stringResource(R.string.finalize_board)
-                                )
-                            }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        Button(
-                            onClick = { onSaveClicked(gameName.trim()) }, // Added trim()
-                            modifier = Modifier
-                                .height(dimensionResource(R.dimen.button_height_large))
-                                .fillMaxWidth(),
-                            enabled = chosenImageUris.size == numImagesRequired &&
-                                    gameName.isNotBlank() &&
-                                    gameName.length >= 3 &&
-                                    !uiState.isUploading,
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
-                        ) {
-                            if (uiState.isUploading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(dimensionResource(R.dimen.spacing_large)),
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    strokeWidth = 3.dp
-                                )
-                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                Text(
-                                    stringResource(R.string.saving_board),
-                                    fontWeight = FontWeight.Black
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = if (oldName != null) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
-                                    contentDescription = null
-                                )
-                                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.radius_medium)))
-                                Text(
-                                    text = if (oldName != null) stringResource(R.string.update_and_play) else stringResource(
-                                        R.string.create_and_play
-                                    ),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold
-                                )
-                            }
-                        }
+                    Box(modifier = Modifier.weight(1f)) {
+                        ImageGrid(
+                            chosenImageUris = chosenImageUris,
+                            numImagesRequired = numImagesRequired,
+                            gridColumns = gridColumns,
+                            isLoading = uiState.isLoading,
+                            onPlaceholderClicked = onPlaceholderClicked,
+                            onImageClicked = onImageClicked,
+                            onRemoveImage = onRemoveImage,
+                            playButtonClick = viewModel::playButtonClick
+                        )
                     }
 
-                    if (uiState.isUploading) {
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                        LinearProgressIndicator(
-                            progress = { uiState.uploadProgress / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(CircleShape),
-                            strokeCap = StrokeCap.Round,
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                    SectionHeader(
+                        icon = EvaIcons.Outline.Edit,
+                        title = stringResource(R.string.step_2_title),
+                        subtitle = stringResource(R.string.step_2_subtitle)
+                    )
+
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+                    shadowElevation = 32.dp,
+                    tonalElevation = 8.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(dimensionResource(R.dimen.spacing_large))
+                            .navigationBarsPadding()
+                    ) {
+                        CreateControls(
+                            gameName = gameName,
+                            onNameChange = { gameName = it },
+                            isUploading = uiState.isUploading,
+                            uploadProgress = uiState.uploadProgress,
+                            numChosen = chosenImageUris.size,
+                            numRequired = numImagesRequired,
+                            isEdit = oldName != null,
+                            onSaveClicked = { onSaveClicked(gameName.trim()) }
                         )
                     }
                 }
             }
         }
 
-        // Success Dialog
+        // Dialogs...
         if (uiState.isSuccess) {
             AppDialog(
                 onDismissRequest = {},
@@ -328,24 +273,19 @@ fun CreateScreen(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-                Button(
-                    onClick = {
-                        val activity = context as? Activity
-                        val resultData = Intent()
-                        resultData.putExtra(EXTRA_GAME_NAME, uiState.gameName)
-                        activity?.setResult(Activity.RESULT_OK, resultData)
-                        activity?.finish()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
-                ) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(onClick = {
+                    val activity = context as? Activity
+                    val resultData = Intent()
+                    resultData.putExtra(EXTRA_GAME_NAME, uiState.gameName)
+                    activity?.setResult(Activity.RESULT_OK, resultData)
+                    activity?.finish()
+                }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                     Text(stringResource(R.string.start_game), fontWeight = FontWeight.Bold)
                 }
             }
         }
 
-        // Name Taken Dialog
         if (uiState.nameTaken) {
             AppDialog(
                 onDismissRequest = { viewModel.resetState() },
@@ -358,15 +298,140 @@ fun CreateScreen(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = { viewModel.resetState() },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(stringResource(R.string.change_name_action))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SelectionProgressBar(chosenCount: Int, requiredCount: Int) {
+    val selectionProgress = chosenCount.toFloat() / requiredCount
+    LinearProgressIndicator(
+        progress = { selectionProgress },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+            .height(10.dp)
+            .clip(CircleShape),
+        strokeCap = StrokeCap.Round,
+        color = if (selectionProgress >= 1f) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+        trackColor = MaterialTheme.colorScheme.surfaceVariant
+    )
+}
+
+@Composable
+private fun ImageGrid(
+    chosenImageUris: List<Uri>,
+    numImagesRequired: Int,
+    gridColumns: Int,
+    isLoading: Boolean,
+    onPlaceholderClicked: () -> Unit,
+    onImageClicked: (Int) -> Unit,
+    onRemoveImage: (Uri) -> Unit,
+    playButtonClick: () -> Unit
+) {
+    if (chosenImageUris.isEmpty() && !isLoading) {
+        EmptySelectionState(onClick = onPlaceholderClicked, onSoundClick = playButtonClick)
+    } else if (isLoading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(gridColumns),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            itemsIndexed(chosenImageUris) { index, uri ->
+                ImageItem(
+                    uri = uri,
+                    onClick = { onImageClicked(index) },
+                    onRemove = { onRemoveImage(uri) })
+            }
+            if (chosenImageUris.size < numImagesRequired) {
+                item { PlaceholderItem(onClick = onPlaceholderClicked) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CreateControls(
+    gameName: String,
+    onNameChange: (String) -> Unit,
+    isUploading: Boolean,
+    uploadProgress: Int,
+    numChosen: Int,
+    numRequired: Int,
+    isEdit: Boolean,
+    onSaveClicked: () -> Unit
+) {
+    Column {
+        OutlinedTextField(
+            value = gameName,
+            onValueChange = { if (it.length <= 24) onNameChange(it) },
+            label = { Text(stringResource(R.string.board_identity_label)) },
+            placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            enabled = !isUploading,
+            shape = RoundedCornerShape(16.dp),
+            colors = getAppTextFieldColors(),
+            leadingIcon = { Icon(EvaIcons.Outline.Flash, contentDescription = null) }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onSaveClicked,
+            modifier = Modifier
+                .height(56.dp)
+                .fillMaxWidth(),
+            enabled = numChosen == numRequired && gameName.isNotBlank() && gameName.length >= 3 && !isUploading,
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            if (isUploading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 3.dp
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(stringResource(R.string.saving_board), fontWeight = FontWeight.Black)
+            } else {
+                Icon(
+                    if (isEdit) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = if (isEdit) stringResource(R.string.update_and_play) else stringResource(
+                        R.string.create_and_play
+                    ), fontWeight = FontWeight.ExtraBold
+                )
+            }
+        }
+
+        if (isUploading) {
+            Spacer(modifier = Modifier.height(16.dp))
+            LinearProgressIndicator(
+                progress = { uploadProgress / 100f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(CircleShape),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+            )
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.umrhsn.mmoire.ui.screens
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,8 +55,10 @@ import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.ui.theme.BluePrimary
 import com.umrhsn.mmoire.ui.theme.GreenPrimary
 import com.umrhsn.mmoire.ui.theme.MemoirePrimary
+import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.ui.theme.OrangePrimary
 import com.umrhsn.mmoire.ui.theme.RedPrimary
+import com.umrhsn.mmoire.viewmodels.SettingsUiState
 import com.umrhsn.mmoire.viewmodels.SettingsViewModel
 import compose.icons.EvaIcons
 import compose.icons.evaicons.Outline
@@ -72,200 +78,265 @@ import compose.icons.evaicons.outline.VolumeUp
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
+    windowSizeClass: WindowSizeClass,
     onBackClicked: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    val isTablet = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+
+    MemoireTheme(
+        appTheme = uiState.currentTheme,
+        appColorTheme = uiState.currentColorTheme,
+        isTintEnabled = uiState.isTintEnabled
     ) {
-        AppHeader(
-            title = stringResource(R.string.app_settings),
-            navigationIcon = {
-                AppHeaderIcon(
-                    icon = EvaIcons.Outline.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    onClick = onBackClicked
-                )
-            }
-        )
-
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 20.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            AppHeader(
+                title = stringResource(R.string.app_settings),
+                navigationIcon = {
+                    AppHeaderIcon(
+                        icon = EvaIcons.Outline.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        onClick = onBackClicked
+                    )
+                }
+            )
 
-            // Audio Section
-            SettingsCategory(
-                title = stringResource(R.string.audio_settings),
-                icon = EvaIcons.Outline.Music
-            ) {
-                SettingsToggle(
-                    title = stringResource(R.string.sound_enabled),
-                    checked = uiState.currentSoundEnabled,
-                    onCheckedChange = { viewModel.toggleSound(it) },
-                    icon = if (uiState.currentSoundEnabled) EvaIcons.Outline.VolumeUp else EvaIcons.Outline.VolumeOff
-                )
-            }
-
-            // Personalization Section (Visuals)
-            SettingsCategory(
-                title = stringResource(R.string.personalization),
-                icon = EvaIcons.Outline.ColorPalette
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    // Theme Mode Sub-section
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            text = stringResource(R.string.theme),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-
-                        val themes = listOf(
-                            AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
-                            AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
-                            AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
-                        )
-
-                        themes.forEach { (themeData, icon) ->
-                            val (theme, label) = themeData
-                            SettingsOption(
-                                label = label,
-                                selected = uiState.currentTheme == theme,
-                                onClick = { viewModel.updateTheme(theme) },
-                                icon = icon
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (isTablet) {
+                    // Tablet Layout: Two columns
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(32.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ) {
+                            AudioSection(uiState.currentSoundEnabled, viewModel::toggleSound)
+                            LanguageSection(
+                                uiState.currentLanguage,
+                                viewModel.isLanguageSelected(uiState.currentLanguage),
+                                viewModel::updateLanguage
                             )
                         }
-                    }
 
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                    )
-
-                    // Color Palette Sub-section
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(
-                            text = stringResource(R.string.color_theme),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .weight(1.2f)
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
                         ) {
-                            val colorThemes = listOf(
-                                AppColorTheme.DEFAULT to MemoirePrimary,
-                                AppColorTheme.RED to RedPrimary,
-                                AppColorTheme.BLUE to BluePrimary,
-                                AppColorTheme.GREEN to GreenPrimary,
-                                AppColorTheme.ORANGE to OrangePrimary
-                            )
+                            PersonalizationSection(uiState, viewModel)
+                        }
+                    }
+                } else {
+                    // Mobile Layout: Single column scrollable
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp)
+                            .verticalScroll(scrollState),
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        AudioSection(uiState.currentSoundEnabled, viewModel::toggleSound)
+                        PersonalizationSection(uiState, viewModel)
+                        LanguageSection(
+                            uiState.currentLanguage,
+                            viewModel.isLanguageSelected(uiState.currentLanguage),
+                            viewModel::updateLanguage
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+                }
 
-                            colorThemes.forEach { (theme, color) ->
-                                ColorThemeCircle(
-                                    color = color,
-                                    selected = uiState.currentColorTheme == theme,
-                                    onClick = { viewModel.updateColorTheme(theme) }
+                if (uiState.showRestartDialog) {
+                    AppDialog(
+                        onDismissRequest = { viewModel.dismissRestartDialog() },
+                        title = stringResource(R.string.restart_required_title),
+                        icon = EvaIcons.Outline.Refresh
+                    ) {
+                        Text(
+                            text = stringResource(R.string.restart_required_message),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { viewModel.dismissRestartDialog() },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                            Button(
+                                onClick = {
+                                    viewModel.confirmLanguageChange()
+                                    (context as? ComponentActivity)?.recreate()
+                                },
+                                modifier = Modifier.weight(1.5f),
+                                shape = RoundedCornerShape(16.dp)
+                            ) {
+                                Text(
+                                    stringResource(R.string.restart_now),
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
 
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
-                    )
+@Composable
+private fun AudioSection(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    SettingsCategory(
+        title = stringResource(R.string.audio_settings),
+        icon = EvaIcons.Outline.Music
+    ) {
+        SettingsToggle(
+            title = stringResource(R.string.sound_enabled),
+            checked = enabled,
+            onCheckedChange = onToggle,
+            icon = if (enabled) EvaIcons.Outline.VolumeUp else EvaIcons.Outline.VolumeOff
+        )
+    }
+}
 
-                    // Tint Toggle Sub-section
-                    SettingsToggle(
-                        title = stringResource(R.string.background_tint),
-                        checked = uiState.isTintEnabled,
-                        onCheckedChange = { viewModel.toggleBackgroundTint(it) },
-                        icon = EvaIcons.Outline.Flash
+@Composable
+private fun PersonalizationSection(uiState: SettingsUiState, viewModel: SettingsViewModel) {
+    SettingsCategory(
+        title = stringResource(R.string.personalization),
+        icon = EvaIcons.Outline.ColorPalette
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.theme),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                val themes = listOf(
+                    AppTheme.SYSTEM to stringResource(R.string.theme_system) to EvaIcons.Outline.Layout,
+                    AppTheme.LIGHT to stringResource(R.string.theme_light) to EvaIcons.Outline.Sun,
+                    AppTheme.DARK to stringResource(R.string.theme_dark) to EvaIcons.Outline.Moon
+                )
+
+                themes.forEach { (themeData, icon) ->
+                    val (theme, label) = themeData
+                    SettingsOption(
+                        label = label,
+                        selected = uiState.currentTheme == theme,
+                        onClick = { viewModel.updateTheme(theme) },
+                        icon = icon
                     )
                 }
             }
 
-            // Language Section
-            SettingsCategory(
-                title = stringResource(R.string.language),
-                icon = EvaIcons.Outline.Globe2
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val languages = listOf(
-                        null to stringResource(R.string.lang_system) to "🌐",
-                        "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
-                        "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
-                        "en" to stringResource(R.string.lang_en) to "🇺🇸",
-                        "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
-                        "de" to stringResource(R.string.lang_de) to "🇩🇪",
-                        "es" to stringResource(R.string.lang_es) to "🇪🇸"
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = stringResource(R.string.color_theme),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val colorThemes = listOf(
+                        AppColorTheme.DEFAULT to MemoirePrimary,
+                        AppColorTheme.RED to RedPrimary,
+                        AppColorTheme.BLUE to BluePrimary,
+                        AppColorTheme.GREEN to GreenPrimary,
+                        AppColorTheme.ORANGE to OrangePrimary
                     )
 
-                    languages.forEach { (langData, emoji) ->
-                        val (tag, label) = langData
-                        SettingsOption(
-                            label = label,
-                            selected = viewModel.isLanguageSelected(tag),
-                            onClick = { viewModel.updateLanguage(tag) },
-                            emoji = emoji
+                    colorThemes.forEach { (theme, color) ->
+                        ColorThemeCircle(
+                            color = color,
+                            selected = uiState.currentColorTheme == theme,
+                            onClick = { viewModel.updateColorTheme(theme) }
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-        }
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+            )
 
-        if (uiState.showRestartDialog) {
-            AppDialog(
-                onDismissRequest = { viewModel.dismissRestartDialog() },
-                title = stringResource(R.string.restart_required_title),
-                icon = EvaIcons.Outline.Refresh
-            ) {
-                Text(
-                    text = stringResource(R.string.restart_required_message),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface
+            SettingsToggle(
+                title = stringResource(R.string.background_tint),
+                checked = uiState.isTintEnabled,
+                onCheckedChange = { viewModel.toggleBackgroundTint(it) },
+                icon = EvaIcons.Outline.Flash
+            )
+        }
+    }
+}
+
+@Composable
+private fun LanguageSection(
+    currentLanguage: String?,
+    isSelected: Boolean,
+    onUpdate: (String?) -> Unit
+) {
+    SettingsCategory(
+        title = stringResource(R.string.language),
+        icon = EvaIcons.Outline.Globe2
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            val languages = listOf(
+                null to stringResource(R.string.lang_system) to "🌐",
+                "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
+                "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
+                "en" to stringResource(R.string.lang_en) to "🇺🇸",
+                "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
+                "de" to stringResource(R.string.lang_de) to "🇩🇪",
+                "es" to stringResource(R.string.lang_es) to "🇪🇸"
+            )
+
+            languages.forEach { (langData, emoji) ->
+                val (tag, label) = langData
+                SettingsOption(
+                    label = label,
+                    selected = currentLanguage == tag,
+                    onClick = { onUpdate(tag) },
+                    emoji = emoji
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.dismissRestartDialog() },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                    Button(
-                        onClick = { viewModel.confirmLanguageChange() },
-                        modifier = Modifier.weight(1.5f),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text(stringResource(R.string.restart_now), fontWeight = FontWeight.Bold)
-                    }
-                }
             }
         }
     }

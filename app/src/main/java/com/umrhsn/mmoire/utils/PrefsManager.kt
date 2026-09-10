@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
+import com.umrhsn.mmoire.models.TwoPlayerLayout
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +28,9 @@ class PrefsManager @Inject constructor(
 
     private val _tintFlow = MutableStateFlow(isBackgroundTintEnabled())
     val tintFlow: StateFlow<Boolean> = _tintFlow.asStateFlow()
+
+    private val _twoPlayerLayoutFlow = MutableStateFlow(getTwoPlayerLayoutInternal())
+    val twoPlayerLayoutFlow: StateFlow<TwoPlayerLayout> = _twoPlayerLayoutFlow.asStateFlow()
 
     private val _localeFlow = MutableStateFlow(getLanguage())
     val localeFlow: StateFlow<String?> = _localeFlow.asStateFlow()
@@ -99,5 +103,23 @@ class PrefsManager @Inject constructor(
     fun setBackgroundTintEnabled(enabled: Boolean) {
         prefs.edit { putBoolean("bg_tint_enabled", enabled) }
         _tintFlow.value = enabled
+    }
+
+    fun getTwoPlayerLayout(): TwoPlayerLayout {
+        return _twoPlayerLayoutFlow.value
+    }
+
+    private fun getTwoPlayerLayoutInternal(): TwoPlayerLayout {
+        val name = prefs.getString("two_player_layout", TwoPlayerLayout.FACE_TO_FACE.name)
+        return try {
+            TwoPlayerLayout.valueOf(name ?: TwoPlayerLayout.FACE_TO_FACE.name)
+        } catch (e: Exception) {
+            TwoPlayerLayout.FACE_TO_FACE
+        }
+    }
+
+    fun setTwoPlayerLayout(layout: TwoPlayerLayout) {
+        prefs.edit { putString("two_player_layout", layout.name) }
+        _twoPlayerLayoutFlow.value = layout
     }
 }

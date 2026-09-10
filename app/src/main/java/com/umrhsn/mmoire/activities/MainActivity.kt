@@ -11,6 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.refreshSettings()
     }
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate: current locale=${resources.configuration.locale}")
         enableEdgeToEdge()
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val windowSizeClass = calculateWindowSizeClass(this)
 
             MemoireTheme(
                 appTheme = uiState.appTheme,
@@ -57,6 +61,7 @@ class MainActivity : AppCompatActivity() {
                 key(uiState.appLanguage) {
                     MainScreen(
                         viewModel = viewModel,
+                        windowSizeClass = windowSizeClass,
                         onCreateClicked = { desiredSize ->
                             val intent = Intent(this, CreateActivity::class.java).putExtra(
                                 EXTRA_BOARD_SIZE,

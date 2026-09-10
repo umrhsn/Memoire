@@ -17,11 +17,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,6 +35,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -84,6 +84,7 @@ import compose.icons.evaicons.outline.Trash2
 @Composable
 fun BrowseScreen(
     viewModel: BrowseViewModel,
+    windowSizeClass: WindowSizeClass,
     onBackClicked: () -> Unit,
     onGameSelected: (String) -> Unit,
     onEditSelected: (String) -> Unit
@@ -91,6 +92,12 @@ fun BrowseScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var previewGame by remember { mutableStateOf<UserImageListWithId?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
+
+    val columns = when (windowSizeClass.widthSizeClass) {
+        WindowWidthSizeClass.Compact -> 1
+        WindowWidthSizeClass.Medium -> 2
+        else -> 3
+    }
 
     Scaffold(
         topBar = {
@@ -226,10 +233,17 @@ fun BrowseScreen(
             } else if (uiState.filteredGames.isEmpty()) {
                 EmptyState(modifier = Modifier.align(Alignment.Center))
             } else {
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(columns),
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(
+                        start = 8.dp,
+                        top = 0.dp,
+                        end = 8.dp,
+                        bottom = 16.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(uiState.filteredGames) { game ->
                         GameItem(

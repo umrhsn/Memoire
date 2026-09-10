@@ -8,6 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.ui.screens.BrowseScreen
@@ -31,7 +34,6 @@ class BrowseActivity : ComponentActivity() {
             if (result.resultCode == RESULT_OK) {
                 val gameName = result.data?.getStringExtra(EXTRA_GAME_NAME)
                 if (gameName != null) {
-                    // If the game was edited/renamed, we might want to return that to MainActivity
                     val resultData = Intent()
                     resultData.putExtra(EXTRA_GAME_NAME, gameName)
                     setResult(RESULT_OK, resultData)
@@ -42,12 +44,14 @@ class BrowseActivity : ComponentActivity() {
             }
         }
 
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val windowSizeClass = calculateWindowSizeClass(this)
 
             MemoireTheme(
                 appTheme = uiState.appTheme,
@@ -56,6 +60,7 @@ class BrowseActivity : ComponentActivity() {
             ) {
                 BrowseScreen(
                     viewModel = viewModel,
+                    windowSizeClass = windowSizeClass,
                     onBackClicked = { finish() },
                     onGameSelected = { gameName ->
                         val resultData = Intent()
