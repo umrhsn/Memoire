@@ -287,6 +287,8 @@ fun MainScreen(
                     uiState = uiState,
                     haptic = haptic,
                     viewModel = viewModel,
+                    isTablet = isTablet,
+                    isLandscape = isLandscape,
                     onBrowseClicked = onBrowseClicked,
                     onSettingsClicked = onSettingsClicked,
                     showSizeDialog = { showSizeDialog = true },
@@ -424,9 +426,13 @@ private fun TwoPlayerLayoutSwitcher(
                     .weight(1f)
                     .fillMaxWidth()
                     .graphicsLayer {
-                        rotationZ = when (layout) {
-                            TwoPlayerLayout.SIDE_BY_SIDE -> 0f
-                            else -> 180f
+                        rotationZ = if (isTablet) {
+                            180f
+                        } else {
+                            when (layout) {
+                                TwoPlayerLayout.SIDE_BY_SIDE -> 0f
+                                else -> 180f
+                            }
                         }
                     }
             ) {
@@ -438,7 +444,8 @@ private fun TwoPlayerLayoutSwitcher(
                     onCardClicked = { onCardClicked(it, 1) },
                     isTablet = isTablet,
                     isLandscape = isLandscape,
-                    statsAtBottom = false // Header at top of column. 180 rot -> at Divider.
+                    statsAtBottom = false,
+                    useCompactHeader = true
                 )
             }
             HorizontalDivider(
@@ -460,7 +467,7 @@ private fun TwoPlayerLayoutSwitcher(
                     onCardClicked = { onCardClicked(it, 2) },
                     isTablet = isTablet,
                     isLandscape = isLandscape,
-                    statsAtBottom = false // Header at top of column (Divider).
+                    statsAtBottom = false
                 )
             }
         }
@@ -547,9 +554,10 @@ private fun TwoPlayerLayoutSwitcher(
 
                     TwoPlayerLayout.OPPOSITE -> {
                         // Opposite mode rotates the entire right slot by 180 deg
-                        Box(modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer { rotationZ = 180f }) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer { rotationZ = 180f }) {
                             PlayerRaceHalf(
                                 playerNumber = 2,
                                 game = uiState.memoryGameP2,
@@ -587,6 +595,8 @@ private fun MainHeader(
     uiState: MainUiState,
     haptic: HapticFeedback,
     viewModel: MainViewModel,
+    isTablet: Boolean,
+    isLandscape: Boolean,
     onBrowseClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
     showSizeDialog: () -> Unit,
@@ -597,7 +607,7 @@ private fun MainHeader(
     AppHeader(
         title = uiState.gameName ?: stringResource(R.string.app_name),
         actions = {
-            if (uiState.isTwoPlayerMode) {
+            if (uiState.isTwoPlayerMode && !(isTablet && !isLandscape)) {
                 // Layout Toggle for 2-player mode
                 AppHeaderIcon(
                     icon = when (uiState.twoPlayerLayout) {
