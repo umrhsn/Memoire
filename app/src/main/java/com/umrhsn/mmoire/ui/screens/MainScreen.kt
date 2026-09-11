@@ -413,14 +413,10 @@ private fun TwoPlayerLayoutSwitcher(
     val layout = uiState.twoPlayerLayout
 
     // Split direction based on mode and orientation
-    val isHorizontalSplit = if (isLandscape) {
-        layout == TwoPlayerLayout.OPPOSITE
-    } else {
-        true // Always top-bottom in portrait
-    }
+    val isHorizontalSplit = !isLandscape
 
     if (isHorizontalSplit) {
-        // Mode: OPPOSITE or Portrait split
+        // Mode: Portrait split (Always stacked Top/Bottom)
         Column(modifier = Modifier.fillMaxSize()) {
             // Player 1 Area (Top Slot)
             Box(
@@ -442,7 +438,7 @@ private fun TwoPlayerLayoutSwitcher(
                     onCardClicked = { onCardClicked(it, 1) },
                     isTablet = isTablet,
                     isLandscape = isLandscape,
-                    statsAtBottom = (layout != TwoPlayerLayout.SIDE_BY_SIDE)
+                    statsAtBottom = false // Header at top of column. 180 rot -> at Divider.
                 )
             }
             HorizontalDivider(
@@ -464,51 +460,54 @@ private fun TwoPlayerLayoutSwitcher(
                     onCardClicked = { onCardClicked(it, 2) },
                     isTablet = isTablet,
                     isLandscape = isLandscape,
-                    statsAtBottom = false
+                    statsAtBottom = false // Header at top of column (Divider).
                 )
             }
         }
     } else {
-        // Mode: FACE_TO_FACE or SIDE_BY_SIDE (Landscape vertical split)
+        // Landscape vertical split
         Row(modifier = Modifier.fillMaxSize()) {
             // Player 1 Area (Left Slot)
             Box(modifier = Modifier.weight(1f)) {
-                if (layout == TwoPlayerLayout.FACE_TO_FACE) {
-                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                        val w = this.maxWidth
-                        val h = this.maxHeight
-                        Box(
-                            modifier = Modifier
-                                .size(h, w)
-                                .align(Alignment.Center)
-                                .graphicsLayer {
-                                    rotationZ = 90f
-                                }
-                        ) {
-                            PlayerRaceHalf(
-                                playerNumber = 1,
-                                game = uiState.memoryGameP1,
-                                boardSize = uiState.boardSize,
-                                timeSeconds = uiState.timerSeconds,
-                                onCardClicked = { onCardClicked(it, 1) },
-                                isTablet = isTablet,
-                                isLandscape = true,
-                                statsAtBottom = true // Rotates to center-right
-                            )
+                when (layout) {
+                    TwoPlayerLayout.FACE_TO_FACE -> {
+                        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                            val w = this.maxWidth
+                            val h = this.maxHeight
+                            Box(
+                                modifier = Modifier
+                                    .size(h, w)
+                                    .align(Alignment.Center)
+                                    .graphicsLayer { rotationZ = 90f }
+                            ) {
+                                PlayerRaceHalf(
+                                    playerNumber = 1,
+                                    game = uiState.memoryGameP1,
+                                    boardSize = uiState.boardSize,
+                                    timeSeconds = uiState.timerSeconds,
+                                    onCardClicked = { onCardClicked(it, 1) },
+                                    isTablet = isTablet,
+                                    isLandscape = true,
+                                    statsAtBottom = false, // Top rotates to divider
+                                    useCompactHeader = true
+                                )
+                            }
                         }
                     }
-                } else {
-                    // SIDE_BY_SIDE: No rotation, no constraint swap
-                    PlayerRaceHalf(
-                        playerNumber = 1,
-                        game = uiState.memoryGameP1,
-                        boardSize = uiState.boardSize,
-                        timeSeconds = uiState.timerSeconds,
-                        onCardClicked = { onCardClicked(it, 1) },
-                        isTablet = isTablet,
-                        isLandscape = true,
-                        statsAtBottom = false
-                    )
+
+                    else -> {
+                        // SIDE_BY_SIDE or OPPOSITE
+                        PlayerRaceHalf(
+                            playerNumber = 1,
+                            game = uiState.memoryGameP1,
+                            boardSize = uiState.boardSize,
+                            timeSeconds = uiState.timerSeconds,
+                            onCardClicked = { onCardClicked(it, 1) },
+                            isTablet = isTablet,
+                            isLandscape = true,
+                            statsAtBottom = false
+                        )
+                    }
                 }
             }
 
@@ -520,18 +519,37 @@ private fun TwoPlayerLayoutSwitcher(
 
             // Player 2 Area (Right Slot)
             Box(modifier = Modifier.weight(1f)) {
-                if (layout == TwoPlayerLayout.FACE_TO_FACE) {
-                    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                        val w = this.maxWidth
-                        val h = this.maxHeight
-                        Box(
-                            modifier = Modifier
-                                .size(h, w)
-                                .align(Alignment.Center)
-                                .graphicsLayer {
-                                    rotationZ = -90f
-                                }
-                        ) {
+                when (layout) {
+                    TwoPlayerLayout.FACE_TO_FACE -> {
+                        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                            val w = this.maxWidth
+                            val h = this.maxHeight
+                            Box(
+                                modifier = Modifier
+                                    .size(h, w)
+                                    .align(Alignment.Center)
+                                    .graphicsLayer { rotationZ = -90f }
+                            ) {
+                                PlayerRaceHalf(
+                                    playerNumber = 2,
+                                    game = uiState.memoryGameP2,
+                                    boardSize = uiState.boardSize,
+                                    timeSeconds = uiState.timerSecondsP2,
+                                    onCardClicked = { onCardClicked(it, 2) },
+                                    isTablet = isTablet,
+                                    isLandscape = true,
+                                    statsAtBottom = false, // Top rotates to divider
+                                    useCompactHeader = true
+                                )
+                            }
+                        }
+                    }
+
+                    TwoPlayerLayout.OPPOSITE -> {
+                        // Opposite mode rotates the entire right slot by 180 deg
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer { rotationZ = 180f }) {
                             PlayerRaceHalf(
                                 playerNumber = 2,
                                 game = uiState.memoryGameP2,
@@ -540,22 +558,24 @@ private fun TwoPlayerLayoutSwitcher(
                                 onCardClicked = { onCardClicked(it, 2) },
                                 isTablet = isTablet,
                                 isLandscape = true,
-                                statsAtBottom = false // Rotates to center-left
+                                statsAtBottom = false
                             )
                         }
                     }
-                } else {
-                    // SIDE_BY_SIDE
-                    PlayerRaceHalf(
-                        playerNumber = 2,
-                        game = uiState.memoryGameP2,
-                        boardSize = uiState.boardSize,
-                        timeSeconds = uiState.timerSecondsP2,
-                        onCardClicked = { onCardClicked(it, 2) },
-                        isTablet = isTablet,
-                        isLandscape = true,
-                        statsAtBottom = false
-                    )
+
+                    else -> {
+                        // SIDE_BY_SIDE
+                        PlayerRaceHalf(
+                            playerNumber = 2,
+                            game = uiState.memoryGameP2,
+                            boardSize = uiState.boardSize,
+                            timeSeconds = uiState.timerSecondsP2,
+                            onCardClicked = { onCardClicked(it, 2) },
+                            isTablet = isTablet,
+                            isLandscape = true,
+                            statsAtBottom = false
+                        )
+                    }
                 }
             }
         }
@@ -767,7 +787,7 @@ private fun StatsSection(uiState: MainUiState, isVertical: Boolean) {
             uiState.bestTime?.let {
                 StatItem(
                     icon = EvaIcons.Outline.Award,
-                    label = stringResource(R.string.best_time_tracking_label),
+                    label = "Best Time",
                     value = formatDuration(it),
                     isHighlight = true
                 )
@@ -927,13 +947,18 @@ private fun PlayerStatsHeader(
     playerNumber: Int,
     game: MemoryGame?,
     boardSize: BoardSize,
-    timeSeconds: Long
+    timeSeconds: Long,
+    isCompact: Boolean = false
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = if (isCompact) {
+            Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        } else {
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+        },
+        horizontalArrangement = if (isCompact) Arrangement.spacedBy(16.dp) else Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         PlayerStatsContent(playerNumber, game, boardSize, timeSeconds)
@@ -949,12 +974,22 @@ private fun PlayerRaceHalf(
     onCardClicked: (Int) -> Unit,
     isTablet: Boolean = false,
     isLandscape: Boolean = false,
-    statsAtBottom: Boolean = false
+    statsAtBottom: Boolean = false,
+    useCompactHeader: Boolean = false
 ) {
     val haptic = LocalHapticFeedback.current
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = if (useCompactHeader) Alignment.CenterHorizontally else Alignment.Start
+    ) {
         if (!statsAtBottom) {
-            PlayerStatsHeader(playerNumber, game, boardSize, timeSeconds)
+            PlayerStatsHeader(
+                playerNumber,
+                game,
+                boardSize,
+                timeSeconds,
+                isCompact = useCompactHeader
+            )
         }
 
         Box(modifier = Modifier.weight(1f)) {
@@ -974,7 +1009,13 @@ private fun PlayerRaceHalf(
         }
 
         if (statsAtBottom) {
-            PlayerStatsHeader(playerNumber, game, boardSize, timeSeconds)
+            PlayerStatsHeader(
+                playerNumber,
+                game,
+                boardSize,
+                timeSeconds,
+                isCompact = useCompactHeader
+            )
         }
     }
 }
