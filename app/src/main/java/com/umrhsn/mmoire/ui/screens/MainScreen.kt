@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
@@ -215,25 +217,6 @@ fun MainScreen(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-
-                            Box {
-                                AppHeaderIcon(
-                                    icon = EvaIcons.Outline.MoreVertical,
-                                    contentDescription = stringResource(R.string.more_options),
-                                    onClick = { showMoreMenu = true }
-                                )
-
-                                OverflowDropdownMenu(
-                                    expanded = showMoreMenu,
-                                    onDismissRequest = { showMoreMenu = false },
-                                    onSettingsClicked = onSettingsClicked,
-                                    onBrowseClicked = onBrowseClicked,
-                                    showCreateSelectionDialog = {
-                                        showCreateSelectionDialog = true
-                                    },
-                                    startTutorial = { viewModel.startTutorial() }
-                                )
-                            }
                         }
 
                         HorizontalDivider(
@@ -275,6 +258,41 @@ fun MainScreen(
                                 Icon(EvaIcons.Outline.Grid, contentDescription = null)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(stringResource(R.string.change_size))
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                SidebarActionButton(
+                                    icon = EvaIcons.Outline.PlusCircle,
+                                    label = stringResource(R.string.create_game),
+                                    onClick = { showCreateSelectionDialog = true },
+                                    modifier = Modifier.weight(1f)
+                                )
+                                SidebarActionButton(
+                                    icon = EvaIcons.Outline.Folder,
+                                    label = stringResource(R.string.load_game),
+                                    onClick = onBrowseClicked,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                SidebarActionButton(
+                                    icon = EvaIcons.Outline.Settings,
+                                    label = stringResource(R.string.settings),
+                                    onClick = onSettingsClicked,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                SidebarActionButton(
+                                    icon = EvaIcons.Outline.QuestionMarkCircle,
+                                    label = stringResource(R.string.help),
+                                    onClick = { viewModel.startTutorial() },
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
                         }
                     }
@@ -647,26 +665,49 @@ private fun MainHeader(
                 }
             )
 
-            Box {
+            if (isTablet) {
                 AppHeaderIcon(
-                    icon = EvaIcons.Outline.MoreVertical,
-                    contentDescription = stringResource(R.string.more_options),
-                    onClick = { onMoreMenuChange(true) },
-                    modifier = Modifier.tutorialAnchor(
-                        "more_options",
-                        viewModel::onAnchorPositioned,
-                        viewModel::onAnchorRemoved
+                    icon = EvaIcons.Outline.PlusCircle,
+                    contentDescription = stringResource(R.string.create_game),
+                    onClick = showCreateSelectionDialog
+                )
+                AppHeaderIcon(
+                    icon = EvaIcons.Outline.Folder,
+                    contentDescription = stringResource(R.string.load_game),
+                    onClick = onBrowseClicked
+                )
+                AppHeaderIcon(
+                    icon = EvaIcons.Outline.Settings,
+                    contentDescription = stringResource(R.string.settings),
+                    onClick = onSettingsClicked
+                )
+                AppHeaderIcon(
+                    icon = EvaIcons.Outline.QuestionMarkCircle,
+                    contentDescription = stringResource(R.string.help),
+                    onClick = { viewModel.startTutorial() }
+                )
+            } else {
+                Box {
+                    AppHeaderIcon(
+                        icon = EvaIcons.Outline.MoreVertical,
+                        contentDescription = stringResource(R.string.more_options),
+                        onClick = { onMoreMenuChange(true) },
+                        modifier = Modifier.tutorialAnchor(
+                            "more_options",
+                            viewModel::onAnchorPositioned,
+                            viewModel::onAnchorRemoved
+                        )
                     )
-                )
 
-                OverflowDropdownMenu(
-                    expanded = showMoreMenu,
-                    onDismissRequest = { onMoreMenuChange(false) },
-                    onBrowseClicked = onBrowseClicked,
-                    onSettingsClicked = onSettingsClicked,
-                    showCreateSelectionDialog = showCreateSelectionDialog,
-                    startTutorial = { viewModel.startTutorial() }
-                )
+                    OverflowDropdownMenu(
+                        expanded = showMoreMenu,
+                        onDismissRequest = { onMoreMenuChange(false) },
+                        onBrowseClicked = onBrowseClicked,
+                        onSettingsClicked = onSettingsClicked,
+                        showCreateSelectionDialog = showCreateSelectionDialog,
+                        startTutorial = { viewModel.startTutorial() }
+                    )
+                }
             }
         },
         modifier = Modifier.tutorialAnchor(
@@ -1036,6 +1077,35 @@ private fun PlayerRaceHalf(
                 isCompact = useCompactHeader
             )
         }
+    }
+}
+
+@Composable
+private fun SidebarActionButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(52.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
+            contentColor = MaterialTheme.colorScheme.primary
+        ),
+        contentPadding = PaddingValues(horizontal = 8.dp)
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

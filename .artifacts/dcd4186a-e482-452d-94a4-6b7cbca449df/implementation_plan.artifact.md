@@ -1,34 +1,25 @@
-# Implementation Plan - Universal Device Orientation and 2-Player Logic
+# Implementation Plan - Expose and Label Actions on Large Displays
 
-This plan unifies the orientation and 2-player layout logic to handle phones, tablets, and opened foldables correctly. It ensures phones stay in portrait and that square-ish foldables are treated as large displays regardless of orientation.
+This plan refactors the UI to expose and label game actions (Create, Load, Settings, Help) on tablets and opened foldables.
 
 ## Proposed Changes
-
-### [Activities]
-#### [MODIFY] [MainActivity.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/activities/MainActivity.kt)
-- **Lock Phones to Portrait**: Use a threshold of `500dp` for `smallestScreenWidthDp` to lock mobile phones and folded foldables to portrait mode. This ensures they never accidentally rotate to a layout that doesn't benefit them.
 
 ### [UI Screens]
 #### [MODIFY] [MainScreen.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/ui/screens/MainScreen.kt)
 
-**1. Reliable Device Category Detection**
-- Use `config.smallestScreenWidthDp >= 500` as the definition for `isLargeDisplay`. This correctly includes tablets and opened foldables (like Pixel Fold).
-- Detect "tall screens" using `windowSizeClass.heightSizeClass == WindowHeightSizeClass.Expanded`.
+**1. Create `SidebarActionButton`**
+- A reusable component that matches the large action buttons (icon + label) but is styled with a light background to match the original icons.
 
-**2. Intelligent Layout Decision**
-- Define `treatAsLandscape` (vertical split) as true if the device is in landscape **OR** if it's a large display that isn't tall (opened foldable held vertically).
-- Only show the "Change Layout" toggle on `isLargeDisplay` when `treatAsLandscape` is true. This hides it in tablet portrait but keeps it on foldables.
+**2. Update Sidebar (Tablet Landscape)**
+- Place the four actions in a 2x2 grid at the bottom of the sidebar.
+- Each button in the grid will use the new `SidebarActionButton` style with its respective label.
 
-**3. Portrait Mirroring Fix**
-- Ensure the top-bottom split (used in portrait) always forces the 180° mirrored "Opposite" rotation for Player 1, providing a consistent head-to-head experience on narrow screens.
+**3. Update Top Bar (Large Displays)**
+- On tablets and opened foldables (portrait and 2-player modes), spread the action icons across the top bar instead of hiding them in a "More" menu.
 
 ## Verification Plan
 
 ### Manual Verification
-- **Pixel 7 (Phone)**: Confirm locked portrait, no toggle, forced mirrored view.
-- **Pixel Tablet (Large Tablet)**:
-    - **Portrait**: No toggle, forced mirrored view.
-    - **Landscape**: Toggle visible, 3 modes functional.
-- **Pixel 10 Pro Fold (Foldable)**:
-    - **Folded**: Matches phone behavior.
-    - **Opened**: Toggle visible in both directions, allowing side-by-side splits on the square screen.
+- **Tablet Landscape**: Confirm sidebar has Reset/Size buttons followed by 4 labeled small buttons in 2x2.
+- **Tablet Portrait / 2-Player**: Confirm top bar has all icons visible.
+- **Phone**: Confirm "More" overflow menu still functions correctly.
