@@ -94,12 +94,15 @@ import compose.icons.evaicons.outline.Award
 import compose.icons.evaicons.outline.CheckmarkCircle2
 import compose.icons.evaicons.outline.Clock
 import compose.icons.evaicons.outline.Flash
+import compose.icons.evaicons.outline.Flip
+import compose.icons.evaicons.outline.Flip2
 import compose.icons.evaicons.outline.Folder
 import compose.icons.evaicons.outline.Grid
 import compose.icons.evaicons.outline.Image
 import compose.icons.evaicons.outline.Layers
 import compose.icons.evaicons.outline.MoreVertical
 import compose.icons.evaicons.outline.Navigation2
+import compose.icons.evaicons.outline.People
 import compose.icons.evaicons.outline.Person
 import compose.icons.evaicons.outline.PlusCircle
 import compose.icons.evaicons.outline.QuestionMarkCircle
@@ -426,14 +429,9 @@ private fun TwoPlayerLayoutSwitcher(
                     .weight(1f)
                     .fillMaxWidth()
                     .graphicsLayer {
-                        rotationZ = if (isTablet) {
-                            180f
-                        } else {
-                            when (layout) {
-                                TwoPlayerLayout.SIDE_BY_SIDE -> 0f
-                                else -> 180f
-                            }
-                        }
+                        // For tablets in portrait, force 180 (Opposite)
+                        // For phones, they are locked to portrait, so they also always get 180.
+                        rotationZ = 180f
                     }
             ) {
                 PlayerRaceHalf(
@@ -445,7 +443,7 @@ private fun TwoPlayerLayoutSwitcher(
                     isTablet = isTablet,
                     isLandscape = isLandscape,
                     statsAtBottom = false,
-                    useCompactHeader = true
+                    useCompactHeader = isTablet
                 )
             }
             HorizontalDivider(
@@ -467,7 +465,8 @@ private fun TwoPlayerLayoutSwitcher(
                     onCardClicked = { onCardClicked(it, 2) },
                     isTablet = isTablet,
                     isLandscape = isLandscape,
-                    statsAtBottom = false
+                    statsAtBottom = false,
+                    useCompactHeader = isTablet
                 )
             }
         }
@@ -607,13 +606,13 @@ private fun MainHeader(
     AppHeader(
         title = uiState.gameName ?: stringResource(R.string.app_name),
         actions = {
-            if (uiState.isTwoPlayerMode && !(isTablet && !isLandscape)) {
-                // Layout Toggle for 2-player mode
+            if (uiState.isTwoPlayerMode && isTablet && isLandscape) {
+                // Layout Toggle for 2-player mode (Only on tablets in landscape)
                 AppHeaderIcon(
                     icon = when (uiState.twoPlayerLayout) {
-                        TwoPlayerLayout.FACE_TO_FACE -> EvaIcons.Outline.Navigation2
-                        TwoPlayerLayout.SIDE_BY_SIDE -> EvaIcons.Outline.Person
-                        TwoPlayerLayout.OPPOSITE -> EvaIcons.Outline.Flash
+                        TwoPlayerLayout.FACE_TO_FACE -> EvaIcons.Outline.Flip2
+                        TwoPlayerLayout.SIDE_BY_SIDE -> EvaIcons.Outline.People
+                        TwoPlayerLayout.OPPOSITE -> EvaIcons.Outline.Flip
                     },
                     contentDescription = "Change Layout",
                     onClick = { viewModel.toggleTwoPlayerLayout() }

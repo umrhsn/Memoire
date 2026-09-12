@@ -3,6 +3,7 @@ package com.umrhsn.mmoire.activities
 import android.R
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
@@ -48,6 +49,11 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate: current locale=${resources.configuration.locale}")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        // Lock phones to portrait mode
+        if (resources.configuration.smallestScreenWidthDp < 600) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()

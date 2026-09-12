@@ -1,31 +1,39 @@
-# Implementation Plan - Refine Tablet Portrait 2-Player UI
+# Implementation Plan - Device-Specific Orientation and 2-Player UI Refinement
 
-This plan hides the redundant layout toggle in tablet portrait mode and forces a consistent mirrored "Opposite" view for that orientation, ensuring a clean and functional head-to-head experience on large screens.
+This plan addresses orientation restrictions for phones/folded devices and refines the 2-player layout logic to ensure the best experience across phones, tablets, and foldables.
 
 ## Proposed Changes
+
+### [Activities]
+#### [MODIFY] [MainActivity.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/activities/MainActivity.kt)
+- **Force Portrait for Phones**: In `onCreate`, use `WindowSizeClass` to detect if the display is `Compact`. If so, set `requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT`.
+- This ensures phones and folded foldables always stay in portrait mode, as requested.
 
 ### [UI Components]
 #### [MODIFY] [MainScreen.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/ui/screens/MainScreen.kt)
 
-**1. Update `MainHeader` Logic**
-- Update the `MainHeader` function signature to accept `isTablet: Boolean` and `isLandscape: Boolean`.
-- Wrap the "Change Layout" `AppHeaderIcon` in a condition to hide it specifically for tablet portrait: `if (uiState.isTwoPlayerMode && !(isTablet && !isLandscape))`.
-- Update the `MainHeader` call site in `MainScreen` to pass these new parameters.
+**1. MainHeader Toggle Visibility**
+- Update the condition for showing the "Change Layout" icon.
+- It should be **hidden** if:
+    - Device is `Compact` (Phone/Folded).
+    - Device is in **Portrait** (even if it's a tablet).
+- It should be **visible** if:
+    - Device is `Medium` or `Expanded` (Tablet/Opened Foldable) **AND** it's in **Landscape**.
 
-**2. Force Mirrored View in Tablet Portrait**
-- In `TwoPlayerLayoutSwitcher`, modify the `rotationZ` assignment for the top slot (Player 1) in the `isHorizontalSplit` (portrait/stacked) branch.
-- If `isTablet` is true, force `rotationZ = 180f` regardless of the stored `layout` value.
-- Preserve the existing `when(layout)` logic for phones to maintain their flexible portrait behavior.
+**2. TwoPlayerLayoutSwitcher Logic**
+- **Force Opposite for Phones**: If `isTablet` is false (Compact), force the `OPPOSITE` (mirrored top-bottom) rendering logic.
+- **Opened Foldable Treatment**: For `Medium/Expanded` devices, treat the display as "Landscape" (vertical split) more aggressively if needed, but primarily follow the `isLandscape` flag for tablets.
+- Ensure the `rotationZ` and `statsAtBottom` logic for the forced portrait mode is solid.
 
 ## Verification Plan
 
 ### Manual Verification
-- **Pixel Tablet (Portrait)**:
-    - Confirm the "Change Layout" icon is hidden.
-    - Confirm **Player 1 (Top)** is always rotated 180°, even if `SIDE_BY_SIDE` was previously selected in landscape.
-- **Pixel Tablet (Landscape)**:
-    - Confirm the "Change Layout" icon is visible and functional.
-- **Phone (Both Orientations)**:
-    - Confirm the "Change Layout" icon remains visible and functional in all modes.
-- **Single Player**:
-    - Confirm no visual changes or regressions in the header.
+- **Phone Emulator (e.g., Pixel 7)**:
+    - Verify the app cannot rotate to landscape.
+    - Verify 2-player mode shows Player 1 at bottom, Player 2 at top (mirrored), and **no layout toggle icon**.
+- **Tablet Emulator (e.g., Pixel Tablet)**:
+    - **Portrait**: No toggle icon, forced Opposite-style mirrored view.
+    - **Landscape**: Toggle icon visible, all 3 modes functional.
+- **Foldable Emulator (e.g., Pixel Fold)**:
+    - **Folded**: Behavior matches Phone (Portrait only, no toggle).
+    - **Opened**: Behavior matches Tablet (Rotation allowed, toggle visible in landscape).
