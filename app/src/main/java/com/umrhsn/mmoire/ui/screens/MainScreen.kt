@@ -43,8 +43,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -127,8 +127,15 @@ fun MainScreen(
     val haptic = LocalHapticFeedback.current
     val config = LocalConfiguration.current
 
-    val isTablet = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val isTablet = config.smallestScreenWidthDp >= 600
     val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    // For foldables that are square-ish when opened, treat them as landscape
+    // even if held in portrait orientation.
+    val isFoldableOpened =
+        isTablet && !isLandscape && windowSizeClass.heightSizeClass < WindowHeightSizeClass.Expanded
+
+    val treatAsLandscape = isLandscape || isFoldableOpened
 
     var showWinDialog by remember { mutableStateOf(false) }
 
@@ -292,6 +299,7 @@ fun MainScreen(
                     viewModel = viewModel,
                     isTablet = isTablet,
                     isLandscape = isLandscape,
+                    treatAsLandscape = treatAsLandscape,
                     onBrowseClicked = onBrowseClicked,
                     onSettingsClicked = onSettingsClicked,
                     showSizeDialog = { showSizeDialog = true },
@@ -314,7 +322,8 @@ fun MainScreen(
                             uiState = uiState,
                             onCardClicked = onCardClicked,
                             isTablet = isTablet,
-                            isLandscape = isLandscape
+                            isLandscape = isLandscape,
+                            treatAsLandscape = treatAsLandscape
                         )
                     } else {
                         GameBoardArea(
@@ -413,12 +422,12 @@ private fun TwoPlayerLayoutSwitcher(
     uiState: MainUiState,
     onCardClicked: (Int, Int) -> Unit,
     isTablet: Boolean,
-    isLandscape: Boolean
+    isLandscape: Boolean,
+    treatAsLandscape: Boolean
 ) {
     val layout = uiState.twoPlayerLayout
 
-    // Split direction based on mode and orientation
-    val isHorizontalSplit = !isLandscape
+    val isHorizontalSplit = !treatAsLandscape
 
     if (isHorizontalSplit) {
         // Mode: Portrait split (Always stacked Top/Bottom)
@@ -493,7 +502,7 @@ private fun TwoPlayerLayoutSwitcher(
                                     timeSeconds = uiState.timerSeconds,
                                     onCardClicked = { onCardClicked(it, 1) },
                                     isTablet = isTablet,
-                                    isLandscape = true,
+                                    isLandscape = treatAsLandscape,
                                     statsAtBottom = false, // Top rotates to divider
                                     useCompactHeader = true
                                 )
@@ -510,7 +519,7 @@ private fun TwoPlayerLayoutSwitcher(
                             timeSeconds = uiState.timerSeconds,
                             onCardClicked = { onCardClicked(it, 1) },
                             isTablet = isTablet,
-                            isLandscape = true,
+                            isLandscape = treatAsLandscape,
                             statsAtBottom = false
                         )
                     }
@@ -543,7 +552,7 @@ private fun TwoPlayerLayoutSwitcher(
                                     timeSeconds = uiState.timerSecondsP2,
                                     onCardClicked = { onCardClicked(it, 2) },
                                     isTablet = isTablet,
-                                    isLandscape = true,
+                                    isLandscape = treatAsLandscape,
                                     statsAtBottom = false, // Top rotates to divider
                                     useCompactHeader = true
                                 )
@@ -564,7 +573,7 @@ private fun TwoPlayerLayoutSwitcher(
                                 timeSeconds = uiState.timerSecondsP2,
                                 onCardClicked = { onCardClicked(it, 2) },
                                 isTablet = isTablet,
-                                isLandscape = true,
+                                isLandscape = treatAsLandscape,
                                 statsAtBottom = false
                             )
                         }
@@ -579,7 +588,7 @@ private fun TwoPlayerLayoutSwitcher(
                             timeSeconds = uiState.timerSecondsP2,
                             onCardClicked = { onCardClicked(it, 2) },
                             isTablet = isTablet,
-                            isLandscape = true,
+                            isLandscape = treatAsLandscape,
                             statsAtBottom = false
                         )
                     }
@@ -596,6 +605,7 @@ private fun MainHeader(
     viewModel: MainViewModel,
     isTablet: Boolean,
     isLandscape: Boolean,
+    treatAsLandscape: Boolean,
     onBrowseClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
     showSizeDialog: () -> Unit,
@@ -606,8 +616,8 @@ private fun MainHeader(
     AppHeader(
         title = uiState.gameName ?: stringResource(R.string.app_name),
         actions = {
-            if (uiState.isTwoPlayerMode && isTablet && isLandscape) {
-                // Layout Toggle for 2-player mode (Only on tablets in landscape)
+            if (uiState.isTwoPlayerMode && isTablet && treatAsLandscape) {
+                // Layout Toggle for 2-player mode (Only on tablets in landscape/foldables)
                 AppHeaderIcon(
                     icon = when (uiState.twoPlayerLayout) {
                         TwoPlayerLayout.FACE_TO_FACE -> EvaIcons.Outline.Flip2
