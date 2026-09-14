@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Lock phones to portrait mode
-        if (resources.configuration.smallestScreenWidthDp < 600) {
+        if (resources.configuration.smallestScreenWidthDp < 500) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
 

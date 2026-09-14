@@ -14,10 +14,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,7 +30,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
@@ -69,7 +66,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
@@ -81,6 +77,7 @@ import com.umrhsn.mmoire.ui.components.AppDropdownItem
 import com.umrhsn.mmoire.ui.components.AppHeader
 import com.umrhsn.mmoire.ui.components.AppHeaderIcon
 import com.umrhsn.mmoire.ui.components.FloatingPill
+import com.umrhsn.mmoire.ui.components.FloatingVerticalPill
 import com.umrhsn.mmoire.ui.components.MemoryBoard
 import com.umrhsn.mmoire.ui.components.StatBadge
 import com.umrhsn.mmoire.ui.components.TutorialOverlay
@@ -129,13 +126,13 @@ fun MainScreen(
     val haptic = LocalHapticFeedback.current
     val config = LocalConfiguration.current
 
-    val isTablet = config.smallestScreenWidthDp >= 600
+    val isTablet = config.smallestScreenWidthDp >= 500
     val isLandscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    // For foldables that are square-ish when opened, treat them as landscape
-    // even if held in portrait orientation.
-    val isFoldableOpened =
-        isTablet && !isLandscape && windowSizeClass.heightSizeClass < WindowHeightSizeClass.Expanded
+    // Foldables are large displays (isTablet) but they aren't "tall" (Expanded height) when opened.
+    // Real tablets in portrait are "tall" (Expanded height).
+    val isTallScreen = windowSizeClass.heightSizeClass == WindowHeightSizeClass.Expanded
+    val isFoldableOpened = isTablet && !isTallScreen
 
     val treatAsLandscape = isLandscape || isFoldableOpened
 
@@ -177,126 +174,27 @@ fun MainScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        if (isTablet && isLandscape && !uiState.isTwoPlayerMode) {
-            // Tablet Landscape Layout: Sidebar for stats, main area for board
-            Row(modifier = Modifier.fillMaxSize()) {
-                // Sidebar styled as a vertical floating pill to match the header style
-                Surface(
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .padding(16.dp)
-                        .width(280.dp)
-                        .fillMaxHeight(),
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(32.dp),
-                    tonalElevation = 2.dp,
-                    shadowElevation = 8.dp,
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 24.dp)
-                            .verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(20.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = uiState.gameName ?: stringResource(R.string.app_name),
-                                modifier = Modifier.weight(1f),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Black,
-                                textAlign = TextAlign.Start,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(
-                                alpha = 0.4f
-                            )
-                        )
-
-                        StatsSection(uiState = uiState, isVertical = true)
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Button(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    viewModel.refreshGame()
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(52.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Icon(EvaIcons.Outline.Refresh, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.reset_game))
-                            }
-
-                            Button(
-                                onClick = { showSizeDialog = true },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(52.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Icon(EvaIcons.Outline.Grid, contentDescription = null)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(stringResource(R.string.change_size))
-                            }
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                SidebarActionButton(
-                                    icon = EvaIcons.Outline.PlusCircle,
-                                    label = stringResource(R.string.create_game),
-                                    onClick = { showCreateSelectionDialog = true },
-                                    modifier = Modifier.weight(1f)
-                                )
-                                SidebarActionButton(
-                                    icon = EvaIcons.Outline.Folder,
-                                    label = stringResource(R.string.load_game),
-                                    onClick = onBrowseClicked,
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                SidebarActionButton(
-                                    icon = EvaIcons.Outline.Settings,
-                                    label = stringResource(R.string.settings),
-                                    onClick = onSettingsClicked,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                SidebarActionButton(
-                                    icon = EvaIcons.Outline.QuestionMarkCircle,
-                                    label = stringResource(R.string.help),
-                                    onClick = { viewModel.startTutorial() },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
-                        }
-                    }
-                }
+        if (treatAsLandscape && isTablet && !uiState.isTwoPlayerMode) {
+            // Large Display Flanking Panels Layout
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .padding(24.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                LeftIconActionPanel(
+                    onRefreshClicked = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        viewModel.refreshGame()
+                    },
+                    onSizeClicked = { showSizeDialog = true },
+                    onCreateClicked = { showCreateSelectionDialog = true },
+                    onBrowseClicked = onBrowseClicked,
+                    onSettingsClicked = onSettingsClicked,
+                    onHelpClicked = { viewModel.startTutorial() }
+                )
 
                 Box(modifier = Modifier.weight(1f)) {
                     GameBoardArea(
@@ -304,9 +202,11 @@ fun MainScreen(
                         onCardClicked = onCardClicked,
                         haptic = haptic,
                         isTablet = isTablet,
-                        isLandscape = isLandscape
+                        isLandscape = treatAsLandscape
                     )
                 }
+
+                RightStatsIconPanel(uiState = uiState)
             }
         } else {
             // Phone or Tablet Portrait Layout
@@ -1081,30 +981,117 @@ private fun PlayerRaceHalf(
 }
 
 @Composable
-private fun SidebarActionButton(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit,
+private fun LeftIconActionPanel(
+    onRefreshClicked: () -> Unit,
+    onSizeClicked: () -> Unit,
+    onCreateClicked: () -> Unit,
+    onBrowseClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
+    onHelpClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(52.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
-            contentColor = MaterialTheme.colorScheme.primary
-        ),
-        contentPadding = PaddingValues(horizontal = 8.dp)
+    FloatingVerticalPill(modifier = modifier) {
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.Refresh,
+            contentDescription = stringResource(R.string.reset_game),
+            onClick = onRefreshClicked
+        )
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.Grid,
+            contentDescription = stringResource(R.string.change_size),
+            onClick = onSizeClicked
+        )
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.PlusCircle,
+            contentDescription = stringResource(R.string.create_game),
+            onClick = onCreateClicked
+        )
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.Folder,
+            contentDescription = stringResource(R.string.load_game),
+            onClick = onBrowseClicked
+        )
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.Settings,
+            contentDescription = stringResource(R.string.settings),
+            onClick = onSettingsClicked
+        )
+        AppHeaderIcon(
+            icon = EvaIcons.Outline.QuestionMarkCircle,
+            contentDescription = stringResource(R.string.help),
+            onClick = onHelpClicked
+        )
+    }
+}
+
+@Composable
+private fun RightStatsIconPanel(
+    uiState: MainUiState,
+    modifier: Modifier = Modifier
+) {
+    val game = uiState.memoryGameP1 ?: return
+    FloatingVerticalPill(modifier = modifier) {
+        StatIconValue(
+            icon = EvaIcons.Outline.Flash,
+            value = game.getNumMoves().toString(),
+            tooltipText = stringResource(R.string.moves_tracking_label)
+        )
+        StatIconValue(
+            icon = EvaIcons.Outline.Layers,
+            value = "${game.numPairsFound}/${uiState.boardSize.getNumPairs()}",
+            tooltipText = stringResource(R.string.pairs_tracking_label)
+        )
+        StatIconValue(
+            icon = EvaIcons.Outline.Clock,
+            value = formatDuration(uiState.timerSeconds),
+            tooltipText = stringResource(R.string.timer_tracking_label)
+        )
+        uiState.bestTime?.let {
+            StatIconValue(
+                icon = EvaIcons.Outline.Award,
+                value = formatDuration(it),
+                tooltipText = stringResource(R.string.best_time_tracking_label),
+                contentColor = MaterialTheme.colorScheme.primary,
+                useHighlightBackground = true
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatIconValue(
+    icon: ImageVector,
+    value: String,
+    tooltipText: String,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    useHighlightBackground: Boolean = false
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(vertical = 4.dp)
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(
+                    if (useHighlightBackground) contentColor.copy(alpha = 0.15f)
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = tooltipText,
+                tint = contentColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
         Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            text = value,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = if (useHighlightBackground) contentColor else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

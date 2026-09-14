@@ -1,25 +1,27 @@
-# Implementation Plan - Expose and Label Actions on Large Displays
+# Implementation Plan - Minimalist Flanking Icon Pills with Icon Backgrounds
 
-This plan refactors the UI to expose and label game actions (Create, Load, Settings, Help) on tablets and opened foldables.
+This plan finalizes the flanking panels for tablets and foldables, moving to a minimalist icon-only design in a single vertical column, and adds circular backgrounds to the statistics icons to match the action icons' visual style.
 
 ## Proposed Changes
 
+### [UI Components]
+#### [MODIFY] `SharedComponents.kt`
+- **Update `StatBadge`**:
+    - Wrap the `Icon` inside the `StatBadge` row with a circular container (`Box` with `CircleShape` and `onSurface.copy(alpha = 0.06f)`).
+    - This ensures portrait mode stats have the "circular faint backgrounds" implemented as requested.
+    - Set the icon size within this container to `18.dp` (matching `stat_icon_size`).
+
 ### [UI Screens]
-#### [MODIFY] [MainScreen.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/ui/screens/MainScreen.kt)
-
-**1. Create `SidebarActionButton`**
-- A reusable component that matches the large action buttons (icon + label) but is styled with a light background to match the original icons.
-
-**2. Update Sidebar (Tablet Landscape)**
-- Place the four actions in a 2x2 grid at the bottom of the sidebar.
-- Each button in the grid will use the new `SidebarActionButton` style with its respective label.
-
-**3. Update Top Bar (Large Displays)**
-- On tablets and opened foldables (portrait and 2-player modes), spread the action icons across the top bar instead of hiding them in a "More" menu.
+#### [MODIFY] `MainScreen.kt`
+- **Refactor `LeftIconActionPanel`**: Remove all text labels and grouping. Use a single `Column` of 6 icon buttons inside a `FloatingVerticalPill`. Use `AppHeaderIcon` for consistency.
+- **Refactor `RightStatsIconPanel`**: Use `FloatingVerticalPill` for consistency.
+- **Update `StatIconValue`**:
+    - Ensure the circular background style matches `StatBadge` exactly (shape, color, and icon tint).
+    - Align the text value underneath the icon container.
+- **Update Layout Logic**: Ensure these pills flank the centered board on tablet landscape and opened foldables.
 
 ## Verification Plan
-
-### Manual Verification
-- **Tablet Landscape**: Confirm sidebar has Reset/Size buttons followed by 4 labeled small buttons in 2x2.
-- **Tablet Portrait / 2-Player**: Confirm top bar has all icons visible.
-- **Phone**: Confirm "More" overflow menu still functions correctly.
+- **Tablet Landscape**: Confirm slim icon-only pills appear.
+- **Stats Panel Check**: Verify icons in the right panel have circular backgrounds and text values are correctly positioned underneath.
+- **Portrait Stats Check**: Confirm icons in the bottom stat pill (portrait) also have circular faint backgrounds.
+- **Upright Check**: Confirm every icon and text value is upright and horizontal.
