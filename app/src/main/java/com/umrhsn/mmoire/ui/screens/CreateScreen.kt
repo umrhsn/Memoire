@@ -193,10 +193,11 @@ fun CreateScreen(
                     }
                 }
             } else {
-                // Mobile Layout: Existing Vertical Flow
+                // Mobile Layout: Scrollable Vertical Flow
                 Column(
                     modifier = Modifier
                         .weight(1f)
+                        .verticalScroll(rememberScrollState())
                         .padding(horizontal = dimensionResource(R.dimen.spacing_medium))
                 ) {
                     SectionHeader(
@@ -211,18 +212,17 @@ fun CreateScreen(
 
                     SelectionProgressBar(chosenImageUris.size, numImagesRequired)
 
-                    Box(modifier = Modifier.weight(1f)) {
-                        ImageGrid(
-                            chosenImageUris = chosenImageUris,
-                            numImagesRequired = numImagesRequired,
-                            gridColumns = gridColumns,
-                            isLoading = uiState.isLoading,
-                            onPlaceholderClicked = onPlaceholderClicked,
-                            onImageClicked = onImageClicked,
-                            onRemoveImage = onRemoveImage,
-                            playButtonClick = viewModel::playButtonClick
-                        )
-                    }
+                    ImageGrid(
+                        chosenImageUris = chosenImageUris,
+                        numImagesRequired = numImagesRequired,
+                        gridColumns = gridColumns,
+                        isLoading = uiState.isLoading,
+                        onPlaceholderClicked = onPlaceholderClicked,
+                        onImageClicked = onImageClicked,
+                        onRemoveImage = onRemoveImage,
+                        playButtonClick = viewModel::playButtonClick,
+                        scrollable = false // Let the screen scroll handle it
+                    )
 
                     SectionHeader(
                         icon = EvaIcons.Outline.Edit,
@@ -230,32 +230,18 @@ fun CreateScreen(
                         subtitle = stringResource(R.string.step_2_subtitle)
                     )
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-                }
+                    CreateControls(
+                        gameName = gameName,
+                        onNameChange = { gameName = it },
+                        isUploading = uiState.isUploading,
+                        uploadProgress = uiState.uploadProgress,
+                        numChosen = chosenImageUris.size,
+                        numRequired = numImagesRequired,
+                        isEdit = oldName != null,
+                        onSaveClicked = { onSaveClicked(gameName.trim()) }
+                    )
 
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-                    shadowElevation = 32.dp,
-                    tonalElevation = 8.dp
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(dimensionResource(R.dimen.spacing_large))
-                            .navigationBarsPadding()
-                    ) {
-                        CreateControls(
-                            gameName = gameName,
-                            onNameChange = { gameName = it },
-                            isUploading = uiState.isUploading,
-                            uploadProgress = uiState.uploadProgress,
-                            numChosen = chosenImageUris.size,
-                            numRequired = numImagesRequired,
-                            isEdit = oldName != null,
-                            onSaveClicked = { onSaveClicked(gameName.trim()) }
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(32.dp)) // Padding at bottom of scroll
                 }
             }
         }
@@ -336,30 +322,64 @@ private fun ImageGrid(
     onPlaceholderClicked: () -> Unit,
     onImageClicked: (Int) -> Unit,
     onRemoveImage: (Uri) -> Unit,
-    playButtonClick: () -> Unit
+    playButtonClick: () -> Unit,
+    scrollable: Boolean = true
 ) {
     if (chosenImageUris.isEmpty() && !isLoading) {
         EmptySelectionState(onClick = onPlaceholderClicked, onSoundClick = playButtonClick)
     } else if (isLoading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            modifier = if (scrollable) Modifier.fillMaxSize() else Modifier.height(200.dp).fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
             CircularProgressIndicator()
         }
     } else {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(gridColumns),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(chosenImageUris) { index, uri ->
-                ImageItem(
-                    uri = uri,
-                    onClick = { onImageClicked(index) },
-                    onRemove = { onRemoveImage(uri) })
+        if (scrollable) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(gridColumns),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(chosenImageUris) { index, uri ->
+                    ImageItem(
+                        uri = uri,
+                        onClick = { onImageClicked(index) },
+                        onRemove = { onRemoveImage(uri) })
+                }
+                if (chosenImageUris.size < numImagesRequired) {
+                    item { PlaceholderItem(onClick = onPlaceholderClicked) }
+                }
             }
-            if (chosenImageUris.size < numImagesRequired) {
-                item { PlaceholderItem(onClick = onPlaceholderClicked) }
+        } else {
+            // Non-scrollable grid for mobile scrollable screen
+            val allItemsCount = chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
+            val rowCount = (allItemsCount + gridColumns - 1) / gridColumns
+            
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                repeat(rowCount) { rowIndex ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        repeat(gridColumns) { colIndex ->
+                            val itemIndex = rowIndex * gridColumns + colIndex
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (itemIndex < chosenImageUris.size) {
+                                    val uri = chosenImageUris[itemIndex]
+                                    ImageItem(
+                                        uri = uri,
+                                        onClick = { onImageClicked(itemIndex) },
+                                        onRemove = { onRemoveImage(uri) }
+                                    )
+                                } else if (itemIndex == chosenImageUris.size && itemIndex < numImagesRequired) {
+                                    PlaceholderItem(onClick = onPlaceholderClicked)
+                                } else {
+                                    Spacer(modifier = Modifier.aspectRatio(1f))
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -484,8 +504,8 @@ private fun SectionHeader(
 private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.spacing_medium)),
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
@@ -498,49 +518,49 @@ private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
             )
         ) {
             Column(
-                modifier = Modifier.padding(32.dp),
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 Icon(
                     imageVector = EvaIcons.Outline.Image,
                     contentDescription = null,
-                    modifier = Modifier.size(80.dp),
+                    modifier = Modifier.size(64.dp),
                     tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = stringResource(R.string.no_photos_yet),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
                 Text(
                     text = stringResource(R.string.no_photos_yet_subtitle),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 4.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = {
                         onSoundClick()
                         onClick()
                     },
-                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
                     contentPadding = PaddingValues(
-                        horizontal = 32.dp,
-                        vertical = 16.dp
+                        horizontal = 32.dp
                     )
                 ) {
-                    Icon(EvaIcons.Outline.Plus, contentDescription = null)
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Icon(EvaIcons.Outline.Plus, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.open_gallery), fontWeight = FontWeight.ExtraBold)
                 }
             }

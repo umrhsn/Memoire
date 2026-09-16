@@ -1,24 +1,31 @@
-# Implementation Plan - Fixed 2-Player Stats Layout and Visibility
+# Implementation Plan - Fix Create Board UI Responsiveness
 
-This plan fixes the visibility of player names in dark mode and implements a non-scrollable, two-row statistics layout for 2-player mode.
+This plan fixes the issue where the "Open Gallery" button and Step 2 header are squashed on smaller screens in the "New Board" page.
 
 ## Proposed Changes
 
-### [UI Components]
-#### [MODIFY] `SharedComponents.kt` - `StatBadge`
-- **Icon Background**: Maintain the circular background for icons.
-- **Constraints**: Ensure text does not wrap or truncate (`maxLines = 1`).
-
 ### [UI Screens]
-#### [MODIFY] `MainScreen.kt` - `PlayerStatsRow`
-- **Layout**: Use a `Column` to create a two-row structure:
-    - **Row 1**: Player name and icon, aligned to the **start**.
-    - **Row 2**: Statistics badges, aligned to the **end**.
-- **Visibility**: Set the color of the "Player X" text to `MaterialTheme.colorScheme.onSurface` to ensure it is visible in both light (black) and dark (white) modes.
-- **Responsiveness**: Ensure the layout is not scrollable and fits all content by using the two-row stack.
+#### [MODIFY] `CreateScreen.kt`
+
+**1. Make Mobile Layout Scrollable**
+- Wrap the main content area (Step 1 and Step 2) in a `Column` with `verticalScroll`.
+- Move the Step 2 Header from the Step 1 `Column` to the bottom section or ensure it's part of the global scroll.
+- Ensure the bottom section (Step 2 Controls) is also part of the scroll or correctly positioned if it needs to be sticky. (I will make it part of the scroll for better space management on small screens).
+
+**2. Compact `EmptySelectionState`**
+- Reduce the icon size from 80dp to 64dp.
+- Reduce vertical padding and spacers within the card.
+- Ensure the card uses `wrapContentHeight` and does not force a large minimum height.
+
+**3. Fix Image Grid height in Scrollable Column**
+- Since `LazyVerticalGrid` cannot be directly placed in a `verticalScroll` with `fillMaxSize`, I will either:
+    - Use `Modifier.heightIn(max = ...)` for the grid.
+    - Or replace it with a non-lazy grid for mobile if the number of items is small (it's max 20).
+    - Or use `LazyColumn` for the whole screen and use `Grid` items.
+- Choice: I will use a `Column` with `verticalScroll` for the whole screen and implement the grid using `Row`s or a custom flow layout to allow it to expand naturally within the scroll.
 
 ## Verification Plan
-- **2-Player Dark Mode**: Confirm "Player 1" and "Player 2" text is clearly visible (white/light).
-- **2-Player Light Mode**: Confirm "Player 1" and "Player 2" text is clearly visible (black/dark).
-- **Alignment Check**: Confirm Player info is at the start and Stats are at the end, stacked vertically.
-- **No Scroll Check**: Confirm the row does not scroll horizontally.
+- **Mobile Layout**: Open "New Board" on a phone.
+- **Empty State**: Confirm "No Photos Yet" card is fully visible and the "Open Gallery" button is correctly sized and has text.
+- **Scroll Check**: Verify the whole page can be scrolled if content exceeds the screen height.
+- **Tablet Check**: Ensure tablet layout (horizontal split) remains unaffected.

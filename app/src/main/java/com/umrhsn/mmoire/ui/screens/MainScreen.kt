@@ -893,8 +893,7 @@ private fun PlayerStatsRow(
                 text = stringResource(R.string.player_n, playerNumber),
                 style = if (isCompact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Black,
-                maxLines = 1
+                fontWeight = FontWeight.Black
             )
         }
 
