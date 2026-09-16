@@ -1,27 +1,24 @@
-# Implementation Plan - Minimalist Flanking Icon Pills with Icon Backgrounds
+# Implementation Plan - Fixed 2-Player Stats Layout and Visibility
 
-This plan finalizes the flanking panels for tablets and foldables, moving to a minimalist icon-only design in a single vertical column, and adds circular backgrounds to the statistics icons to match the action icons' visual style.
+This plan fixes the visibility of player names in dark mode and implements a non-scrollable, two-row statistics layout for 2-player mode.
 
 ## Proposed Changes
 
 ### [UI Components]
-#### [MODIFY] `SharedComponents.kt`
-- **Update `StatBadge`**:
-    - Wrap the `Icon` inside the `StatBadge` row with a circular container (`Box` with `CircleShape` and `onSurface.copy(alpha = 0.06f)`).
-    - This ensures portrait mode stats have the "circular faint backgrounds" implemented as requested.
-    - Set the icon size within this container to `18.dp` (matching `stat_icon_size`).
+#### [MODIFY] `SharedComponents.kt` - `StatBadge`
+- **Icon Background**: Maintain the circular background for icons.
+- **Constraints**: Ensure text does not wrap or truncate (`maxLines = 1`).
 
 ### [UI Screens]
-#### [MODIFY] `MainScreen.kt`
-- **Refactor `LeftIconActionPanel`**: Remove all text labels and grouping. Use a single `Column` of 6 icon buttons inside a `FloatingVerticalPill`. Use `AppHeaderIcon` for consistency.
-- **Refactor `RightStatsIconPanel`**: Use `FloatingVerticalPill` for consistency.
-- **Update `StatIconValue`**:
-    - Ensure the circular background style matches `StatBadge` exactly (shape, color, and icon tint).
-    - Align the text value underneath the icon container.
-- **Update Layout Logic**: Ensure these pills flank the centered board on tablet landscape and opened foldables.
+#### [MODIFY] `MainScreen.kt` - `PlayerStatsRow`
+- **Layout**: Use a `Column` to create a two-row structure:
+    - **Row 1**: Player name and icon, aligned to the **start**.
+    - **Row 2**: Statistics badges, aligned to the **end**.
+- **Visibility**: Set the color of the "Player X" text to `MaterialTheme.colorScheme.onSurface` to ensure it is visible in both light (black) and dark (white) modes.
+- **Responsiveness**: Ensure the layout is not scrollable and fits all content by using the two-row stack.
 
 ## Verification Plan
-- **Tablet Landscape**: Confirm slim icon-only pills appear.
-- **Stats Panel Check**: Verify icons in the right panel have circular backgrounds and text values are correctly positioned underneath.
-- **Portrait Stats Check**: Confirm icons in the bottom stat pill (portrait) also have circular faint backgrounds.
-- **Upright Check**: Confirm every icon and text value is upright and horizontal.
+- **2-Player Dark Mode**: Confirm "Player 1" and "Player 2" text is clearly visible (white/light).
+- **2-Player Light Mode**: Confirm "Player 1" and "Player 2" text is clearly visible (black/dark).
+- **Alignment Check**: Confirm Player info is at the start and Stats are at the end, stacked vertically.
+- **No Scroll Check**: Confirm the row does not scroll horizontally.

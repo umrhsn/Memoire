@@ -350,23 +350,32 @@ fun StatBadge(
         ) {
             Row(
                 modifier = Modifier.padding(
-                    horizontal = 14.dp,
-                    vertical = 8.dp
+                    horizontal = 8.dp,
+                    vertical = 6.dp
                 ),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_small))
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
-                        .size(dimensionResource(R.dimen.stat_icon_size))
-                        .graphicsLayer {
-                            if (autoMirror && isRtl) {
-                                rotationY = 180f
-                            }
-                        }
-                )
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .graphicsLayer {
+                                if (autoMirror && isRtl) {
+                                    rotationY = 180f
+                                }
+                            },
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
                 Text(
                     text = value,
                     fontWeight = FontWeight.ExtraBold,

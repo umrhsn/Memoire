@@ -370,7 +370,7 @@ private fun TwoPlayerLayoutSwitcher(
                     isTablet = isTablet,
                     isLandscape = isLandscape,
                     statsAtBottom = false,
-                    useCompactHeader = isTablet
+                    useCompactHeader = !isTablet
                 )
             }
             HorizontalDivider(
@@ -393,7 +393,7 @@ private fun TwoPlayerLayoutSwitcher(
                     isTablet = isTablet,
                     isLandscape = isLandscape,
                     statsAtBottom = false,
-                    useCompactHeader = isTablet
+                    useCompactHeader = !isTablet
                 )
             }
         }
@@ -854,74 +854,75 @@ fun formatDuration(seconds: Long): String {
 }
 
 @Composable
-private fun PlayerStatsContent(
-    playerNumber: Int,
-    game: MemoryGame?,
-    boardSize: BoardSize,
-    timeSeconds: Long
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                EvaIcons.Outline.Person,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = stringResource(R.string.player_n, playerNumber),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Black
-        )
-    }
-
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        StatBadge(
-            EvaIcons.Outline.Clock,
-            formatDuration(timeSeconds),
-            tooltipText = stringResource(R.string.timer_tracking_label)
-        )
-        StatBadge(
-            EvaIcons.Outline.Flash,
-            (game?.getNumMoves() ?: 0).toString(),
-            tooltipText = stringResource(R.string.moves_tracking_label)
-        )
-        StatBadge(
-            EvaIcons.Outline.Layers,
-            "${game?.numPairsFound ?: 0}/${boardSize.getNumPairs()}",
-            tooltipText = stringResource(R.string.pairs_tracking_label)
-        )
-    }
-}
-
-@Composable
-private fun PlayerStatsHeader(
+private fun PlayerStatsRow(
     playerNumber: Int,
     game: MemoryGame?,
     boardSize: BoardSize,
     timeSeconds: Long,
+    modifier: Modifier = Modifier,
     isCompact: Boolean = false
 ) {
-    Row(
-        modifier = if (isCompact) {
-            Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        } else {
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-        },
-        horizontalArrangement = if (isCompact) Arrangement.spacedBy(16.dp) else Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        PlayerStatsContent(playerNumber, game, boardSize, timeSeconds)
+        // Player Info Row (Aligned to Start)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(if (isCompact) 28.dp else 32.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    EvaIcons.Outline.Person,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(if (isCompact) 16.dp else 18.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(if (isCompact) 6.dp else 8.dp))
+            Text(
+                text = stringResource(R.string.player_n, playerNumber),
+                style = if (isCompact) MaterialTheme.typography.titleSmall else MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Black,
+                maxLines = 1
+            )
+        }
+
+        // Stats Badges Row (Aligned to End)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(
+                if (isCompact) 4.dp else 8.dp,
+                Alignment.End
+            ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            StatBadge(
+                EvaIcons.Outline.Clock,
+                formatDuration(timeSeconds),
+                tooltipText = stringResource(R.string.timer_tracking_label)
+            )
+            StatBadge(
+                EvaIcons.Outline.Flash,
+                (game?.getNumMoves() ?: 0).toString(),
+                tooltipText = stringResource(R.string.moves_tracking_label)
+            )
+            StatBadge(
+                EvaIcons.Outline.Layers,
+                "${game?.numPairsFound ?: 0}/${boardSize.getNumPairs()}",
+                tooltipText = stringResource(R.string.pairs_tracking_label)
+            )
+        }
     }
 }
 
@@ -943,11 +944,11 @@ private fun PlayerRaceHalf(
         horizontalAlignment = if (useCompactHeader) Alignment.CenterHorizontally else Alignment.Start
     ) {
         if (!statsAtBottom) {
-            PlayerStatsHeader(
-                playerNumber,
-                game,
-                boardSize,
-                timeSeconds,
+            PlayerStatsRow(
+                playerNumber = playerNumber,
+                game = game,
+                boardSize = boardSize,
+                timeSeconds = timeSeconds,
                 isCompact = useCompactHeader
             )
         }
@@ -969,11 +970,11 @@ private fun PlayerRaceHalf(
         }
 
         if (statsAtBottom) {
-            PlayerStatsHeader(
-                playerNumber,
-                game,
-                boardSize,
-                timeSeconds,
+            PlayerStatsRow(
+                playerNumber = playerNumber,
+                game = game,
+                boardSize = boardSize,
+                timeSeconds = timeSeconds,
                 isCompact = useCompactHeader
             )
         }
