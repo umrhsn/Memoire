@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.MemoryCard
 
 private const val OPTIMIZED_IMAGE_SIZE = 250
@@ -38,9 +41,14 @@ private const val OPTIMIZED_IMAGE_SIZE = 250
 fun MemoryCardItem(
     memoryCard: MemoryCard,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    isCardTintEnabled: Boolean = false
 ) {
     val context = LocalContext.current
+    // Use luminance check to determine if current theme is dark, 
+    // ensuring "Card Tint" setting works correctly even if app theme override system theme.
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -138,8 +146,20 @@ fun MemoryCardItem(
                     )
                 }
             } else {
+                val faceDownRes = if (isCardTintEnabled) {
+                    when (appColorTheme) {
+                        AppColorTheme.DEFAULT -> if (isDark) R.drawable.memory_card_facedown_purple_dark else R.drawable.memory_card_facedown_purple
+                        AppColorTheme.RED -> if (isDark) R.drawable.memory_card_facedown_red_dark else R.drawable.memory_card_facedown_red
+                        AppColorTheme.BLUE -> if (isDark) R.drawable.memory_card_facedown_blue_dark else R.drawable.memory_card_facedown_blue
+                        AppColorTheme.GREEN -> if (isDark) R.drawable.memory_card_facedown_green_dark else R.drawable.memory_card_facedown_green
+                        AppColorTheme.ORANGE -> if (isDark) R.drawable.memory_card_facedown_orange_dark else R.drawable.memory_card_facedown_orange
+                    }
+                } else {
+                    R.drawable.memory_card_facedown
+                }
+
                 Image(
-                    painter = painterResource(R.drawable.memory_card_facedown),
+                    painter = painterResource(faceDownRes),
                     contentDescription = contentDescription,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

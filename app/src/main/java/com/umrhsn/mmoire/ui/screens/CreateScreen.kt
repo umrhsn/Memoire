@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -329,7 +328,9 @@ private fun ImageGrid(
         EmptySelectionState(onClick = onPlaceholderClicked, onSoundClick = playButtonClick)
     } else if (isLoading) {
         Box(
-            modifier = if (scrollable) Modifier.fillMaxSize() else Modifier.height(200.dp).fillMaxWidth(),
+            modifier = if (scrollable) Modifier.fillMaxSize() else Modifier
+                .height(200.dp)
+                .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -355,9 +356,10 @@ private fun ImageGrid(
             }
         } else {
             // Non-scrollable grid for mobile scrollable screen
-            val allItemsCount = chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
+            val allItemsCount =
+                chosenImageUris.size + (if (chosenImageUris.size < numImagesRequired) 1 else 0)
             val rowCount = (allItemsCount + gridColumns - 1) / gridColumns
-            
+
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 repeat(rowCount) { rowIndex ->
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -559,7 +561,11 @@ private fun EmptySelectionState(onClick: () -> Unit, onSoundClick: () -> Unit) {
                         horizontal = 32.dp
                     )
                 ) {
-                    Icon(EvaIcons.Outline.Plus, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Icon(
+                        EvaIcons.Outline.Plus,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.open_gallery), fontWeight = FontWeight.ExtraBold)
                 }

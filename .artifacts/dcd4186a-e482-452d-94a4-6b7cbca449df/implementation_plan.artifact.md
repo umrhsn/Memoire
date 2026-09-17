@@ -1,31 +1,29 @@
-# Implementation Plan - Fix Create Board UI Responsiveness
+# Implementation Plan - Fix 2-Player RTL Positioning (Manual Order Swap)
 
-This plan fixes the issue where the "Open Gallery" button and Step 2 header are squashed on smaller screens in the "New Board" page.
+This plan fixes the physical positioning of players in 2-player mode on tablets/foldables in landscape. It ensures Player 1 is always on the left and Player 2 is on the right, regardless of whether the system language is LTR (like English) or RTL (like Arabic).
 
 ## Proposed Changes
 
 ### [UI Screens]
-#### [MODIFY] `CreateScreen.kt`
+#### [MODIFY] [MainScreen.kt](file:///C:/Users/pc/umrhsn/Memoire/app/src/main/java/com/umrhsn/mmoire/ui/screens/MainScreen.kt)
 
-**1. Make Mobile Layout Scrollable**
-- Wrap the main content area (Step 1 and Step 2) in a `Column` with `verticalScroll`.
-- Move the Step 2 Header from the Step 1 `Column` to the bottom section or ensure it's part of the global scroll.
-- Ensure the bottom section (Step 2 Controls) is also part of the scroll or correctly positioned if it needs to be sticky. (I will make it part of the scroll for better space management on small screens).
+**1. Detect Layout Direction**
+- Inside `TwoPlayerLayoutSwitcher`, get the current `LayoutDirection` using `LocalLayoutDirection.current`.
 
-**2. Compact `EmptySelectionState`**
-- Reduce the icon size from 80dp to 64dp.
-- Reduce vertical padding and spacers within the card.
-- Ensure the card uses `wrapContentHeight` and does not force a large minimum height.
-
-**3. Fix Image Grid height in Scrollable Column**
-- Since `LazyVerticalGrid` cannot be directly placed in a `verticalScroll` with `fillMaxSize`, I will either:
-    - Use `Modifier.heightIn(max = ...)` for the grid.
-    - Or replace it with a non-lazy grid for mobile if the number of items is small (it's max 20).
-    - Or use `LazyColumn` for the whole screen and use `Grid` items.
-- Choice: I will use a `Column` with `verticalScroll` for the whole screen and implement the grid using `Row`s or a custom flow layout to allow it to expand naturally within the scroll.
+**2. Manual Slot Ordering in Landscape `Row`**
+- Replace the `CompositionLocalProvider` hack (which appears to be ineffective) with explicit logic.
+- If `isRtl`:
+    - Render the "Player 2" area first.
+    - Render the "Player 1" area second.
+    - Result in RTL: [P2 (Right)] [P1 (Left)]. Physically: [P1] [P2].
+- If `!isRtl`:
+    - Render the "Player 1" area first.
+    - Render the "Player 2" area second.
+    - Result in LTR: [P1 (Left)] [P2 (Right)]. Physically: [P1] [P2].
 
 ## Verification Plan
-- **Mobile Layout**: Open "New Board" on a phone.
-- **Empty State**: Confirm "No Photos Yet" card is fully visible and the "Open Gallery" button is correctly sized and has text.
-- **Scroll Check**: Verify the whole page can be scrolled if content exceeds the screen height.
-- **Tablet Check**: Ensure tablet layout (horizontal split) remains unaffected.
+
+### Manual Verification
+- **Tablet Landscape (Arabic)**: Confirm Player 1 is physically on the left and Player 2 is on the right.
+- **Tablet Landscape (English)**: Confirm Player 1 is on the left and Player 2 is on the right.
+- **Functionality**: Ensure rotations (Face-to-Face) remain correctly associated with the correct player slot.

@@ -304,6 +304,13 @@ private fun PersonalizationSection(uiState: SettingsUiState, viewModel: Settings
                 onCheckedChange = { viewModel.toggleBackgroundTint(it) },
                 icon = EvaIcons.Outline.Flash
             )
+
+            SettingsToggle(
+                title = stringResource(R.string.card_tint),
+                checked = uiState.isCardTintEnabled,
+                onCheckedChange = { viewModel.toggleCardTint(it) },
+                icon = EvaIcons.Outline.Flash
+            )
         }
     }
 }

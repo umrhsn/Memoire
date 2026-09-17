@@ -19,6 +19,7 @@ data class SettingsUiState(
     val currentTheme: AppTheme = AppTheme.SYSTEM,
     val currentColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
     val isTintEnabled: Boolean = false,
+    val isCardTintEnabled: Boolean = false,
     val pendingLanguage: String? = null,
     val showRestartDialog: Boolean = false
 )
@@ -35,7 +36,8 @@ class SettingsViewModel @Inject constructor(
             currentSoundEnabled = prefs.isSoundEnabled(),
             currentTheme = prefs.getTheme(),
             currentColorTheme = prefs.getColorTheme(),
-            isTintEnabled = prefs.isBackgroundTintEnabled()
+            isTintEnabled = prefs.isBackgroundTintEnabled(),
+            isCardTintEnabled = prefs.isCardTintEnabled()
         )
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -91,5 +93,10 @@ class SettingsViewModel @Inject constructor(
     fun toggleBackgroundTint(enabled: Boolean) {
         prefs.setBackgroundTintEnabled(enabled)
         _uiState.update { it.copy(isTintEnabled = enabled) }
+    }
+
+    fun toggleCardTint(enabled: Boolean) {
+        prefs.setCardTintEnabled(enabled)
+        _uiState.update { it.copy(isCardTintEnabled = enabled) }
     }
 }

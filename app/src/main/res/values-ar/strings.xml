@@ -102,6 +102,7 @@
     <string name="lang_es">Español</string>
     <string name="color_theme">لون التطبيق</string>
     <string name="background_tint">تظليل الخلفية</string>
+    <string name="card_tint">تلوين البطاقات</string>
     <string name="restart_required_title">إعادة تشغيل مطلوبة</string>
     <string name="restart_required_message">يحتاج التطبيق إلى إعادة التشغيل لتطبيق إعدادات اللغة الجديدة. هل تريد إعادة التشغيل الآن؟</string>
     <string name="restart_now">إعادة التشغيل الآن</string>

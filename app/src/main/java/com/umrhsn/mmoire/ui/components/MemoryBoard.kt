@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.umrhsn.mmoire.R
+import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.BoardSize
 import com.umrhsn.mmoire.models.MemoryCard
 import kotlinx.coroutines.delay
@@ -37,8 +38,8 @@ fun MemoryBoard(
     onCardClicked: (Int) -> Unit,
     modifier: Modifier = Modifier,
     isTwoPlayerMode: Boolean = false,
-    isTablet: Boolean = false,
-    isLandscape: Boolean = false
+    appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
+    isCardTintEnabled: Boolean = false
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -149,7 +150,9 @@ fun MemoryBoard(
                 ) {
                     MemoryCardItem(
                         memoryCard = card,
-                        onClick = { onCardClicked(index) }
+                        onClick = { onCardClicked(index) },
+                        appColorTheme = appColorTheme,
+                        isCardTintEnabled = isCardTintEnabled
                     )
                 }
             }

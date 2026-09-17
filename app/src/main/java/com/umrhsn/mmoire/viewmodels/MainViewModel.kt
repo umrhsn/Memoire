@@ -46,6 +46,7 @@ data class MainUiState(
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
     val isTintEnabled: Boolean = false,
+    val isCardTintEnabled: Boolean = false,
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
     val twoPlayerLayout: TwoPlayerLayout = TwoPlayerLayout.FACE_TO_FACE,
@@ -67,6 +68,7 @@ class MainViewModel @Inject constructor(
             appTheme = prefs.getTheme(),
             appColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
+            isCardTintEnabled = prefs.isCardTintEnabled(),
             twoPlayerLayout = prefs.getTwoPlayerLayout(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
@@ -96,6 +98,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.tintFlow.collect { enabled ->
                 _uiState.update { it.copy(isTintEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.cardTintFlow.collect { enabled ->
+                _uiState.update { it.copy(isCardTintEnabled = enabled) }
             }
         }
         viewModelScope.launch {

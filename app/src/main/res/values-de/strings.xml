@@ -98,6 +98,7 @@
     <string name="lang_es">Spanisch</string>
     <string name="color_theme">Farbschema</string>
     <string name="background_tint">Hintergrundtönung</string>
+    <string name="card_tint">Karten-Tönung</string>
     <string name="restart_required_title">Neustart erforderlich</string>
     <string name="restart_required_message">Die App muss neu gestartet werden, um die neuen Spracheinstellungen zu übernehmen. Jetzt neu starten?</string>
     <string name="restart_now">JETZT NEUSTARTEN</string>

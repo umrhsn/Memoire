@@ -29,6 +29,9 @@ class PrefsManager @Inject constructor(
     private val _tintFlow = MutableStateFlow(isBackgroundTintEnabled())
     val tintFlow: StateFlow<Boolean> = _tintFlow.asStateFlow()
 
+    private val _cardTintFlow = MutableStateFlow(isCardTintEnabled())
+    val cardTintFlow: StateFlow<Boolean> = _cardTintFlow.asStateFlow()
+
     private val _twoPlayerLayoutFlow = MutableStateFlow(getTwoPlayerLayoutInternal())
     val twoPlayerLayoutFlow: StateFlow<TwoPlayerLayout> = _twoPlayerLayoutFlow.asStateFlow()
 
@@ -103,6 +106,15 @@ class PrefsManager @Inject constructor(
     fun setBackgroundTintEnabled(enabled: Boolean) {
         prefs.edit { putBoolean("bg_tint_enabled", enabled) }
         _tintFlow.value = enabled
+    }
+
+    fun isCardTintEnabled(): Boolean {
+        return prefs.getBoolean("card_tint_enabled", false)
+    }
+
+    fun setCardTintEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean("card_tint_enabled", enabled) }
+        _cardTintFlow.value = enabled
     }
 
     fun getTwoPlayerLayout(): TwoPlayerLayout {
