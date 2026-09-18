@@ -1,7 +1,10 @@
 package com.umrhsn.mmoire.viewmodels
 
 import app.cash.turbine.test
+import com.umrhsn.mmoire.models.AppColorTheme
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.BoardSize
+import com.umrhsn.mmoire.models.TwoPlayerLayout
 import com.umrhsn.mmoire.models.UserImageList
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.utils.LocaleManager
@@ -9,6 +12,7 @@ import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -37,7 +41,19 @@ class MainViewModelTest {
     fun setUp() = runTest(testDispatcher) {
         Dispatchers.setMain(testDispatcher)
         whenever(localeManager.getSelectedLanguageTag()).thenReturn("en")
-        whenever(prefs.getTheme()).thenReturn(com.umrhsn.mmoire.models.AppTheme.SYSTEM)
+        whenever(prefs.getTheme()).thenReturn(AppTheme.SYSTEM)
+        whenever(prefs.getColorTheme()).thenReturn(AppColorTheme.DEFAULT)
+        whenever(prefs.isBackgroundTintEnabled()).thenReturn(true)
+        whenever(prefs.isCardTintEnabled()).thenReturn(true)
+        whenever(prefs.getLanguage()).thenReturn("en")
+        whenever(prefs.getTwoPlayerLayout()).thenReturn(TwoPlayerLayout.FACE_TO_FACE)
+        whenever(prefs.themeFlow).thenReturn(MutableStateFlow(AppTheme.SYSTEM))
+        whenever(prefs.colorThemeFlow).thenReturn(MutableStateFlow(AppColorTheme.DEFAULT))
+        whenever(prefs.tintFlow).thenReturn(MutableStateFlow(true))
+        whenever(prefs.cardTintFlow).thenReturn(MutableStateFlow(true))
+        whenever(prefs.localeFlow).thenReturn(MutableStateFlow("en"))
+        whenever(prefs.twoPlayerLayoutFlow).thenReturn(MutableStateFlow(TwoPlayerLayout.FACE_TO_FACE))
+
         whenever(prefs.isSoundEnabled()).thenReturn(true)
         whenever(prefs.isFirstTime()).thenReturn(false)
         whenever(repository.getRecord(any())).thenReturn(null)
@@ -55,7 +71,7 @@ class MainViewModelTest {
             val state = awaitItem()
             assertEquals(BoardSize.SUPER_DUPER_EASY, state.boardSize)
             assertNotNull(state.memoryGameP1)
-            assertEquals(com.umrhsn.mmoire.models.AppTheme.SYSTEM, state.appTheme)
+            assertEquals(AppTheme.SYSTEM, state.appTheme)
             assertEquals("en", state.appLanguage)
             cancelAndIgnoreRemainingEvents()
         }
@@ -101,7 +117,7 @@ class MainViewModelTest {
     fun `refreshSettings updates state from prefs`() = runTest(testDispatcher) {
         whenever(localeManager.getSelectedLanguageTag()).thenReturn("fr")
         whenever(prefs.isSoundEnabled()).thenReturn(false)
-        whenever(prefs.getTheme()).thenReturn(com.umrhsn.mmoire.models.AppTheme.DARK)
+        whenever(prefs.getTheme()).thenReturn(AppTheme.DARK)
 
         viewModel.refreshSettings()
 
@@ -109,7 +125,7 @@ class MainViewModelTest {
             val state = awaitItem()
             assertEquals("fr", state.appLanguage)
             assertEquals(false, state.isSoundEnabled)
-            assertEquals(com.umrhsn.mmoire.models.AppTheme.DARK, state.appTheme)
+            assertEquals(AppTheme.DARK, state.appTheme)
             cancelAndIgnoreRemainingEvents()
         }
     }

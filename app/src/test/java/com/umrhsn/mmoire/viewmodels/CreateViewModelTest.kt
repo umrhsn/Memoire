@@ -1,21 +1,27 @@
 package com.umrhsn.mmoire.viewmodels
 
+import android.content.ContentResolver
+import android.net.Uri
 import app.cash.turbine.test
+import com.umrhsn.mmoire.models.AppColorTheme
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.models.UserImageList
 import com.umrhsn.mmoire.repository.GameRepository
+import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -30,16 +36,28 @@ class CreateViewModelTest {
 
     private val repository: GameRepository = mock()
     private val soundManager: SoundManager = mock()
+    private val prefs: PrefsManager = mock()
+    private val contentResolver: ContentResolver = mock()
     private lateinit var viewModel: CreateViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    @BeforeEach
+    @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = CreateViewModel(repository, soundManager)
+
+        whenever(prefs.getTheme()).thenReturn(AppTheme.SYSTEM)
+        whenever(prefs.getColorTheme()).thenReturn(AppColorTheme.DEFAULT)
+        whenever(prefs.isBackgroundTintEnabled()).thenReturn(true)
+        whenever(prefs.getLanguage()).thenReturn("en")
+        whenever(prefs.themeFlow).thenReturn(MutableStateFlow(AppTheme.SYSTEM))
+        whenever(prefs.colorThemeFlow).thenReturn(MutableStateFlow(AppColorTheme.DEFAULT))
+        whenever(prefs.tintFlow).thenReturn(MutableStateFlow(true))
+        whenever(prefs.localeFlow).thenReturn(MutableStateFlow("en"))
+
+        viewModel = CreateViewModel(repository, soundManager, prefs)
     }
 
-    @AfterEach
+    @After
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -70,14 +88,15 @@ class CreateViewModelTest {
     @Test
     fun `createGame success updates state`() = runTest(testDispatcher) {
         val gameName = "newGame"
-        val imageBytes = listOf(byteArrayOf(1, 2))
+        val uris = listOf(Uri.parse("content://media/external/images/media/1"))
+
         whenever(repository.checkGameExists(gameName)).thenReturn(false)
         whenever(repository.uploadImage(eq(gameName), any(), any())).thenReturn("url1")
         whenever(repository.createGame(eq(gameName), any())).thenReturn(true)
 
         viewModel.uiState.test {
             awaitItem() // Initial
-            viewModel.createGame(gameName, imageBytes)
+            viewModel.createGame(contentResolver, gameName, uris)
 
             // Skip progress states
             var state = awaitItem()
@@ -96,11 +115,12 @@ class CreateViewModelTest {
     @Test
     fun `createGame with existing name sets nameTaken`() = runTest(testDispatcher) {
         val gameName = "existing"
+
         whenever(repository.checkGameExists(gameName)).thenReturn(true)
 
         viewModel.uiState.test {
             awaitItem() // Initial
-            viewModel.createGame(gameName, emptyList())
+            viewModel.createGame(contentResolver, gameName, emptyList())
 
             var lastState = awaitItem()
             // We might get the combined result immediately or intermediate states

@@ -1,11 +1,15 @@
 package com.umrhsn.mmoire.viewmodels
 
 import app.cash.turbine.test
+import com.umrhsn.mmoire.models.AppColorTheme
+import com.umrhsn.mmoire.models.AppTheme
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.repository.UserImageListWithId
+import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -23,6 +27,7 @@ class BrowseViewModelTest {
 
     private val repository: GameRepository = mock()
     private val soundManager: SoundManager = mock()
+    private val prefs: PrefsManager = mock()
     private lateinit var viewModel: BrowseViewModel
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -36,7 +41,18 @@ class BrowseViewModelTest {
     fun setUp() = runTest(testDispatcher) {
         Dispatchers.setMain(testDispatcher)
         whenever(repository.getAllLocalGames()).thenReturn(testGames)
-        viewModel = BrowseViewModel(repository, soundManager)
+
+        whenever(prefs.getTheme()).thenReturn(AppTheme.SYSTEM)
+        whenever(prefs.getColorTheme()).thenReturn(AppColorTheme.DEFAULT)
+        whenever(prefs.isBackgroundTintEnabled()).thenReturn(true)
+        whenever(prefs.getLanguage()).thenReturn("en")
+        whenever(prefs.themeFlow).thenReturn(MutableStateFlow(AppTheme.SYSTEM))
+        whenever(prefs.colorThemeFlow).thenReturn(MutableStateFlow(AppColorTheme.DEFAULT))
+        whenever(prefs.tintFlow).thenReturn(MutableStateFlow(true))
+        whenever(prefs.cardTintFlow).thenReturn(MutableStateFlow(true))
+        whenever(prefs.localeFlow).thenReturn(MutableStateFlow("en"))
+
+        viewModel = BrowseViewModel(repository, soundManager, prefs)
     }
 
     @AfterEach
