@@ -20,6 +20,7 @@ data class SettingsUiState(
     val currentColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
     val isTintEnabled: Boolean = false,
     val isCardTintEnabled: Boolean = false,
+    val isHighVisibilityModeEnabled: Boolean = false,
     val pendingLanguage: String? = null,
     val showRestartDialog: Boolean = false
 )
@@ -37,7 +38,8 @@ class SettingsViewModel @Inject constructor(
             currentTheme = prefs.getTheme(),
             currentColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
-            isCardTintEnabled = prefs.isCardTintEnabled()
+            isCardTintEnabled = prefs.isCardTintEnabled(),
+            isHighVisibilityModeEnabled = prefs.isHighVisibilityModeEnabled()
         )
     )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
@@ -98,5 +100,10 @@ class SettingsViewModel @Inject constructor(
     fun toggleCardTint(enabled: Boolean) {
         prefs.setCardTintEnabled(enabled)
         _uiState.update { it.copy(isCardTintEnabled = enabled) }
+    }
+
+    fun toggleHighVisibilityMode(enabled: Boolean) {
+        prefs.setHighVisibilityModeEnabled(enabled)
+        _uiState.update { it.copy(isHighVisibilityModeEnabled = enabled) }
     }
 }

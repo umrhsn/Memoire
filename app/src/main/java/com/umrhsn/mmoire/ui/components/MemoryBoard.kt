@@ -39,7 +39,8 @@ fun MemoryBoard(
     modifier: Modifier = Modifier,
     isTwoPlayerMode: Boolean = false,
     appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
-    isCardTintEnabled: Boolean = false
+    isCardTintEnabled: Boolean = false,
+    isHighVisibilityModeEnabled: Boolean = false
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -152,7 +153,8 @@ fun MemoryBoard(
                         memoryCard = card,
                         onClick = { onCardClicked(index) },
                         appColorTheme = appColorTheme,
-                        isCardTintEnabled = isCardTintEnabled
+                        isCardTintEnabled = isCardTintEnabled,
+                        isHighVisibilityModeEnabled = isHighVisibilityModeEnabled
                     )
                 }
             }

@@ -37,12 +37,14 @@ class SettingsViewModelTest {
         whenever(prefs.getColorTheme()).thenReturn(AppColorTheme.DEFAULT)
         whenever(prefs.isBackgroundTintEnabled()).thenReturn(true)
         whenever(prefs.isCardTintEnabled()).thenReturn(true)
+        whenever(prefs.isHighVisibilityModeEnabled()).thenReturn(false)
         whenever(prefs.getLanguage()).thenReturn("en")
         whenever(prefs.themeFlow).thenReturn(MutableStateFlow(AppTheme.SYSTEM))
         whenever(prefs.colorThemeFlow).thenReturn(MutableStateFlow(AppColorTheme.DEFAULT))
         whenever(prefs.tintFlow).thenReturn(MutableStateFlow(true))
         whenever(prefs.cardTintFlow).thenReturn(MutableStateFlow(true))
         whenever(prefs.localeFlow).thenReturn(MutableStateFlow("en"))
+        whenever(prefs.highVisibilityModeFlow).thenReturn(MutableStateFlow(false))
 
         whenever(localeManager.getSelectedLanguageTag()).thenReturn("en")
         viewModel = SettingsViewModel(prefs, localeManager)
@@ -100,6 +102,17 @@ class SettingsViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertEquals(false, state.currentSoundEnabled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `toggleHighVisibilityMode changes state and prefs immediately`() = runTest(testDispatcher) {
+        viewModel.toggleHighVisibilityMode(true)
+        verify(prefs).setHighVisibilityModeEnabled(true)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals(true, state.isHighVisibilityModeEnabled)
             cancelAndIgnoreRemainingEvents()
         }
     }

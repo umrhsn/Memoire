@@ -98,8 +98,15 @@
     <string name="lang_de">Alemán</string>
     <string name="lang_es">Español</string>
     <string name="color_theme">Tema de color</string>
+    <string name="color_default">Predeterminado</string>
+    <string name="color_red">Rojo</string>
+    <string name="color_blue">Azul</string>
+    <string name="color_green">Verde</string>
+    <string name="color_orange">Naranja</string>
     <string name="background_tint">Tinte de fondo</string>
     <string name="card_tint">Tinte de las cartas</string>
+    <string name="high_visibility_mode">Modo de alta visibilidad</string>
+    <string name="high_visibility_mode_desc">Añade iconos y etiquetas para ayudar a distinguir colores y estados del juego.</string>
     <string name="restart_required_title">Reinicio Requerido</string>
     <string name="restart_required_message">La aplicación necesita reiniciarse para aplicar los nuevos ajustes de idioma. ¿Reiniciar ahora?</string>
     <string name="restart_now">REINICIAR AHORA</string>

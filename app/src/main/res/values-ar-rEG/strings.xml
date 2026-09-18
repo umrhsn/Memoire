@@ -101,7 +101,15 @@
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
     <string name="color_theme">لون اللعبة</string>
+    <string name="color_default">العادي</string>
+    <string name="color_red">أحمر</string>
+    <string name="color_blue">أزرق</string>
+    <string name="color_green">أخضر</string>
+    <string name="color_orange">برتقالي</string>
     <string name="background_tint">لون خفيف للخلفية</string>
+    <string name="card_tint">تلوين الكروت</string>
+    <string name="high_visibility_mode">وضع الرؤية الواضحة</string>
+    <string name="high_visibility_mode_desc">بيضيف أيقونات وعلامات عشان تساعدك تفرق بين الألوان وحالات اللعب.</string>
     <string name="restart_required_title">محتاجين نقفل ونفتح تاني</string>
     <string name="restart_required_message">اللعبة محتاجة تقفل وتفتح تاني عشان نغير اللغة. نقفل دلوقتي؟</string>
     <string name="restart_now">اقفل دلوقتي</string>

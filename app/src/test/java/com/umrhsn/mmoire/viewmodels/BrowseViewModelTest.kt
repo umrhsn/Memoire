@@ -45,12 +45,14 @@ class BrowseViewModelTest {
         whenever(prefs.getTheme()).thenReturn(AppTheme.SYSTEM)
         whenever(prefs.getColorTheme()).thenReturn(AppColorTheme.DEFAULT)
         whenever(prefs.isBackgroundTintEnabled()).thenReturn(true)
+        whenever(prefs.isHighVisibilityModeEnabled()).thenReturn(false)
         whenever(prefs.getLanguage()).thenReturn("en")
         whenever(prefs.themeFlow).thenReturn(MutableStateFlow(AppTheme.SYSTEM))
         whenever(prefs.colorThemeFlow).thenReturn(MutableStateFlow(AppColorTheme.DEFAULT))
         whenever(prefs.tintFlow).thenReturn(MutableStateFlow(true))
         whenever(prefs.cardTintFlow).thenReturn(MutableStateFlow(true))
         whenever(prefs.localeFlow).thenReturn(MutableStateFlow("en"))
+        whenever(prefs.highVisibilityModeFlow).thenReturn(MutableStateFlow(false))
 
         viewModel = BrowseViewModel(repository, soundManager, prefs)
     }

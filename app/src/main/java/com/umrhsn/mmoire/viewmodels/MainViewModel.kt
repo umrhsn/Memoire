@@ -50,6 +50,7 @@ data class MainUiState(
     val isSoundEnabled: Boolean = true,
     val isTwoPlayerMode: Boolean = false,
     val twoPlayerLayout: TwoPlayerLayout = TwoPlayerLayout.FACE_TO_FACE,
+    val isHighVisibilityModeEnabled: Boolean = false,
     val winner: Int? = null,
     val hasTriggeredWinEffects: Boolean = false
 )
@@ -69,6 +70,7 @@ class MainViewModel @Inject constructor(
             appColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
             isCardTintEnabled = prefs.isCardTintEnabled(),
+            isHighVisibilityModeEnabled = prefs.isHighVisibilityModeEnabled(),
             twoPlayerLayout = prefs.getTwoPlayerLayout(),
             isSoundEnabled = prefs.isSoundEnabled()
         )
@@ -103,6 +105,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.cardTintFlow.collect { enabled ->
                 _uiState.update { it.copy(isCardTintEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.highVisibilityModeFlow.collect { enabled ->
+                _uiState.update { it.copy(isHighVisibilityModeEnabled = enabled) }
             }
         }
         viewModelScope.launch {

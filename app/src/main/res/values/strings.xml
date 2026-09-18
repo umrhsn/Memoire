@@ -97,8 +97,15 @@
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
     <string name="color_theme">Color Theme</string>
+    <string name="color_default">Default</string>
+    <string name="color_red">Red</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_green">Green</string>
+    <string name="color_orange">Orange</string>
     <string name="background_tint">Background Tint</string>
     <string name="card_tint">Card Tint</string>
+    <string name="high_visibility_mode">High-visibility mode</string>
+    <string name="high_visibility_mode_desc">Adds icons and labels to help distinguish colors and game states.</string>
     <string name="restart_required_title">Restart Required</string>
     <string name="restart_required_message">The app needs to restart to apply the new language settings. Restart now?</string>
     <string name="restart_now">RESTART NOW</string>

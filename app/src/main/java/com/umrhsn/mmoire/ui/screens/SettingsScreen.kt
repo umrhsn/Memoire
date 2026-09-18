@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -276,17 +278,35 @@ private fun PersonalizationSection(uiState: SettingsUiState, viewModel: Settings
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val colorThemes = listOf(
-                        AppColorTheme.DEFAULT to MemoirePrimary,
-                        AppColorTheme.RED to RedPrimary,
-                        AppColorTheme.BLUE to BluePrimary,
-                        AppColorTheme.GREEN to GreenPrimary,
-                        AppColorTheme.ORANGE to OrangePrimary
+                        Triple(
+                            AppColorTheme.DEFAULT,
+                            MemoirePrimary,
+                            stringResource(R.string.color_default)
+                        ),
+                        Triple(AppColorTheme.RED, RedPrimary, stringResource(R.string.color_red)),
+                        Triple(
+                            AppColorTheme.BLUE,
+                            BluePrimary,
+                            stringResource(R.string.color_blue)
+                        ),
+                        Triple(
+                            AppColorTheme.GREEN,
+                            GreenPrimary,
+                            stringResource(R.string.color_green)
+                        ),
+                        Triple(
+                            AppColorTheme.ORANGE,
+                            OrangePrimary,
+                            stringResource(R.string.color_orange)
+                        )
                     )
 
-                    colorThemes.forEach { (theme, color) ->
+                    colorThemes.forEach { (theme, color, label) ->
                         ColorThemeCircle(
                             color = color,
+                            label = label,
                             selected = uiState.currentColorTheme == theme,
+                            isHighVisibilityEnabled = uiState.isHighVisibilityModeEnabled,
                             onClick = { viewModel.updateColorTheme(theme) }
                         )
                     }
@@ -309,6 +329,13 @@ private fun PersonalizationSection(uiState: SettingsUiState, viewModel: Settings
                 title = stringResource(R.string.card_tint),
                 checked = uiState.isCardTintEnabled,
                 onCheckedChange = { viewModel.toggleCardTint(it) },
+                icon = EvaIcons.Outline.Flash
+            )
+
+            SettingsToggle(
+                title = stringResource(R.string.high_visibility_mode),
+                checked = uiState.isHighVisibilityModeEnabled,
+                onCheckedChange = { viewModel.toggleHighVisibilityMode(it) },
                 icon = EvaIcons.Outline.Flash
             )
         }
@@ -352,38 +379,58 @@ private fun LanguageSection(
 @Composable
 private fun ColorThemeCircle(
     color: Color,
+    label: String,
     selected: Boolean,
+    isHighVisibilityEnabled: Boolean,
     onClick: () -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(if (selected) color.copy(alpha = 0.2f) else Color.Transparent)
-            .clickable { onClick() }
-            .padding(6.dp),
-        contentAlignment = Alignment.Center
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            shape = CircleShape,
-            color = color,
-            border = if (selected) BorderStroke(
-                2.dp,
-                MaterialTheme.colorScheme.onSurface
-            ) else null,
-            shadowElevation = if (selected) 4.dp else 0.dp
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(if (selected) color.copy(alpha = 0.2f) else Color.Transparent)
+                .clickable { onClick() }
+                .padding(6.dp),
+            contentAlignment = Alignment.Center
         ) {
-            if (selected) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = EvaIcons.Outline.CheckmarkCircle2,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = CircleShape,
+                color = color,
+                border = if (selected) BorderStroke(
+                    2.dp,
+                    MaterialTheme.colorScheme.onSurface
+                ) else null,
+                shadowElevation = if (selected) 4.dp else 0.dp
+            ) {
+                if (selected) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = EvaIcons.Outline.CheckmarkCircle2,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
+        }
+
+        if (isHighVisibilityEnabled) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.widthIn(max = 60.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

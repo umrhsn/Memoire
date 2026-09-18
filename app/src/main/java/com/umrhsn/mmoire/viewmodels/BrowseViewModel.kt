@@ -25,6 +25,7 @@ data class BrowseUiState(
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
     val isTintEnabled: Boolean = false,
+    val isHighVisibilityModeEnabled: Boolean = false,
     val appLanguage: String? = null
 )
 
@@ -44,7 +45,8 @@ class BrowseViewModel @Inject constructor(
             appTheme = prefs.getTheme(),
             appColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
-            appLanguage = prefs.getLanguage()
+            appLanguage = prefs.getLanguage(),
+            isHighVisibilityModeEnabled = prefs.isHighVisibilityModeEnabled()
         )
     )
     val uiState: StateFlow<BrowseUiState> = _uiState.asStateFlow()
@@ -66,6 +68,11 @@ class BrowseViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.tintFlow.collect { enabled ->
                 _uiState.update { it.copy(isTintEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.highVisibilityModeFlow.collect { enabled ->
+                _uiState.update { it.copy(isHighVisibilityModeEnabled = enabled) }
             }
         }
         viewModelScope.launch {

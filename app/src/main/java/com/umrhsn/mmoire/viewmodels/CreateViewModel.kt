@@ -40,6 +40,7 @@ data class CreateUiState(
     val appTheme: AppTheme = AppTheme.SYSTEM,
     val appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
     val isTintEnabled: Boolean = false,
+    val isHighVisibilityModeEnabled: Boolean = false,
     val appLanguage: String? = null
 )
 
@@ -55,7 +56,8 @@ class CreateViewModel @Inject constructor(
             appTheme = prefs.getTheme(),
             appColorTheme = prefs.getColorTheme(),
             isTintEnabled = prefs.isBackgroundTintEnabled(),
-            appLanguage = prefs.getLanguage()
+            appLanguage = prefs.getLanguage(),
+            isHighVisibilityModeEnabled = prefs.isHighVisibilityModeEnabled()
         )
     )
     val uiState: StateFlow<CreateUiState> = _uiState.asStateFlow()
@@ -75,6 +77,11 @@ class CreateViewModel @Inject constructor(
         viewModelScope.launch {
             prefs.tintFlow.collect { enabled ->
                 _uiState.update { it.copy(isTintEnabled = enabled) }
+            }
+        }
+        viewModelScope.launch {
+            prefs.highVisibilityModeFlow.collect { enabled ->
+                _uiState.update { it.copy(isHighVisibilityModeEnabled = enabled) }
             }
         }
         viewModelScope.launch {

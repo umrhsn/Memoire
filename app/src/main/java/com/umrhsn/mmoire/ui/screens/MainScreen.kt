@@ -368,7 +368,8 @@ private fun TwoPlayerLayoutSwitcher(
                     statsAtBottom = false,
                     useCompactHeader = !isTablet,
                     appColorTheme = uiState.appColorTheme,
-                    isCardTintEnabled = uiState.isCardTintEnabled
+                    isCardTintEnabled = uiState.isCardTintEnabled,
+                    isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                 )
             }
             HorizontalDivider(
@@ -392,7 +393,8 @@ private fun TwoPlayerLayoutSwitcher(
                     statsAtBottom = false,
                     useCompactHeader = !isTablet,
                     appColorTheme = uiState.appColorTheme,
-                    isCardTintEnabled = uiState.isCardTintEnabled
+                    isCardTintEnabled = uiState.isCardTintEnabled,
+                    isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                 )
             }
         }
@@ -423,7 +425,8 @@ private fun TwoPlayerLayoutSwitcher(
                                         statsAtBottom = false, // Top rotates to divider
                                         useCompactHeader = true,
                                         appColorTheme = uiState.appColorTheme,
-                                        isCardTintEnabled = uiState.isCardTintEnabled
+                                        isCardTintEnabled = uiState.isCardTintEnabled,
+                                        isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                                     )
                                 }
                             }
@@ -440,7 +443,8 @@ private fun TwoPlayerLayoutSwitcher(
                                 isTablet = isTablet,
                                 statsAtBottom = false,
                                 appColorTheme = uiState.appColorTheme,
-                                isCardTintEnabled = uiState.isCardTintEnabled
+                                isCardTintEnabled = uiState.isCardTintEnabled,
+                                isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                             )
                         }
                     }
@@ -471,7 +475,8 @@ private fun TwoPlayerLayoutSwitcher(
                                         statsAtBottom = false, // Top rotates to divider
                                         useCompactHeader = true,
                                         appColorTheme = uiState.appColorTheme,
-                                        isCardTintEnabled = uiState.isCardTintEnabled
+                                        isCardTintEnabled = uiState.isCardTintEnabled,
+                                        isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                                     )
                                 }
                             }
@@ -492,7 +497,8 @@ private fun TwoPlayerLayoutSwitcher(
                                     isTablet = isTablet,
                                     statsAtBottom = false,
                                     appColorTheme = uiState.appColorTheme,
-                                    isCardTintEnabled = uiState.isCardTintEnabled
+                                    isCardTintEnabled = uiState.isCardTintEnabled,
+                                    isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                                 )
                             }
                         }
@@ -508,7 +514,8 @@ private fun TwoPlayerLayoutSwitcher(
                                 isTablet = isTablet,
                                 statsAtBottom = false,
                                 appColorTheme = uiState.appColorTheme,
-                                isCardTintEnabled = uiState.isCardTintEnabled
+                                isCardTintEnabled = uiState.isCardTintEnabled,
+                                isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
                             )
                         }
                     }
@@ -730,7 +737,8 @@ private fun GameBoardArea(
                     onCardClicked(pos, 1)
                 },
                 appColorTheme = uiState.appColorTheme,
-                isCardTintEnabled = uiState.isCardTintEnabled
+                isCardTintEnabled = uiState.isCardTintEnabled,
+                isHighVisibilityModeEnabled = uiState.isHighVisibilityModeEnabled
             )
         }
     }
@@ -879,7 +887,8 @@ private fun PlayerRaceHalf(
     statsAtBottom: Boolean = false,
     useCompactHeader: Boolean = false,
     appColorTheme: AppColorTheme = AppColorTheme.DEFAULT,
-    isCardTintEnabled: Boolean = false
+    isCardTintEnabled: Boolean = false,
+    isHighVisibilityModeEnabled: Boolean = false
 ) {
     val haptic = LocalHapticFeedback.current
     Column(
@@ -907,7 +916,8 @@ private fun PlayerRaceHalf(
                         onCardClicked(it)
                     },
                     appColorTheme = appColorTheme,
-                    isCardTintEnabled = isCardTintEnabled
+                    isCardTintEnabled = isCardTintEnabled,
+                    isHighVisibilityModeEnabled = isHighVisibilityModeEnabled
                 )
             }
         }

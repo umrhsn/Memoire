@@ -32,6 +32,9 @@ class PrefsManager @Inject constructor(
     private val _cardTintFlow = MutableStateFlow(isCardTintEnabled())
     val cardTintFlow: StateFlow<Boolean> = _cardTintFlow.asStateFlow()
 
+    private val _highVisibilityFlow = MutableStateFlow(isHighVisibilityModeEnabled())
+    val highVisibilityModeFlow: StateFlow<Boolean> = _highVisibilityFlow.asStateFlow()
+
     private val _twoPlayerLayoutFlow = MutableStateFlow(getTwoPlayerLayoutInternal())
     val twoPlayerLayoutFlow: StateFlow<TwoPlayerLayout> = _twoPlayerLayoutFlow.asStateFlow()
 
@@ -115,6 +118,15 @@ class PrefsManager @Inject constructor(
     fun setCardTintEnabled(enabled: Boolean) {
         prefs.edit { putBoolean("card_tint_enabled", enabled) }
         _cardTintFlow.value = enabled
+    }
+
+    fun isHighVisibilityModeEnabled(): Boolean {
+        return prefs.getBoolean("high_visibility_enabled", false)
+    }
+
+    fun setHighVisibilityModeEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean("high_visibility_enabled", enabled) }
+        _highVisibilityFlow.value = enabled
     }
 
     fun getTwoPlayerLayout(): TwoPlayerLayout {

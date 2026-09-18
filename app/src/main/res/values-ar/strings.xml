@@ -101,8 +101,15 @@
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
     <string name="color_theme">لون التطبيق</string>
+    <string name="color_default">افتراضي</string>
+    <string name="color_red">أحمر</string>
+    <string name="color_blue">أزرق</string>
+    <string name="color_green">أخضر</string>
+    <string name="color_orange">برتقالي</string>
     <string name="background_tint">تظليل الخلفية</string>
     <string name="card_tint">تلوين البطاقات</string>
+    <string name="high_visibility_mode">وضع وضوح الرؤية</string>
+    <string name="high_visibility_mode_desc">يضيف أيقونات وعلامات للمساعدة في تمييز الألوان وحالات اللعبة.</string>
     <string name="restart_required_title">إعادة تشغيل مطلوبة</string>
     <string name="restart_required_message">يحتاج التطبيق إلى إعادة التشغيل لتطبيق إعدادات اللغة الجديدة. هل تريد إعادة التشغيل الآن؟</string>
     <string name="restart_now">إعادة التشغيل الآن</string>

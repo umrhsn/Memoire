@@ -97,8 +97,15 @@
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Spanisch</string>
     <string name="color_theme">Farbschema</string>
+    <string name="color_default">Standard</string>
+    <string name="color_red">Rot</string>
+    <string name="color_blue">Blau</string>
+    <string name="color_green">Grün</string>
+    <string name="color_orange">Orange</string>
     <string name="background_tint">Hintergrundtönung</string>
     <string name="card_tint">Karten-Tönung</string>
+    <string name="high_visibility_mode">Hoher Kontrast</string>
+    <string name="high_visibility_mode_desc">Fügt Symbole und Beschriftungen hinzu, um Farben und Spielzustände besser zu unterscheiden.</string>
     <string name="restart_required_title">Neustart erforderlich</string>
     <string name="restart_required_message">Die App muss neu gestartet werden, um die neuen Spracheinstellungen zu übernehmen. Jetzt neu starten?</string>
     <string name="restart_now">JETZT NEUSTARTEN</string>
