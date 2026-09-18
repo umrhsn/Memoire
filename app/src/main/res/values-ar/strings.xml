@@ -156,6 +156,7 @@
     <string name="board_identity_label">اسم اللعبة</string>
     <string name="board_id_placeholder">مثلاً: رحلة العائلة</string>
     <string name="saving_board">جاري الحفظ…</string>
+    <string name="finalizing_board">جاري المعالجة…</string>
     <string name="create_and_play">إنشاء ولعب</string>
     <string name="board_ready_title">اللعبة جاهزة! 🎉</string>
     <string name="board_ready_message">لعبتك \'%1$s\' جاهزة. تم حفظها في جهازك.</string>

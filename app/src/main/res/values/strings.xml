@@ -144,6 +144,7 @@
     <string name="board_identity_label">Board Identity</string>
     <string name="board_id_placeholder">e.g., Family Vacation</string>
     <string name="saving_board">SAVING BOARD…</string>
+    <string name="finalizing_board">FINALIZING BOARD…</string>
     <string name="create_and_play">CREATE &amp; PLAY</string>
     <string name="board_ready_title">Board Ready! 🎉</string>
     <string name="board_ready_message">Your custom board \'%1$s\' is ready to play. It has been saved to your local storage.</string>

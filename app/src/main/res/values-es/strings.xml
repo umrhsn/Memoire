@@ -147,6 +147,7 @@
     <string name="board_identity_label">Identidad del tablero</string>
     <string name="board_id_placeholder">ej. vacaciones_familia</string>
     <string name="saving_board">GUARDANDO TABLERO…</string>
+    <string name="finalizing_board">FINALIZANDO TABLERO…</string>
     <string name="create_and_play">CREAR Y JUGAR</string>
     <string name="board_ready_title">¡Tablero listo! 🎉</string>
     <string name="board_ready_message">Tu tablero \'%1$s\' está listo y guardado localmente.</string>

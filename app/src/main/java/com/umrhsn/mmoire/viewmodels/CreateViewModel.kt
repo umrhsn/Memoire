@@ -1,25 +1,35 @@
 package com.umrhsn.mmoire.viewmodels
 
+import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.AppColorTheme
 import com.umrhsn.mmoire.models.AppTheme
+import com.umrhsn.mmoire.networking.BitmapScaler
 import com.umrhsn.mmoire.repository.GameRepository
 import com.umrhsn.mmoire.utils.PrefsManager
 import com.umrhsn.mmoire.utils.SoundManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 data class CreateUiState(
     val isLoading: Boolean = false,
     val isUploading: Boolean = false,
+    val isProcessing: Boolean = false,
     val uploadProgress: Int = 0,
     val isSuccess: Boolean = false,
     val errorMessage: Int? = null,
@@ -100,11 +110,17 @@ class CreateViewModel @Inject constructor(
         }
     }
 
-    fun createGame(gameName: String, imageByteArrays: List<ByteArray>, oldName: String? = null) {
+    fun createGame(
+        contentResolver: ContentResolver,
+        gameName: String,
+        imageUris: List<Uri>,
+        oldName: String? = null
+    ) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    isUploading = true,
+                    isProcessing = true,
+                    isUploading = false,
                     errorMessage = null,
                     errorArg = null,
                     nameTaken = false
@@ -115,13 +131,22 @@ class CreateViewModel @Inject constructor(
                 soundManager.playSound(SoundManager.SoundType.MATCH_FAIL)
                 _uiState.update {
                     it.copy(
-                        isUploading = false,
+                        isProcessing = false,
                         nameTaken = true,
                         gameName = gameName
                     )
                 }
                 return@launch
             }
+
+            // Process images on IO dispatcher to avoid ANR
+            val imageByteArrays = withContext(Dispatchers.IO) {
+                imageUris.map { uri ->
+                    getImageByteArray(contentResolver, uri)
+                }
+            }
+
+            _uiState.update { it.copy(isProcessing = false, isUploading = true) }
 
             val imageUrls = mutableListOf<String>()
 
@@ -172,5 +197,23 @@ class CreateViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun getImageByteArray(contentResolver: ContentResolver, photoUri: Uri): ByteArray {
+        val originalBitmap = try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(contentResolver, photoUri)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
+            }
+        } catch (e: Exception) {
+            Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        }
+        val scaledBitmap = BitmapScaler.scaleToFitHeight(originalBitmap, 250)
+        val byteOutputStream = ByteArrayOutputStream()
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteOutputStream)
+        return byteOutputStream.toByteArray()
     }
 }

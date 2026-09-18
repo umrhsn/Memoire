@@ -419,9 +419,9 @@ private fun TwoPlayerLayoutSwitcher(
                                         boardSize = uiState.boardSize,
                                         timeSeconds = uiState.timerSeconds,
                                         onCardClicked = { onCardClicked(it, 1) },
-                                    isTablet = isTablet,
-                                    statsAtBottom = false, // Top rotates to divider
-                                    useCompactHeader = true,
+                                        isTablet = isTablet,
+                                        statsAtBottom = false, // Top rotates to divider
+                                        useCompactHeader = true,
                                         appColorTheme = uiState.appColorTheme,
                                         isCardTintEnabled = uiState.isCardTintEnabled
                                     )
@@ -467,9 +467,9 @@ private fun TwoPlayerLayoutSwitcher(
                                         boardSize = uiState.boardSize,
                                         timeSeconds = uiState.timerSecondsP2,
                                         onCardClicked = { onCardClicked(it, 2) },
-                                    isTablet = isTablet,
-                                    statsAtBottom = false, // Top rotates to divider
-                                    useCompactHeader = true,
+                                        isTablet = isTablet,
+                                        statsAtBottom = false, // Top rotates to divider
+                                        useCompactHeader = true,
                                         appColorTheme = uiState.appColorTheme,
                                         isCardTintEnabled = uiState.isCardTintEnabled
                                     )
@@ -489,8 +489,8 @@ private fun TwoPlayerLayoutSwitcher(
                                     boardSize = uiState.boardSize,
                                     timeSeconds = uiState.timerSecondsP2,
                                     onCardClicked = { onCardClicked(it, 2) },
-                                isTablet = isTablet,
-                                statsAtBottom = false,
+                                    isTablet = isTablet,
+                                    statsAtBottom = false,
                                     appColorTheme = uiState.appColorTheme,
                                     isCardTintEnabled = uiState.isCardTintEnabled
                                 )

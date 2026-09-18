@@ -147,6 +147,7 @@
     <string name="board_identity_label">Identité du plateau</string>
     <string name="board_id_placeholder">ex: vacances_famille</string>
     <string name="saving_board">SAUVEGARDE EN COURS…</string>
+    <string name="finalizing_board">FINALISATION EN COURS…</string>
     <string name="create_and_play">CRÉER &amp; JOUER</string>
     <string name="board_ready_title">Plateau prêt ! 🎉</string>
     <string name="board_ready_message">Votre plateau \'%1$s\' est prêt et a été sauvegardé localement.</string>

@@ -86,7 +86,6 @@ import compose.icons.evaicons.outline.Image
 import compose.icons.evaicons.outline.Plus
 import compose.icons.evaicons.outline.Save
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScreen(
     viewModel: CreateViewModel,
@@ -99,7 +98,7 @@ fun CreateScreen(
     onPlaceholderClicked: () -> Unit,
     onImageClicked: (Int) -> Unit,
     onRemoveImage: (Uri) -> Unit,
-    onSaveClicked: (String) -> Unit
+    onSaveClicked: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var gameName by remember { mutableStateOf(oldName ?: "") }
@@ -183,6 +182,7 @@ fun CreateScreen(
                             gameName = gameName,
                             onNameChange = { gameName = it },
                             isUploading = uiState.isUploading,
+                            isProcessing = uiState.isProcessing,
                             uploadProgress = uiState.uploadProgress,
                             numChosen = chosenImageUris.size,
                             numRequired = numImagesRequired,
@@ -233,6 +233,7 @@ fun CreateScreen(
                         gameName = gameName,
                         onNameChange = { gameName = it },
                         isUploading = uiState.isUploading,
+                        isProcessing = uiState.isProcessing,
                         uploadProgress = uiState.uploadProgress,
                         numChosen = chosenImageUris.size,
                         numRequired = numImagesRequired,
@@ -392,6 +393,7 @@ private fun CreateControls(
     gameName: String,
     onNameChange: (String) -> Unit,
     isUploading: Boolean,
+    isProcessing: Boolean,
     uploadProgress: Int,
     numChosen: Int,
     numRequired: Int,
@@ -406,7 +408,7 @@ private fun CreateControls(
             placeholder = { Text(stringResource(R.string.board_id_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            enabled = !isUploading,
+            enabled = !isUploading && !isProcessing,
             shape = RoundedCornerShape(16.dp),
             colors = getAppTextFieldColors(),
             leadingIcon = { Icon(EvaIcons.Outline.Flash, contentDescription = null) }
@@ -419,17 +421,21 @@ private fun CreateControls(
             modifier = Modifier
                 .height(56.dp)
                 .fillMaxWidth(),
-            enabled = numChosen == numRequired && gameName.isNotBlank() && gameName.length >= 3 && !isUploading,
+            enabled = numChosen == numRequired && gameName.isNotBlank() && gameName.length >= 3 && !isUploading && !isProcessing,
             shape = RoundedCornerShape(16.dp)
         ) {
-            if (isUploading) {
+            if (isUploading || isProcessing) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 3.dp
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(stringResource(R.string.saving_board), fontWeight = FontWeight.Black)
+                Text(
+                    if (isProcessing) stringResource(R.string.finalizing_board)
+                    else stringResource(R.string.saving_board),
+                    fontWeight = FontWeight.Black
+                )
             } else {
                 Icon(
                     if (isEdit) EvaIcons.Outline.Save else EvaIcons.Outline.CloudUpload,
@@ -444,10 +450,10 @@ private fun CreateControls(
             }
         }
 
-        if (isUploading) {
+        if (isUploading || isProcessing) {
             Spacer(modifier = Modifier.height(16.dp))
             LinearProgressIndicator(
-                progress = { uploadProgress / 100f },
+                progress = { if (isProcessing) 0f else uploadProgress / 100f },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(CircleShape),

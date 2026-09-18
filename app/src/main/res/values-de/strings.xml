@@ -144,6 +144,7 @@
     <string name="board_identity_label">Board-Identität</string>
     <string name="board_id_placeholder">z.B. Familienurlaub</string>
     <string name="saving_board">BOARD WIRD GESPEICHERT…</string>
+    <string name="finalizing_board">BOARD WIRD VERARBEITET…</string>
     <string name="create_and_play">ERSTELLEN &amp; SPIELEN</string>
     <string name="board_ready_title">Board bereit! 🎉</string>
     <string name="board_ready_message">Dein Board \'%1$s\' ist spielbereit und lokal gespeichert.</string>

@@ -2,12 +2,9 @@ package com.umrhsn.mmoire.activities
 
 import android.Manifest
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,19 +19,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.core.content.IntentCompat
-import androidx.core.graphics.createBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.BoardSize
-import com.umrhsn.mmoire.networking.BitmapScaler
 import com.umrhsn.mmoire.ui.screens.CreateScreen
 import com.umrhsn.mmoire.ui.theme.MemoireTheme
 import com.umrhsn.mmoire.utils.EXTRA_BOARD_SIZE
 import com.umrhsn.mmoire.utils.EXTRA_EDIT_GAME_NAME
+import com.umrhsn.mmoire.utils.PickMultipleVisualMediaWithLimit
 import com.umrhsn.mmoire.utils.isPermissionGranted
 import com.umrhsn.mmoire.viewmodels.CreateViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.ByteArrayOutputStream
 
 @AndroidEntryPoint
 class CreateActivity : ComponentActivity() {
@@ -52,7 +47,7 @@ class CreateActivity : ComponentActivity() {
     private var oldGameName: String? = null
 
     private val multiplePhotoPickerLauncher =
-        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(20)) { uris ->
+        registerForActivityResult(PickMultipleVisualMediaWithLimit()) { uris ->
             uris.forEach { uri ->
                 if (chosenImageUris.size < numImagesRequired && !chosenImageUris.contains(uri)) {
                     chosenImageUris.add(uri)
@@ -174,32 +169,16 @@ class CreateActivity : ComponentActivity() {
         if (index != -1) {
             singlePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         } else {
-            multiplePhotoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            multiplePhotoPickerLauncher.launch(
+                PickMultipleVisualMediaWithLimit.Request(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                    pickerLimit
+                )
+            )
         }
     }
 
     private fun handleSaveClick(gameName: String) {
-        // If we are editing, we might have mixed local Uris and raw Bitmaps if we pick new ones.
-        // For simplicity, we'll re-process all Uris into byte arrays.
-        val byteArrays = chosenImageUris.map { getImageByteArray(it) }
-        viewModel.createGame(gameName, byteArrays, oldGameName)
-    }
-
-    private fun getImageByteArray(photoUri: Uri): ByteArray {
-        val originalBitmap = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                val source = ImageDecoder.createSource(contentResolver, photoUri)
-                ImageDecoder.decodeBitmap(source)
-            } else {
-                @Suppress("DEPRECATION")
-                MediaStore.Images.Media.getBitmap(contentResolver, photoUri)
-            }
-        } catch (e: Exception) {
-            createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-        }
-        val scaledBitmap = BitmapScaler.scaleToFitHeight(originalBitmap, 250)
-        val byteOutputStream = ByteArrayOutputStream()
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteOutputStream)
-        return byteOutputStream.toByteArray()
+        viewModel.createGame(contentResolver, gameName, chosenImageUris, oldGameName)
     }
 }
