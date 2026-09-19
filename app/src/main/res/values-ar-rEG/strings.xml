@@ -176,6 +176,7 @@
     <string name="finalize_board">خلص اللوحة</string>
 
     <!-- Toasts & Errors -->
+    <string name="error">خطأ</string>
     <string name="already_won">انت كسبت أصلاً</string>
     <string name="invalid_move">حركة غلط!</string>
     <string name="congratulations">مبروك! كسبت!</string>

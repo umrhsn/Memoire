@@ -294,6 +294,29 @@ fun CreateScreen(
                 }
             }
         }
+
+        if (uiState.errorMessage != null) {
+            AppDialog(
+                onDismissRequest = { viewModel.resetState() },
+                title = stringResource(R.string.error),
+                icon = EvaIcons.Outline.AlertTriangle
+            ) {
+                Text(
+                    text = stringResource(uiState.errorMessage!!, uiState.errorArg ?: ""),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Button(
+                    onClick = { viewModel.resetState() },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            }
+        }
     }
 }
 

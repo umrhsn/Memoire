@@ -165,6 +165,7 @@
     <string name="finalize_board">Board fertigstellen</string>
 
     <!-- Toasts & Errors -->
+    <string name="error">Fehler</string>
     <string name="already_won">Du hast bereits gewonnen</string>
     <string name="invalid_move">Ungültiger Zug!</string>
     <string name="congratulations">Du hast gewonnen! Herzlichen Glückwunsch!</string>

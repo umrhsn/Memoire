@@ -168,6 +168,7 @@
     <string name="finalize_board">Finaliser le plateau</string>
 
     <!-- Toasts & Errors -->
+    <string name="error">Erreur</string>
     <string name="already_won">Vous avez déjà gagné</string>
     <string name="invalid_move">Mouvement invalide !</string>
     <string name="congratulations">Vous avez gagné ! Félicitations !</string>

@@ -168,6 +168,7 @@
     <string name="finalize_board">Finalizar tablero</string>
 
     <!-- Toasts & Errors -->
+    <string name="error">Error</string>
     <string name="already_won">Ya has ganado</string>
     <string name="invalid_move">¡Movimiento inválido!</string>
     <string name="congratulations">¡Ganaste! ¡Felicidades!</string>

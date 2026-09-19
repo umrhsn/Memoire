@@ -101,18 +101,24 @@ class CreateViewModel @Inject constructor(
 
     fun loadGame(gameName: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, errorArg = null) }
             val userImageList = repository.getGame(gameName)
-            if (userImageList != null) {
+            if (userImageList?.images != null && userImageList.images.isNotEmpty()) {
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
                         gameName = gameName,
-                        initialUris = userImageList.images?.map { Uri.parse(it) } ?: emptyList()
+                        initialUris = userImageList.images.map { Uri.parse(it) }
                     )
                 }
             } else {
-                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = R.string.game_not_found,
+                        errorArg = gameName
+                    )
+                }
             }
         }
     }

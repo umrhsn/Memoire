@@ -88,6 +88,46 @@ class CreateViewModelTest {
     }
 
     @Test
+    fun `loadGame with non-existent game sets error state`() = runTest(testDispatcher) {
+        val gameName = "missingGame"
+        whenever(repository.getGame(gameName)).thenReturn(null)
+
+        viewModel.uiState.test {
+            awaitItem() // Initial
+            viewModel.loadGame(gameName)
+
+            var lastState = awaitItem()
+            while (lastState.isLoading) {
+                lastState = awaitItem()
+            }
+
+            assertEquals(com.umrhsn.mmoire.R.string.game_not_found, lastState.errorMessage)
+            assertEquals(gameName, lastState.errorArg)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `loadGame with empty images list sets error state`() = runTest(testDispatcher) {
+        val gameName = "emptyGame"
+        whenever(repository.getGame(gameName)).thenReturn(UserImageList(emptyList()))
+
+        viewModel.uiState.test {
+            awaitItem() // Initial
+            viewModel.loadGame(gameName)
+
+            var lastState = awaitItem()
+            while (lastState.isLoading) {
+                lastState = awaitItem()
+            }
+
+            assertEquals(com.umrhsn.mmoire.R.string.game_not_found, lastState.errorMessage)
+            assertEquals(gameName, lastState.errorArg)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `createGame success updates state`() = runTest(testDispatcher) {
         val gameName = "newGame"
         val uris = listOf(Uri.parse("content://media/external/images/media/1"))
