@@ -95,11 +95,13 @@
     <string name="language">لغة التطبيق</string>
     <string name="lang_system">لغة النظام</string>
     <string name="lang_ar_eg">العربية المصرية (فاكر؟)</string>
+    <string name="lang_ar_sy">العربية السورية (متذكر؟)</string>
     <string name="lang_ar">العربية الفصحى (ذاكرة)</string>
     <string name="lang_en">English</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Español</string>
+    <string name="lang_it">Italiano</string>
     <string name="color_theme">لون التطبيق</string>
     <string name="color_default">افتراضي</string>
     <string name="color_red">أحمر</string>

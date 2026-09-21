@@ -92,11 +92,13 @@
     <string name="language">Langue de l\'application</string>
     <string name="lang_system">Langue du système</string>
     <string name="lang_ar_eg">Arabe égyptien (فاكر؟)</string>
+    <string name="lang_ar_sy">Arabe syrien (متذكر؟)</string>
     <string name="lang_ar">Arabe standard (ذاكرة)</string>
     <string name="lang_en">Anglais</string>
     <string name="lang_fr">Français</string>
     <string name="lang_de">Allemand</string>
     <string name="lang_es">Espagnol</string>
+    <string name="lang_it">Italiano</string>
     <string name="color_theme">Thème de couleur</string>
     <string name="color_default">Par défaut</string>
     <string name="color_red">Rouge</string>

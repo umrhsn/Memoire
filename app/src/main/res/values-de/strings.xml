@@ -91,11 +91,13 @@
     <string name="language">App-Sprache</string>
     <string name="lang_system">Systemsprache</string>
     <string name="lang_ar_eg">Ägyptisches Arabisch (فاكر؟)</string>
+    <string name="lang_ar_sy">Syrisches Arabisch (متذكر؟)</string>
     <string name="lang_ar">Standard-Arabisch (ذاكرة)</string>
     <string name="lang_en">Englisch</string>
     <string name="lang_fr">Französisch</string>
     <string name="lang_de">Deutsch</string>
     <string name="lang_es">Spanisch</string>
+    <string name="lang_it">Italiano</string>
     <string name="color_theme">Farbschema</string>
     <string name="color_default">Standard</string>
     <string name="color_red">Rot</string>

@@ -58,10 +58,14 @@ class SettingsViewModel @Inject constructor(
     fun confirmLanguageChange() {
         val lang = _uiState.value.pendingLanguage
         Log.d(TAG, "confirmLanguageChange: confirming change to [$lang]")
-        localeManager.applyLanguageTag(lang)
+
+        // Normalize Syrian Arabic tag to ar-SY if it's ar-rSY
+        val finalLang = if (lang == "ar-rSY") "ar-SY" else lang
+
+        localeManager.applyLanguageTag(finalLang)
         _uiState.update {
             it.copy(
-                currentLanguage = lang,
+                currentLanguage = finalLang,
                 showRestartDialog = false,
                 pendingLanguage = null
             )

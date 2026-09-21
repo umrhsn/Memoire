@@ -1,0 +1,187 @@
+<resources>
+    <string name="app_name">Mémoire</string>
+
+    <!-- Board Sizes -->
+    <string name="size_super_duper_easy">Super Facilissimo</string>
+    <string name="size_super_easy">Super Facile</string>
+    <string name="size_easy">Facile</string>
+    <string name="size_medium">Medio</string>
+    <string name="size_hard">Difficile</string>
+    <string name="size_super_hard">Super Difficile</string>
+    <string name="size_super_duper_hard">Super Difficilissimo</string>
+
+    <!-- General -->
+    <string name="cancel">Annulla</string>
+    <string name="close">Chiudi</string>
+    <string name="ok">OK</string>
+    <string name="back">Indietro</string>
+    <string name="remove">Rimuovi</string>
+    <string name="delete">Elimina</string>
+    <string name="search">Cerca</string>
+    <string name="play">Gioca</string>
+    <string name="start_game">INIZIA PARTITA</string>
+    <string name="maybe_later">FORSE DOPO</string>
+    <string name="play_again">Gioca Ancora</string>
+    <string name="next">Avanti</string>
+    <string name="finish">Fine</string>
+    <string name="skip">Salta</string>
+    <string name="help">Aiuto</string>
+    <string name="settings">Impostazioni</string>
+    <string name="more_options">Altre Opzioni</string>
+
+    <!-- Accessibility / Labels -->
+    <string name="gameTransition_label" translatable="false">gameTransition</string>
+    <string name="cardFlip_label" translatable="false">cardFlip</string>
+    <string name="cardEntryScale_label" translatable="false">cardEntryScale</string>
+    <string name="cardEntryAlpha_label" translatable="false">cardEntryAlpha</string>
+    <string name="face_up">A faccia in su</string>
+    <string name="face_down">A faccia in giù</string>
+    <string name="preview_desc">Anteprima</string>
+    <string name="remove_desc">Rimuovi</string>
+    <string name="add_image_desc">Aggiungi immagine</string>
+
+    <!-- Main Screen -->
+    <string name="reset_game">Riavvia</string>
+    <string name="change_size">Livello</string>
+    <string name="create_game">Crea</string>
+    <string name="create_custom_game">Crea Partita Personalizzata</string>
+    <string name="load_game">Carica Locale</string>
+    <string name="game_finished">Partita Finita!</string>
+    <string name="perfect_win">Vittoria Perfetta! 🏆</string>
+    <plurals name="win_message_plural">
+        <item quantity="one">Incredibile! Hai completato il tabellone in 1 mossa.</item>
+        <item quantity="other">Incredibile! Hai completato il tabellone in %1$d mosse.</item>
+    </plurals>
+    <string name="choose_level">Scegli Livello</string>
+    <string name="cards_count">%1$d carte</string>
+    <string name="pairs_count">%1$d coppie</string>
+    <string name="cards_pairs_info">%1$d carte • %2$d coppie</string>
+    <string name="pairs_progress">%1$d/%2$d</string>
+    <string name="moves_count">%1$d</string>
+    <string name="edit">Modifica</string>
+    <string name="sort">Ordina</string>
+    <string name="search_boards">Cerca tabelloni…</string>
+    <string name="sort_latest">Più recenti</string>
+    <string name="sort_oldest">Meno recenti</string>
+    <string name="sort_name_asc">Nome (A-Z)</string>
+    <string name="sort_name_desc">Nome (Z-A)</string>
+    <string name="sort_pairs">Numero di Coppie</string>
+    <string name="created_at">Creato il: %1$s</string>
+    <string name="edit_board">Modifica Tabellone</string>
+    <string name="update_and_play">AGGIORNA E GIOCA</string>
+    <string name="timer_format">%1$02d:%2$02d</string>
+    <string name="duration_seconds">%1$d s</string>
+    <string name="duration_minutes_seconds">%1$d m %2$d s</string>
+    <string name="best_time_label">Migliore: %1$s</string>
+    <string name="current_record_info">Nuovo Record Personale! 🏆</string>
+    <string name="moves_tracking_label">Mosse effettuate</string>
+    <string name="pairs_tracking_label">Coppie trovate</string>
+    <string name="timer_tracking_label">Tempo trascorso</string>
+    <string name="best_time_tracking_label">Tempo migliore</string>
+
+    <!-- Settings -->
+    <string name="app_settings">Impostazioni App</string>
+    <string name="audio_settings">Audio e Feedback</string>
+    <string name="sound_enabled">Suoni del Gioco</string>
+    <string name="personalization">Personalizzazione</string>
+    <string name="theme">Tema App</string>
+    <string name="theme_system">Segui Sistema</string>
+    <string name="theme_light">Modalità Chiara</string>
+    <string name="theme_dark">Modalità Scura</string>
+    <string name="language">Lingua dell\'App</string>
+    <string name="lang_system">Segui Sistema</string>
+    <string name="lang_ar_eg">Arabo Egiziano (فاكر؟)</string>
+    <string name="lang_ar_sy">Arabo Siriano (متذكر؟)</string>
+    <string name="lang_ar">Arabo Standard (ذاكرة)</string>
+    <string name="lang_en">English</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_it">Italiano</string>
+    <string name="color_theme">Tema Colore</string>
+    <string name="color_default">Predefinito</string>
+    <string name="color_red">Rosso</string>
+    <string name="color_blue">Blu</string>
+    <string name="color_green">Verde</string>
+    <string name="color_orange">Arancione</string>
+    <string name="background_tint">Tinta Sfondo</string>
+    <string name="card_tint">Tinta Carte</string>
+    <string name="high_visibility_mode">Modalità ad alta visibilità</string>
+    <string name="high_visibility_mode_desc">Aggiunge icone ed etichette per distinguere meglio colori e stati del gioco.</string>
+    <string name="restart_required_title">Riavvio Richiesto</string>
+    <string name="restart_required_message">L\'app deve essere riavviata per applicare le nuove impostazioni di lingua. Riavviare ora?</string>
+    <string name="restart_now">RIAVVIA ORA</string>
+
+    <!-- Tutorial -->
+    <string name="tut_welcome_title">Benvenuto in Mémoire! 🏺</string>
+    <string name="tut_welcome_desc">Una sfida di memoria pensata per concentrazione e velocità. Facciamo un giro!</string>
+    <string name="tut_hub_title">Pannello di Controllo</string>
+    <string name="tut_hub_desc">Usa queste icone per riavviare il gioco, cambiare livello o accedere ad altre opzioni.</string>
+    <string name="tut_board_title">Tabellone di Memoria</string>
+    <string name="tut_board_desc">Qui avviene la magia. Tocca le carte per girarle e trovare le coppie corrispondenti.</string>
+    <string name="tut_stats_title">Prestazioni in Tempo Reale</string>
+    <string name="tut_stats_desc">Tieni traccia di mosse e coppie qui. Cerca di vincere nel minor numero di mosse!</string>
+    <string name="tut_timer_title">Tempo e Record</string>
+    <string name="tut_timer_desc">Tieni d\'occhio il timer! I tuoi tempi migliori vengono salvati automaticamente per ogni livello.</string>
+    <string name="tut_race_title">Sfida a 2 Giocatori</string>
+    <string name="tut_race_desc">Sfidati con un amico! Attiva la modalità 2 Giocatori nel menu dei livelli per gareggiare sullo stesso dispositivo.</string>
+    <string name="tut_help_title">Aiuto in Qualsiasi Momento</string>
+    <string name="tut_help_desc">Hai bisogno di un ripasso? Tocca l\'icona \'?\' in qualsiasi momento per rivedere questa guida.</string>
+
+    <!-- Browse Screen -->
+    <string name="saved_boards">Tabelloni Salvati</string>
+    <string name="no_saved_games">Nessun Gioco Salvato</string>
+    <string name="create_first_board">Crea il tuo primo tabellone personalizzato per vederlo qui.</string>
+    <string name="board_gallery">Galleria Tabelloni</string>
+    <plurals name="contains_pairs_plural">
+        <item quantity="one">Contiene 1 coppia unica</item>
+        <item quantity="other">Contiene %1$d coppie uniche</item>
+    </plurals>
+    <string name="pairs_label">%1$d Coppie</string>
+    <string name="more_images_count">+%1$d</string>
+
+    <!-- Create Screen -->
+    <string name="new_board">Nuovo Tabellone</string>
+    <string name="step_1_title">Passo 1: Scegli le Foto</string>
+    <plurals name="step_1_subtitle_plural">
+        <item quantity="one">Seleziona 1 coppia per il tuo tabellone.</item>
+        <item quantity="other">Seleziona %1$d coppie per il tuo tabellone.</item>
+    </plurals>
+    <string name="step_2_title">Passo 2: Dai un Nome alla Partita</string>
+    <string name="step_2_subtitle">Dagli un nome unico per ritrovarlo più tardi.</string>
+    <string name="board_identity_label">Nome del Tabellone</string>
+    <string name="board_id_placeholder">es., Vacanze in Famiglia</string>
+    <string name="saving_board">SALVATAGGIO TABELLONE…</string>
+    <string name="finalizing_board">COMPLETAMENTO TABELLONE…</string>
+    <string name="create_and_play">CREA E GIOCA</string>
+    <string name="board_ready_title">Tabellone Pronto! 🎉</string>
+    <string name="board_ready_message">Il tuo tabellone \'%1$s\' è pronto. È stato salvato nella memoria locale.</string>
+    <string name="name_exists_title">Nome Già Esistente 😕</string>
+    <string name="name_exists_message">Esiste già un tabellone chiamato \'%1$s\'. Prova con un altro nome.</string>
+    <string name="change_name_action">OK, CAMBIA NOME</string>
+    <string name="no_photos_yet">Nessuna Foto Ancora</string>
+    <string name="no_photos_yet_subtitle">Seleziona immagini dalla tua galleria per creare il tabellone.</string>
+    <string name="open_gallery">APRI GALLERIA</string>
+    <string name="select_all_photos">Seleziona prima tutte le foto</string>
+    <string name="finalize_board">Completa tabellone</string>
+
+    <!-- Toasts & Errors -->
+    <string name="error">Errore</string>
+    <string name="already_won">Hai già vinto</string>
+    <string name="invalid_move">Mossa non valida!</string>
+    <string name="congratulations">Hai vinto! Congratulazioni!</string>
+    <string name="smooth_win_toast">Perfetto! Hai vinto senza fare nemmeno un errore!</string>
+    <string name="nothing_to_refresh">Niente da aggiornare qui</string>
+    <string name="permission_denied">Permesso negato. L\'accesso alle foto è richiesto.</string>
+    <string name="board_full">Il tabellone è già pieno</string>
+    <string name="game_not_found">Spiacenti, impossibile trovare un tabellone chiamato \'%1$s\'</string>
+    <string name="failed_to_save">Impossibile salvare: %1$s</string>
+    <string name="failed_to_create_db">Impossibile creare la voce del gioco nel database</string>
+
+    <!-- 2-Player Mode -->
+    <string name="two_player_mode">Modalità 2 Giocatori</string>
+    <string name="player_n">Giocatore %1$d</string>
+    <string name="score_value">Punteggio: %1$d</string>
+    <string name="winner_player_n">Il Giocatore %1$d Vince!</string>
+    <string name="draw_game">È un Pareggio!</string>
+</resources>

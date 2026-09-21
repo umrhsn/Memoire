@@ -25,7 +25,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs "en", "ar", "ar-rEG", "de", "fr", "es"
+        resConfigs "en", "ar", "ar-rEG", "ar-rSY", "de", "fr", "es", "it"
     }
 
     signingConfigs {

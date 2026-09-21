@@ -1,6 +1,5 @@
 package com.umrhsn.mmoire.activities
 
-import android.R
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -28,6 +27,7 @@ import com.umrhsn.mmoire.utils.showToastSmoothWin
 import com.umrhsn.mmoire.utils.showToastYouWon
 import com.umrhsn.mmoire.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -36,7 +36,19 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(newBase)
+        val prefs = newBase.getSharedPreferences("memoire_prefs", MODE_PRIVATE)
+        val localeTag = prefs.getString("app_language", null)
+        val context = if (localeTag != null) {
+            val locale = Locale.forLanguageTag(localeTag)
+            Locale.setDefault(locale)
+            val config = newBase.resources.configuration
+            config.setLocale(locale)
+            config.setLayoutDirection(locale)
+            newBase.createConfigurationContext(config)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
     }
 
     override fun onStart() {
@@ -97,7 +109,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun triggerWinEffects(isSmoothWin: Boolean) {
-        val rootView = window.decorView.findViewById<ViewGroup>(R.id.content)
+        val rootView = window.decorView.findViewById<ViewGroup>(android.R.id.content)
         if (isSmoothWin) {
             showToastSmoothWin(this)
             rainingConfettiLong(rootView)

@@ -356,11 +356,13 @@ private fun LanguageSection(
             val languages = listOf(
                 null to stringResource(R.string.lang_system) to "🌐",
                 "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
+                "ar-SY" to stringResource(R.string.lang_ar_sy) to "🇸🇾",
                 "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
                 "en" to stringResource(R.string.lang_en) to "🇺🇸",
                 "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
                 "de" to stringResource(R.string.lang_de) to "🇩🇪",
-                "es" to stringResource(R.string.lang_es) to "🇪🇸"
+                "es" to stringResource(R.string.lang_es) to "🇪🇸",
+                "it" to stringResource(R.string.lang_it) to "🇮🇹"
             )
 
             languages.forEach { (langData, emoji) ->
