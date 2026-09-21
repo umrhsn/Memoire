@@ -1,7 +1,10 @@
 package com.umrhsn.mmoire.ui.screens
 
 import androidx.activity.ComponentActivity
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,19 +37,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.umrhsn.mmoire.R
 import com.umrhsn.mmoire.models.AppColorTheme
@@ -76,6 +81,26 @@ import compose.icons.evaicons.outline.Refresh
 import compose.icons.evaicons.outline.Sun
 import compose.icons.evaicons.outline.VolumeOff
 import compose.icons.evaicons.outline.VolumeUp
+
+@Immutable
+private data class LanguageOption(
+    val tag: String?,
+    @StringRes val labelRes: Int,
+    @DrawableRes val flagRes: Int? = null,
+    val icon: ImageVector? = null
+)
+
+private val LanguageOptions = listOf(
+    LanguageOption(null, R.string.lang_system, icon = EvaIcons.Outline.Globe2),
+    LanguageOption("ar-EG", R.string.lang_ar_eg, R.drawable.flag_eg),
+    LanguageOption("ar-SY", R.string.lang_ar_sy, R.drawable.flag_sy),
+    LanguageOption("ar", R.string.lang_ar, R.drawable.flag_sa),
+    LanguageOption("en", R.string.lang_en, R.drawable.flag_us),
+    LanguageOption("fr", R.string.lang_fr, R.drawable.flag_fr),
+    LanguageOption("de", R.string.lang_de, R.drawable.flag_de),
+    LanguageOption("es", R.string.lang_es, R.drawable.flag_es),
+    LanguageOption("it", R.string.lang_it, R.drawable.flag_it),
+)
 
 @Composable
 fun SettingsScreen(
@@ -353,25 +378,13 @@ private fun LanguageSection(
         icon = EvaIcons.Outline.Globe2
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            val languages = listOf(
-                null to stringResource(R.string.lang_system) to "🌐",
-                "ar-EG" to stringResource(R.string.lang_ar_eg) to "🇪🇬",
-                "ar-SY" to stringResource(R.string.lang_ar_sy) to "🇸🇾",
-                "ar" to stringResource(R.string.lang_ar) to "🇸🇦",
-                "en" to stringResource(R.string.lang_en) to "🇺🇸",
-                "fr" to stringResource(R.string.lang_fr) to "🇫🇷",
-                "de" to stringResource(R.string.lang_de) to "🇩🇪",
-                "es" to stringResource(R.string.lang_es) to "🇪🇸",
-                "it" to stringResource(R.string.lang_it) to "🇮🇹"
-            )
-
-            languages.forEach { (langData, emoji) ->
-                val (tag, label) = langData
+            LanguageOptions.forEach { option ->
                 SettingsOption(
-                    label = label,
-                    selected = currentLanguage == tag,
-                    onClick = { onUpdate(tag) },
-                    emoji = emoji
+                    label = stringResource(option.labelRes),
+                    selected = currentLanguage == option.tag,
+                    onClick = { onUpdate(option.tag) },
+                    icon = option.icon,
+                    flagRes = option.flagRes
                 )
             }
         }
@@ -530,7 +543,7 @@ private fun SettingsToggle(
 
 @Composable
 private fun LanguageFlag(
-    emoji: String,
+    @DrawableRes flagRes: Int,
     selected: Boolean
 ) {
     Surface(
@@ -546,11 +559,13 @@ private fun LanguageFlag(
         )
     ) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = emoji,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 2.dp) // Offset emoji vertical alignment
+            Image(
+                painter = painterResource(flagRes),
+                contentDescription = null, // decorative; the label text sits right next to it
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
             )
         }
     }
@@ -562,7 +577,7 @@ private fun SettingsOption(
     selected: Boolean,
     onClick: () -> Unit,
     icon: ImageVector? = null,
-    emoji: String? = null
+    @DrawableRes flagRes: Int? = null
 ) {
     Surface(
         modifier = Modifier
@@ -612,8 +627,8 @@ private fun SettingsOption(
                         )
                     }
                 }
-            } else if (emoji != null) {
-                LanguageFlag(emoji = emoji, selected = selected)
+            } else if (flagRes != null) {
+                LanguageFlag(flagRes = flagRes, selected = selected)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
