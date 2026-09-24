@@ -127,9 +127,9 @@
     <string name="tut_stats_title">الأداء المباشر</string>
     <string name="tut_stats_desc">تابع حركاتك والأزواج اللي لقيتها هنا. حاول تفوز بأقل عدد حركات!</string>
     <string name="tut_timer_title">الوقت والأرقام القياسية</string>
-    <string name="tut_timer_desc">خلي عينك على التايمر! أحسن أوقاتك بتتحفظ أوتوماتيك لكل مستوى.</string>
+    <string name="tut_timer_desc">خلي عينك على التايمر! أوقاتك بتتحفظ أوتوماتيك لكل مستوى.</string>
     <string name="tut_race_title">سباق مع حد</string>
-    <string name="tut_race_desc">تحدى صاحبك! شغل وضع الـ 2-Player من قائمة المستويات وابقوا في سباق مع بعض على نفس الموبايل.</string>
+    <string name="tut_race_desc">اتحدى صاحبك! شغل وضع اللعب مع حد من قائمة المستويات وابقوا في سباق مع بعض على نفس الموبايل.</string>
     <string name="tut_help_title">مساعدة في أي وقت</string>
     <string name="tut_help_desc">محتاج تفتكر حاجة؟ دوس على علامة الاستفهام دي في أي وقت عشان تشوف الدليل ده تاني.</string>
 
@@ -165,6 +165,7 @@
     <string name="board_identity_label">اسم اللعبة</string>
     <string name="board_id_placeholder">مثلاً: صور العيلة</string>
     <string name="saving_board">بنحفظ اللعبة…</string>
+    <string name="finalizing_board">بنجهز اللوحة…</string>
     <string name="create_and_play">اعمل والعب</string>
     <string name="board_ready_title">اللعبة جاهزة! 🎉</string>
     <string name="board_ready_message">لعبتك \'%1$s\' جاهزة. اتحفظت عندك في الموبايل.</string>
@@ -195,5 +196,5 @@
     <string name="player_n">لاعب %1$d</string>
     <string name="score_value">نقط: %1$d</string>
     <string name="winner_player_n">لاعب %1$d كسب!</string>
-    <string name="draw_game">تعادل يا رجالة!</string>
+    <string name="draw_game">طلعت تعادل!</string>
 </resources>
